@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 6.0.2, 2024-11-19T14:25:16. -->
+<!-- Written by QtCreator 6.0.2, 2024-11-20T09:24:32. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -236,8 +236,8 @@
     <valuelist type="QVariantList" key="CustomOutputParsers"/>
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/user/Documents/qt-projects/qt-server-vmp-test-src/qt-server-vmp-test/qt-server-vmp-test.pro</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/user/Documents/qt-projects/qt-server-vmp-test-src/qt-server-vmp-test/qt-server-vmp-test.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/user/Documents/qt-vmp-projects/qt-server-vmp-test-src/qt-server-vmp-test/qt-server-vmp-test.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/user/Documents/qt-vmp-projects/qt-server-vmp-test-src/qt-server-vmp-test/qt-server-vmp-test.pro</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>

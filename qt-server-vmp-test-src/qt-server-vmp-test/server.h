@@ -2,7 +2,7 @@
 #define SERVER_H
 
 // qt
-#include <QDebug> // qInfo() etc
+#include <QDebug> // qInfo()
 
 // c/c++
 #include <iostream>

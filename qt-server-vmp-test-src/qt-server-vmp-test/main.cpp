@@ -9,8 +9,6 @@ int main(int argc, char *argv[])
     struct sockaddr_in addr_client;                  // for bind() and recvfrom()
     socklen_t addr_client_len = sizeof(addr_client); // for parameter in recvfrom()
 
-
-
     if (close(sockfd_commands) == -1)
     {
         qCritical() << "failed to close socket for receiving commands, error: " << std::strerror(errno);

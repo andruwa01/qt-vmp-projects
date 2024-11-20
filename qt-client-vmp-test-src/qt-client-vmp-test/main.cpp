@@ -3,7 +3,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    qSetMessagePattern("%{time [yyyy.MM.dd]} %{time [hh:mm:ss]} %{message}");
+    qSetMessagePattern("%{time [yyyy.MM.dd]} %{time [hh:mm:ss]} %{type} ====> %{message} ");
 
     int sockfd_commands;
     std::vector<char> rx_command_buffer(16, 0);

@@ -64,6 +64,8 @@ int sendDataToClient(const int& sockfd, const std::string& data)
     {
         qWarning() << "sendto(): bytes sent not equals to size of output message !";
     }
+
+    return 0;
 }
 
 int initRxTxSocketServer(int& sockfd, const int port_client, const int port_server)
