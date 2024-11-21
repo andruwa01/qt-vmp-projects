@@ -8,17 +8,18 @@ int main(int argc, char *argv[])
     int sockfd_commands;
     std::vector<char> rx_command_buffer(16, 0);
 
-    // Comment
-    std::string command = "command#1";
+// Comment
+//    std::string command_str = "command#1";
+//    std::vector<char> command(command_str.data(), command_str.data() + command_str.size() + 1);
 
     if (initRxTxSocketClient(sockfd_commands, PORT_CLIENT_COMMANDS, PORT_SERVER_COMMANDS) == -1)
     {
-        qCritical() << "initRxTxSocketClient(): failed, exit the program . . .";
+        qCritical() << "initRxTxSocketClient()" << ": failed, exit the program . . .";
         return -1;
     }
     else
     {
-        qInfo() << "socket for commands was created";
+        qInfo() << "initRxTxSocketClient()" << "socket for commands was created";
     }
 
     if (sendDataToServer(sockfd_commands, command) == -1)

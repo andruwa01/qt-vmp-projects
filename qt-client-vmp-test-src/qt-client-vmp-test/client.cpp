@@ -2,32 +2,33 @@
 
 int receiveDataFromServer(const int& sockfd, std::vector<char>& rx_buffer)
 {
-    qInfo() << "waits for data on " << IP_SERVER << ":" << PORT_SERVER_COMMANDS;
+    qInfo() << "waits for bytes on " << IP_SERVER << ":" << PORT_SERVER_COMMANDS;
+
     if (recv(sockfd, rx_buffer.data(), rx_buffer.size(), 0) == -1)
     {
         qCritical()<< "recvfrom(): " << std::strerror(errno);
         return -1;
     }
 
-    qInfo() << "server got data from: " << IP_SERVER << ":" << PORT_SERVER_COMMANDS << ", data ->";
+    qInfo() << "recvfrom(): " << "server got bytes from: " << IP_SERVER << ":" << PORT_SERVER_COMMANDS << ", data --->";
 
     return 0;
 }
 
-int sendDataToServer(const int& sockfd, const std::string& data)
+int sendDataToServer(const int& sockfd, const std::vector<char>& data)
 {
-    ssize_t bytes_sent = send(sockfd, data.c_str(), data.size(), 0);
+    ssize_t bytes_sent = send(sockfd, data.data(), data.size(), 0);
     if (bytes_sent == -1)
     {
         qCritical() << "sendto(): " << std::strerror(errno);
         return -1;
     }
 
-    qInfo() << "message of " << data.size() << " bytes sent";
+    qInfo() << "sendto(): " << "message of " << data.size() << " bytes sent";
 
     if (bytes_sent != (ssize_t)data.size())
     {
-        qWarning() << "sendto(): bytes sent not equals to size of output message !";
+        qWarning() << "sendto(): " << "sent bytes not equals to size of !";
     }
 
     return 0;
@@ -37,6 +38,7 @@ int sendDataToServer(const int& sockfd, const std::string& data)
 int initRxTxSocketClient(int& sockfd, const int port_client, const int port_server)
 {
     struct sockaddr_in hints;
+
     sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (sockfd == -1)
     {
@@ -44,7 +46,7 @@ int initRxTxSocketClient(int& sockfd, const int port_client, const int port_serv
         return -1;
     }
 
-    qInfo() << "socket for sending commands was created";
+    qInfo() << "socket(): " << "socket for sending bytes was created";
 
     std::memset(&hints, 0, sizeof(hints));
     hints.sin_family = AF_INET;
@@ -61,8 +63,6 @@ int initRxTxSocketClient(int& sockfd, const int port_client, const int port_serv
         close(sockfd);
         return -1;
     }
-
-    qInfo() << "bind(): socket was bound with port on client";
 
     std::memset(&hints, 0, sizeof(hints));
     hints.sin_family = AF_INET;

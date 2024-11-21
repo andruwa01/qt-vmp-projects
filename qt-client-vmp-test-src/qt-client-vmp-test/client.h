@@ -22,7 +22,7 @@
 #include "ipinfo.h" // for info about ip's and ports
 
 int receiveDataFromServer(const int& sockfd, std::vector<char>& rx_buffer);
-int sendDataToServer(const int& sockfd, const std::string& data);
+int sendDataToServer(const int& sockfd, const std::vector<char>& data);
 int initRxTxSocketClient(int& sockfd, const int port_client, const int port_server);
 void printPackage(const std::vector<char>& vec);
 

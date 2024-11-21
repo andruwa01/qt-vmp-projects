@@ -1,1 +1,3 @@
 - [ ] refactor client and server app.
+	- [ ] makeCommand() create method
+- [ ] 
