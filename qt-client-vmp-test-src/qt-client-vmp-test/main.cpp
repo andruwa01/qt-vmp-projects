@@ -8,9 +8,8 @@ int main(int argc, char *argv[])
     int sockfd_commands;
     std::vector<char> rx_command_buffer(16, 0);
 
-// Comment
-//    std::string command_str = "command#1";
-//    std::vector<char> command(command_str.data(), command_str.data() + command_str.size() + 1);
+    std::string command_str = "command#1";
+    std::vector<char> command(command_str.data(), command_str.data() + command_str.size() + 1);
 
     if (initRxTxSocketClient(sockfd_commands, PORT_CLIENT_COMMANDS, PORT_SERVER_COMMANDS) == -1)
     {
@@ -43,7 +42,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    qInfo() << "socket for sending commands was closed";
+    qInfo() << "close(): " << "socket for sending commands was closed";
 
 //    MainWindow w;
 //    w.show();
