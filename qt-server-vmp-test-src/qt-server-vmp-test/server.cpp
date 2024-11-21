@@ -122,13 +122,16 @@ void printPackage(const std::vector<char>& vec)
 
     // print 16 places for elements in package
     std::cout << std::setw(11) << ""; // alining
-    for (size_t i = 0; i < 16; i++) {
+    for (size_t i = 0; i < 16; i++)
+    {
         std::cout << std::hex << std::setw(2) << std::setfill('0') << i << " ";  // print 16 offsets for 16 elements of package in hex format
     }
     std::cout << std::endl;
 
     // print rx_command_buffer
-    for (size_t i = 0; i < vec.size(); i += chunk_size) { // print offset of str in hex format
+    for (size_t i = 0; i < vec.size(); i += chunk_size)
+    {
+        // print offset of str in hex format
         std::cout << std::hex << std::setw(8) << std::setfill('0') << i << " | ";
 
         // print next 16 elements of package
