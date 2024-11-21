@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 
     if (initRxTxSocketClient(sockfd_commands, PORT_CLIENT_COMMANDS, PORT_SERVER_COMMANDS) == -1)
     {
-        qCritical() << "initRxTxSocketClient()" << ": failed, exit the program . . .";
+        qCritical() << "initRxTxSocketClient()" << ": failed, return the program . . .";
         return -1;
     }
     else
@@ -24,13 +24,13 @@ int main(int argc, char *argv[])
 
     if (sendDataToServer(sockfd_commands, command) == -1)
     {
-        qCritical() << "failed to send cmd to server, exit . . .";
+        qCritical() << "failed to send cmd to server, return . . .";
         return -1;
     }
 
     if (receiveDataFromServer(sockfd_commands, rx_command_buffer) == -1)
     {
-        qCritical() << "failed to receive data from server, exit . . .";
+        qCritical() << "failed to receive data from server, return . . .";
         return -1;
     }
 

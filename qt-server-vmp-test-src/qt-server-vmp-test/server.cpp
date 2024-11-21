@@ -6,7 +6,7 @@ int receiveDataFromClient(const int& sockfd, std::vector<char>& rx_buffer)
     struct timeval tv;
     int retval;
 
-       // watch fd of server to see when it has rx_buffer to read
+    // watch fd of server to see when it has rx_buffer to read
     FD_ZERO(&rfds_server);
 
     FD_SET(sockfd, &rfds_server);
@@ -111,7 +111,7 @@ int initRxTxSocketServer(int& sockfd, const int port_client, const int port_serv
         return -1;
     }
 
-    qInfo() << "connect(): socket was connected to port on client";
+    qInfo() << "connect(): " << "socket was connected to port on client";
 
     return 0;
 }
