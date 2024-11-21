@@ -1,2 +1,3 @@
 - [ ] refactor client and server app.
-- [ ] close()
+- [ ] manage close()
+- [ ] convert ssize_t -> size_t ok or not ? 
