@@ -79,8 +79,6 @@ int initRxTxSocketServer(int& sockfd, const int port_client, const int port_serv
         return -1;
     }
 
-    qInfo() << "socket for sending commands was created";
-
     std::memset(&hints, 0, sizeof(hints));
     hints.sin_family = AF_INET;
     hints.sin_port   = htons(port_server);

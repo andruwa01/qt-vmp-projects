@@ -51,7 +51,7 @@ int initRxTxSocketClient(int& sockfd, const int port_client, const int port_serv
     std::memset(&hints, 0, sizeof(hints));
     hints.sin_family = AF_INET;
     hints.sin_port   = htons(port_client);
-    if (inet_pton(AF_INET, IP_CLIENT, &hints.sin_addr.s_addr) == -1)
+    if (inet_pton(AF_INET, IP_CLIENT, &(hints.sin_addr.s_addr)) == -1)
     {
         qCritical() << "inet_pton(): " << std::strerror(errno);
         return -1;
