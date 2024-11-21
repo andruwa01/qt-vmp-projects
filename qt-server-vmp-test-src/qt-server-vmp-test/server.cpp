@@ -27,7 +27,7 @@ int receiveDataFromClient(const int& sockfd, std::vector<char>& rx_buffer)
     }
     else if (retval)
     {
-        qInfo() << "select(): "<< "server is ready to read commands";
+        qInfo() << "select(): " << "server is ready to read commands";
     }
     else
     {
@@ -47,7 +47,7 @@ int receiveDataFromClient(const int& sockfd, std::vector<char>& rx_buffer)
     return 0;
 }
 
-int sendDataToClient(const int& sockfd, const std::string& data)
+int sendDataToClient(const int& sockfd, const std::vector<char>& data)
 {
     qWarning() << "sending response back";
     ssize_t bytes_sent = send(sockfd, data.data(), data.size(), 0);
@@ -142,23 +142,3 @@ void printPackage(const std::vector<char>& vec)
         std::cout << std::endl;  // go next 16 elements
     }
 }
-
-/*int main()
-{
-    std::vector<char> rx_command_buffer(16, 0);
-    std::vector<char> data_buffer(512, 0);
-
-    printPackage(rx_command_buffer);
-
-
-
-    if (close(sockfd_commands) == -1)
-    {
-        qCritical() << "failed to close socket for receiving commands, error: " << std::strerror(errno);
-        return -1;
-    }
-
-    qInfo() << "socket for receiving commands was closed";
-
-    return 0;
-}*/;
