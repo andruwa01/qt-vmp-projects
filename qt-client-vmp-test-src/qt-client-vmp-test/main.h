@@ -1,9 +1,12 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include <QApplication>
-#include <iostream>
+// c/c++
 
+// qt
+#include <QApplication>
+
+// others
 #include "mainwindow.h"
 #include "client.h"
 

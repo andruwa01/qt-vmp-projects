@@ -1,9 +1,6 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-// qt
-#include <QDebug> // for qInfo() etc.
-
 // c/c++
 #include <iostream>
 #include <cerrno>  // errno
@@ -12,14 +9,17 @@
 #include <vector>
 
 // Networking libraries
-#include <sys/types.h>
-#include <sys/socket.h>
+#include <sys/types.h>	// size_t
+#include <sys/socket.h> // socket()
 #include <netinet/in.h> // sockaddr_in
 #include <arpa/inet.h>  // htons, inet_pton
 
-// Costum libraries
-#include <iomanip>
-#include "ipinfo.h" // for info about ip's and ports
+// qt
+#include <QDebug> // qInfo() etc.
+
+// costum libraries
+#include <iomanip>  // setw
+#include "ipinfo.h" // ip addresses
 
 int receiveDataFromServer(const int& sockfd, std::vector<char>& rx_buffer);
 int sendDataToServer(const int& sockfd, const std::vector<char>& data);

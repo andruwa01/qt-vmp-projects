@@ -2,12 +2,13 @@
 
 int main(int argc, char *argv[])
 {
-    qSetMessagePattern("%{time [yyyy.MM.dd]} %{time [hh:mm:ss]} %{message}");
+    qSetMessagePattern("%{time [yyyy.MM.dd]} %{time [hh:mm:ss]} ====> %{message}");
     QApplication a(argc, argv);
 
-    int sockfd_commands, sockfd_server_data;         // for socket()
-    struct sockaddr_in addr_client;                  // for bind() and recvfrom()
-    socklen_t addr_client_len = sizeof(addr_client); // for parameter in recvfrom()
+    int sockfd_commands;
+//    int sockfd_commands, sockfd_server_data;         // for socket()
+//    struct sockaddr_in addr_client;                  // for bind() and recvfrom()
+//    socklen_t addr_client_len = sizeof(addr_client); // for parameter in recvfrom()
 
     std::vector<char> rx_buffer(16, 0);
 

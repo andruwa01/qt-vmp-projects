@@ -35,14 +35,14 @@ int receiveDataFromClient(const int& sockfd, std::vector<char>& rx_buffer)
         return -1;
     }
 
-    qInfo() << "recvfrom() waits for data on " << IP_SERVER << ":" << PORT_SERVER_COMMANDS;
+    qInfo() << "recvfrom(): " << "waits for data on " << IP_SERVER << ":" << PORT_SERVER_COMMANDS;
     if (recv(sockfd, rx_buffer.data(), rx_buffer.size(), 0) == -1)
     {
         qCritical() << "recvfrom(): " << std::strerror(errno);
         return -1;
     }
 
-    qInfo() << "server got command from: " << IP_CLIENT << ":" << PORT_CLIENT_COMMANDS << ", data ->";
+    qInfo() << "recvfrom(): " << "server got command from: " << IP_CLIENT << ":" << PORT_CLIENT_COMMANDS << ", data ->";
 
     return 0;
 }

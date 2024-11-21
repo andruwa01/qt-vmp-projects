@@ -2,7 +2,7 @@
 
 int receiveDataFromServer(const int& sockfd, std::vector<char>& rx_buffer)
 {
-    qInfo() << "waits for bytes on " << IP_SERVER << ":" << PORT_SERVER_COMMANDS;
+    qInfo() << "recvfrom(): " << "waits for bytes on " << IP_SERVER << ":" << PORT_SERVER_COMMANDS;
 
     if (recv(sockfd, rx_buffer.data(), rx_buffer.size(), 0) == -1)
     {
@@ -33,7 +33,6 @@ int sendDataToServer(const int& sockfd, const std::vector<char>& data)
 
     return 0;
 }
-
 
 int initRxTxSocketClient(int& sockfd, const int port_client, const int port_server)
 {
@@ -80,31 +79,34 @@ int initRxTxSocketClient(int& sockfd, const int port_client, const int port_serv
         return -1;
     }
 
-    qInfo() << "connect(): socket was connected to port on server";
+    qInfo() << "connect(): " << "socket was connected to port on server";
 
     return 0;
 }
 
-void printPackage(const std::vector<char>& vec)
+void printPackage(const std::vector<char>& package)
 {
     size_t chunk_size = 16;  // we have 16 elements per string
 
     // print 16 places for elements in package
     std::cout << std::setw(11) << ""; // alining
-    for (size_t i = 0; i < 16; i++) {
+    for (size_t i = 0; i < 16; i++)
+    {
         std::cout << std::hex << std::setw(2) << std::setfill('0') << i << " ";  // print 16 offsets for 16 elements of package in hex format
     }
     std::cout << std::endl;
 
     // print rx_command_buffer
-    for (size_t i = 0; i < vec.size(); i += chunk_size) { // print offset of str in hex format
+    for (size_t i = 0; i < package.size(); i += chunk_size) // print offset of str in hex format
+    {
         std::cout << std::hex << std::setw(8) << std::setfill('0') << i << " | ";
 
         // print next 16 elements of package
-        for (size_t j = i; j < i + chunk_size && j < vec.size(); j++) {
-            std::cout << std::setw(2) << std::setfill(' ') << vec[j] << " ";  // print [j] element
+        for (size_t j = i; j < i + chunk_size && j < package.size(); j++)
+        {
+            std::cout << std::setw(2) << std::setfill(' ') << package[j] << " ";  // print [j] element
         }
 
-        std::cout << std::endl;  // go next 16 elements
+        std::cout << std::endl;  // go next 16 element
     }
 }

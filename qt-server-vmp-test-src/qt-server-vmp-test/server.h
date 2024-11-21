@@ -2,7 +2,7 @@
 #define SERVER_H
 
 // qt
-#include <QDebug> // qInfo()
+#include <QDebug> // qInfo() etc
 
 // c/c++
 #include <iostream>
@@ -15,8 +15,8 @@
 #include <iomanip>		// std::setw
 
 // Networking libraries
-#include <sys/types.h>
-#include <sys/socket.h>
+#include <sys/types.h>	// size_t
+#include <sys/socket.h> // socket()
 #include <netinet/in.h> // sockaddr_in
 #include <arpa/inet.h>  // htons, inet_pton
 
