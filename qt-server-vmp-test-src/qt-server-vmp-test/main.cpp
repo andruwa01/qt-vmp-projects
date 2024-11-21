@@ -2,10 +2,12 @@
 
 int main(int argc, char *argv[])
 {
-    qSetMessagePattern("%{time [yyyy.MM.dd]} %{time [hh:mm:ss]} ====> %{message}");
     QApplication a(argc, argv);
 
+    qSetMessagePattern("%{time [yyyy.MM.dd]} %{time [hh:mm:ss]} %{type} ====> %{message}");
+
     int sockfd_commands;
+
 //    int sockfd_commands, sockfd_server_data;         // for socket()
 //    struct sockaddr_in addr_client;                  // for bind() and recvfrom()
 //    socklen_t addr_client_len = sizeof(addr_client); // for parameter in recvfrom()
@@ -27,12 +29,7 @@ int main(int argc, char *argv[])
         qCritical() << "receiveDataFromClient(): failed, exit the program . . .";
         return -1;
     }
-    else
-    {
-        qInfo() << "receiveDataFromClient(): got bytes from client";
-    }
 
-    printPackage(rx_buffer);
 
     if (sendDataToClient(sockfd_commands, rx_buffer) == -1)
     {

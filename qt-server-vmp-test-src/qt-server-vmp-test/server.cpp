@@ -42,7 +42,8 @@ int receiveDataFromClient(const int& sockfd, std::vector<char>& rx_buffer)
         return -1;
     }
 
-    qInfo() << "recvfrom(): " << "server got command from: " << IP_CLIENT << ":" << PORT_CLIENT_COMMANDS << ", data ->";
+    qInfo() << "recvfrom(): " << "server got command from: " << IP_CLIENT << ":" << PORT_CLIENT_COMMANDS << ", data --->";
+    printPackage(rx_buffer);
 
     return 0;
 }
@@ -95,8 +96,6 @@ int initRxTxSocketServer(int& sockfd, const int port_client, const int port_serv
         close(sockfd);
         return -1;
     }
-
-    qInfo() << "bind(): socket was bound with port on server";
 
     std::memset(&hints, 0, sizeof(hints));
     hints.sin_family = AF_INET;

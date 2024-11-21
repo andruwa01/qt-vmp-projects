@@ -3,6 +3,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
     qSetMessagePattern("%{time [yyyy.MM.dd]} %{time [hh:mm:ss]} %{type} ====> %{message} ");
 
     int sockfd_commands;
@@ -32,8 +33,6 @@ int main(int argc, char *argv[])
         qCritical() << "failed to receive data from server, exit . . .";
         return -1;
     }
-
-    printPackage(rx_command_buffer);
 
     // close
     if (close(sockfd_commands) == -1)

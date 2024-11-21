@@ -11,6 +11,7 @@ int receiveDataFromServer(const int& sockfd, std::vector<char>& rx_buffer)
     }
 
     qInfo() << "recvfrom(): " << "server got bytes from: " << IP_SERVER << ":" << PORT_SERVER_COMMANDS << ", data --->";
+    printPackage(rx_buffer);
 
     return 0;
 }
