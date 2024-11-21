@@ -1,2 +1,2 @@
 - [ ] refactor client and server app.
-- [ ] 
+- [ ] close()
