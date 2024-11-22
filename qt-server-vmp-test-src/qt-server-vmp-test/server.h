@@ -8,6 +8,8 @@
 #include <iostream>
 #include <vector>
 
+#include <unistd.h>
+
 #include <cerrno>       // errno
 #include <cstring>      // std::strerror
 #include <unistd.h>     // close

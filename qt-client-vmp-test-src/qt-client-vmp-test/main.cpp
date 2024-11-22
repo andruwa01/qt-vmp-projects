@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     int sockfd_commands;
     std::vector<char> rx_command_buffer(16, 0);
 
-    std::string command_str = "command#1";
+    std::string command_str = "command#123456789101112131415161718";
     std::vector<char> command(command_str.data(), command_str.data() + command_str.size() + 1);
 
     if (initRxTxSocketClient(sockfd_commands, PORT_CLIENT_COMMANDS, PORT_SERVER_COMMANDS) == -1)

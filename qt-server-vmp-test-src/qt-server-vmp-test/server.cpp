@@ -4,11 +4,9 @@ int receiveDataFromClient(const int& sockfd, std::vector<char>& rx_buffer)
 {
     fd_set rfds_server;
     struct timeval tv;
-    int retval;
 
     // watch fd of server to see when it has rx_buffer to read
     FD_ZERO(&rfds_server);
-
     FD_SET(sockfd, &rfds_server);
 
     // wait for 5 seconds
@@ -18,32 +16,38 @@ int receiveDataFromClient(const int& sockfd, std::vector<char>& rx_buffer)
     // watch server's socket for commands
     qInfo() << "select(): " << "waits for commands on server's socket in 5 seconds . . .";
 
-    int nfds = sockfd + 1;
-    retval = select(nfds, &rfds_server, NULL, NULL, &tv);
-    if (retval == -1)
+    int retval = select(sockfd + 1, &rfds_server, NULL, NULL, &tv);
+    if (retval < 0)
     {
         qCritical() << "select(): " << std::strerror(errno);
         return -1;
     }
-    else if (retval)
+
+    if (FD_ISSET(sockfd, &rfds_server))
     {
-        qInfo() << "select(): " << "server is ready to read commands";
+        qInfo() << "recvfrom(): " << "waits for data on " << IP_SERVER << ":" << PORT_SERVER_COMMANDS;
+        ssize_t bytes_read = recv(sockfd, rx_buffer.data(), rx_buffer.size(), 0);
+        if (bytes_read > 0)
+        {
+
+            qInfo() << "recvfrom(): " << "server got data from: " << IP_CLIENT << ":" << PORT_CLIENT_COMMANDS << ", data --->";
+            printPackage(rx_buffer);
+//            return 2;
+        }
+        else if (bytes_read == 0)
+        {
+            qInfo() << "recvfrom(): " << "zero-length datagram";
+        }
+        else if (bytes_read == -1)
+        {
+            qCritical() << "recvfrom(): " << std::strerror(errno);
+//            return -1;
+        }
     }
     else
     {
-        qCritical() << "select(): " << "no command within 5 seconds";
-        return -1;
+        qInfo() << "select(): " << "no data in timeout period";
     }
-
-    qInfo() << "recvfrom(): " << "waits for data on " << IP_SERVER << ":" << PORT_SERVER_COMMANDS;
-    if (recv(sockfd, rx_buffer.data(), rx_buffer.size(), 0) == -1)
-    {
-        qCritical() << "recvfrom(): " << std::strerror(errno);
-        return -1;
-    }
-
-    qInfo() << "recvfrom(): " << "server got command from: " << IP_CLIENT << ":" << PORT_CLIENT_COMMANDS << ", data --->";
-    printPackage(rx_buffer);
 
     return 0;
 }
@@ -63,7 +67,7 @@ int sendDataToClient(const int& sockfd, const std::vector<char>& data)
 
     if (bytes_sent != (ssize_t)data.size())
     {
-        qWarning() << "sendto(): bytes sent not equals to size of output message !";
+        qWarning() << "sendto(): " << "bytes sent not equals to size of output message !";
     }
 
     return 0;

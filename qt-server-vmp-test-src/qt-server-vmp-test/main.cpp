@@ -8,11 +8,7 @@ int main(int argc, char *argv[])
 
     int sockfd_commands;
 
-//    int sockfd_commands, sockfd_server_data;         // for socket()
-//    struct sockaddr_in addr_client;                  // for bind() and recvfrom()
-//    socklen_t addr_client_len = sizeof(addr_client); // for parameter in recvfrom()
-
-    std::vector<char> rx_buffer(16, 0);
+    std::vector<char> rx_buffer(16);
 
     if (initRxTxSocketServer(sockfd_commands, PORT_CLIENT_COMMANDS, PORT_SERVER_COMMANDS) == -1)
     {
@@ -24,21 +20,9 @@ int main(int argc, char *argv[])
         qInfo() << "initRxTxSocketServer(): socket for commands was created";
     }
 
-    if (receiveDataFromClient(sockfd_commands, rx_buffer) == -1)
+    while(true)
     {
-        qCritical() << "receiveDataFromClient(): failed, exit the program . . .";
-        return -1;
-    }
-
-
-    if (sendDataToClient(sockfd_commands, rx_buffer) == -1)
-    {
-        qInfo() << "sendDataToClient(): failed, exit the program . . .";
-        return -1;
-    }
-    else
-    {
-        qInfo() << "sendDataToClient(): send bytes to client";
+        receiveDataFromClient(sockfd_commands, rx_buffer);
     }
 
     if (close(sockfd_commands) == -1)
@@ -52,5 +36,6 @@ int main(int argc, char *argv[])
     /*failed, exit the program . .
     MainWindow w;
     w.show()*/;
+
     return a.exec();
 }
