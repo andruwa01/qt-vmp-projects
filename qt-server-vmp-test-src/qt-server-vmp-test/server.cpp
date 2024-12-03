@@ -55,6 +55,7 @@ int receiveDataFromClient(const int& sockfd, std::vector<char>& rx_buffer)
 int sendDataToClient(const int& sockfd, const std::vector<char>& data)
 {
     qWarning() << "sending response back";
+
     ssize_t bytes_sent = send(sockfd, data.data(), data.size(), 0);
     if (bytes_sent == -1)
     {

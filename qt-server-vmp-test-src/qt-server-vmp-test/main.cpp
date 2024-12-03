@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 
     /*failed, exit the program . .
     MainWindow w;
-    w.show()*/;
+    w.show()*/
 
     return a.exec();
 }

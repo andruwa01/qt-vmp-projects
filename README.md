@@ -1,7 +1,11 @@
-- [ ] refactor client and server app.
-- [ ] manage close()
-- [ ] convert ssize_t -> size_t ok or not ? 
+- [ ] Создать окна и настроить в них сигналы и слоты.
+- [ ] Создать сокеты для нужных целей.
+- [ ] Протестировать система на винде, посмотреть что из себя представляют пакеты.
 
-- [ ] add .h file with printPackage()
-- [ ] create class Socket
-	- [ ] edit files to make class::method() format
+- [ ] Создать команды соответствующие пакетам.
+- [ ] Начать принимать пакеты.
+
+...
+
+Доп. вопросы:
+- [ ] ?

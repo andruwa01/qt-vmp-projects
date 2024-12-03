@@ -9,18 +9,17 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    logger.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
-    logger.h \
     main.h \
     mainwindow.h
  main.h
 
 FORMS += \
-    mainwindow.ui
+ form.ui \
+ form_2.ui
 
 # Path to header files of fftw3
 INCLUDEPATH += /usr/include

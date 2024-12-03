@@ -10,6 +10,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     setCentralWidget(centralWidget);
 
+    /*
+     * Creating widgets by code (wrong way)
+     *
     createMainLayouts();
     createChartBox();
     createStartButton();
@@ -22,6 +25,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     addSubLayouts();
 
     centralWidget->setLayout(vMainLayout);
+
+    */
 }
 
 MainWindow::~MainWindow()
