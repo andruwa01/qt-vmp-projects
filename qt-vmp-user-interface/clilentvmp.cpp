@@ -1,0 +1,6 @@
+#include "clientVmp"
+
+clilentVmp::clilentVmp()
+{
+
+}

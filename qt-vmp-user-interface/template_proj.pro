@@ -9,17 +9,20 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    ClientVmp.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
+    ClientVmp.h \
+    ipInfo.h \
     main.h \
-    mainwindow.h
+    mainwindow.h \
+    vmp_rx_defs.h
  main.h
 
 FORMS += \
- form.ui \
- form_2.ui
+ mainwindow.ui
 
 # Path to header files of fftw3
 INCLUDEPATH += /usr/include

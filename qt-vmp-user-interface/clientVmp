@@ -1,0 +1,12 @@
+#ifndef CLIENTVMP_H
+#define CLIENTVMP_H
+
+
+class clilentVmp
+{
+public:
+    clilentVmp();
+private:
+};
+
+#endif // CLIENTVMP_H
