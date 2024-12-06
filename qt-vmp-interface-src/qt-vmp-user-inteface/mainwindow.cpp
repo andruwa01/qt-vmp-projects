@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    validateHandle();
+    setValidate();
 }
 
 MainWindow::~MainWindow()
@@ -15,7 +15,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::validateHandle()
+void MainWindow::setValidate()
 {
     // ip mask setup
     // ip address in right format
@@ -35,6 +35,7 @@ void MainWindow::validateHandle()
 
     // frequency setup
     // [1500, ..., 3000] MHZ
+
     QRegularExpression freqStrRegexp("^(1500|1[5-9][0-9]{2}|[2-9][0-9]{3}|[12][0-9]{4}|30000)$");
     QRegularExpressionValidator *freqValidator = new QRegularExpressionValidator(freqStrRegexp, this);
     ui->label_freq_mask->setValidator(freqValidator);

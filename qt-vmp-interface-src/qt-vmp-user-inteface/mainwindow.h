@@ -20,7 +20,7 @@ public:
 private:
     Ui::MainWindow *ui;
 
+    void setValidate();
     void checkFreqInput(const QString &text);
-    void validateHandle();
 };
 #endif // MAINWINDOW_H
