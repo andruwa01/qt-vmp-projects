@@ -7,6 +7,16 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    validateHandle();
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+void MainWindow::validateHandle()
+{
     // ip mask setup
     // ip address in right format
     QString ipRange = "(([ 0]+)|([ 0]*[0-9] *)|([0-9][0-9] )|([ 0][0-9][0-9])|(1[0-9][0-9])|([2][0-4][0-9])|(25[0-5]))";
@@ -29,10 +39,22 @@ MainWindow::MainWindow(QWidget *parent)
     QRegularExpressionValidator *freqValidator = new QRegularExpressionValidator(freqStrRegexp, this);
     ui->label_freq_mask->setValidator(freqValidator);
 
-    // checking frequency wrong values [0, ..., 1499]
+    // checking frequency wrong values [0, ..., 1499] in runtime (during user's entering text)
+    connect(ui->label_freq_mask, &QLineEdit::textChanged, this, &MainWindow::checkFreqInput);
 }
 
-MainWindow::~MainWindow()
+void MainWindow::checkFreqInput(const QString &text)
 {
-    delete ui;
+    int pos = 0;
+    QValidator::State validatorState = ui->label_freq_mask->validator()->validate(const_cast<QString&>(text), pos);
+    if (validatorState == QValidator::Acceptable)
+    {
+        ui->label_freq_mask->setStyleSheet("");
+        ui->pushButton->setEnabled(true);
+    }
+    else
+    {
+        ui->label_freq_mask->setStyleSheet("QLineEdit { border: 2px solid red; }");
+        ui->pushButton->setEnabled(false);
+    }
 }

@@ -17,8 +17,10 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
 private:
     Ui::MainWindow *ui;
+
+    void checkFreqInput(const QString &text);
+    void validateHandle();
 };
 #endif // MAINWINDOW_H
