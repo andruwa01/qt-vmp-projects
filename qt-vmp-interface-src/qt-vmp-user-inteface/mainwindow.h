@@ -5,6 +5,7 @@
 #include <QRegularExpressionValidator>
 
 #include <QMainWindow>
+#include <QLineEdit>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -25,7 +26,8 @@ private:
     void setValidationFreq();
     void setActionOnButtonClicked();
 
-    void checkInputQLine(const QString &text);
+    void validateInputs();
+    bool isInputValid(QLineEdit *lineEdit);
     void onPushButtonClicked();
 };
 #endif // MAINWINDOW_H

@@ -26,13 +26,16 @@ void MainWindow::setValidationIp()
 {
     // ip mask setup
     // ip address in right format
-    QString ipRange = "(([ 0]+)|([ 0]*[0-9] *)|([0-9][0-9] )|([ 0][0-9][0-9])|(1[0-9][0-9])|([2][0-4][0-9])|(25[0-5]))";
+    QString ipRange = "(([ 0]+)|([ 0]*[0-9] *)|([0-9][0-9] )|([ 0[0-9][0-9])|(1[0-9][0-9])|([2][0-4][0-9])|(25[0-5]))";
     QRegularExpression ipStrRegexp("^" + ipRange
                      + "\\." + ipRange
                      + "\\." + ipRange
                      + "\\." + ipRange  + "$");
     QRegularExpressionValidator *ipValidator = new QRegularExpressionValidator(ipStrRegexp, this);
     ui->qline_ip->setValidator(ipValidator);
+
+    // update button when change text
+    connect(ui->qline_ip, &QLineEdit::textChanged, this, &MainWindow::validateInputs);
 }
 
 void MainWindow::setValidationPort()
@@ -42,6 +45,9 @@ void MainWindow::setValidationPort()
     QRegularExpression portStrRegexp("^([1-9]|[1-9][0-9]|[1-9][0-9]{2}|[1-9][0-9]{3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]|655[0-2][0-9]|6553[0-5])$");
     QRegularExpressionValidator *portValidator = new QRegularExpressionValidator(portStrRegexp, this);
     ui->qline_port->setValidator(portValidator);
+
+    // update button when change text
+    connect(ui->qline_port, &QLineEdit::textChanged, this, &MainWindow::validateInputs);
 }
 
 void MainWindow::setValidationFreq()
@@ -53,7 +59,7 @@ void MainWindow::setValidationFreq()
     ui->qline_freq->setValidator(freqValidator);
 
     // does not allow user input [0 ... 1499] MHZ
-    connect(ui->qline_freq, &QLineEdit::textChanged, this, &MainWindow::checkInputQLine);
+     connect(ui->qline_freq, &QLineEdit::textChanged, this, &MainWindow::validateInputs);
 }
 
 void MainWindow::setActionOnButtonClicked()
@@ -62,11 +68,13 @@ void MainWindow::setActionOnButtonClicked()
     connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::onPushButtonClicked);
 }
 
-void MainWindow::checkInputQLine(const QString &text)
+void MainWindow::validateInputs()
 {
-    int pos = 0;
-    QValidator::State validatorFreq = ui->qline_freq->validator()->validate(const_cast<QString&>(text), pos);
-    if (validatorFreq  == QValidator::Acceptable)
+    bool validStatusIp   = isInputValid(ui->qline_ip);
+    bool validStatusPort = isInputValid(ui->qline_port);
+    bool validStatusFreq = isInputValid(ui->qline_freq);
+
+    if (validStatusIp && validStatusPort && validStatusFreq)
     {
         ui->pushButton->setEnabled(true);
     }
@@ -74,6 +82,20 @@ void MainWindow::checkInputQLine(const QString &text)
     {
         ui->pushButton->setEnabled(false);
     }
+}
+
+bool MainWindow::isInputValid(QLineEdit *lineEdit)
+{
+    if (!lineEdit->validator())
+    {
+        return true;
+    }
+
+    int pos = 0;
+    QString text = lineEdit->text();
+    QValidator::State state = lineEdit->validator()->validate(text, pos);
+
+    return state == QValidator::Acceptable;
 }
 
 void MainWindow::onPushButtonClicked()
