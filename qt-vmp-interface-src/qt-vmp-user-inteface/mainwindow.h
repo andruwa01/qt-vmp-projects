@@ -20,7 +20,12 @@ public:
 private:
     Ui::MainWindow *ui;
 
-    void setValidate();
-    void checkFreqInput(const QString &text);
+    void setValidationIp();
+    void setValidationPort();
+    void setValidationFreq();
+    void setActionOnButtonClicked();
+
+    void checkInputQLine(const QString &text);
+    void onPushButtonClicked();
 };
 #endif // MAINWINDOW_H

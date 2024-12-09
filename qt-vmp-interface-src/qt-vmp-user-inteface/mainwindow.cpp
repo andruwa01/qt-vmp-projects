@@ -7,7 +7,14 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    setValidate();
+    // setup ui
+    setValidationIp();
+    setValidationPort();
+    setValidationFreq();
+    setActionOnButtonClicked();
+
+    // thread socketThread()
+    // socketThread.join()
 }
 
 MainWindow::~MainWindow()
@@ -15,7 +22,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::setValidate()
+void MainWindow::setValidationIp()
 {
     // ip mask setup
     // ip address in right format
@@ -23,39 +30,60 @@ void MainWindow::setValidate()
     QRegularExpression ipStrRegexp("^" + ipRange
                      + "\\." + ipRange
                      + "\\." + ipRange
-                     + "\\." + ipRange + "$");
+                     + "\\." + ipRange  + "$");
     QRegularExpressionValidator *ipValidator = new QRegularExpressionValidator(ipStrRegexp, this);
-    ui->label_ip_mask->setValidator(ipValidator);
+    ui->qline_ip->setValidator(ipValidator);
+}
 
+void MainWindow::setValidationPort()
+{
     // port mask setup
     // [0, ... , 65535]
     QRegularExpression portStrRegexp("^([1-9]|[1-9][0-9]|[1-9][0-9]{2}|[1-9][0-9]{3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]|655[0-2][0-9]|6553[0-5])$");
     QRegularExpressionValidator *portValidator = new QRegularExpressionValidator(portStrRegexp, this);
-    ui->label_port_mask->setValidator(portValidator);
-
-    // frequency setup
-    // [1500, ..., 3000] MHZ
-
-    QRegularExpression freqStrRegexp("^(1500|1[5-9][0-9]{2}|[2-9][0-9]{3}|[12][0-9]{4}|30000)$");
-    QRegularExpressionValidator *freqValidator = new QRegularExpressionValidator(freqStrRegexp, this);
-    ui->label_freq_mask->setValidator(freqValidator);
-
-    // checking frequency wrong values [0, ..., 1499] in runtime (during user's entering text)
-    connect(ui->label_freq_mask, &QLineEdit::textChanged, this, &MainWindow::checkFreqInput);
+    ui->qline_port->setValidator(portValidator);
 }
 
-void MainWindow::checkFreqInput(const QString &text)
+void MainWindow::setValidationFreq()
+{
+    // frequency setup
+    // [1500, ..., 3000] MHZ
+    QRegularExpression freqStrRegexp("^(1500|1[5-9][0-9]{2}|[2-9][0-9]{3}|[12][0-9]{4}|30000)$");
+    QRegularExpressionValidator *freqValidator = new QRegularExpressionValidator(freqStrRegexp, this);
+    ui->qline_freq->setValidator(freqValidator);
+
+    // does not allow user input [0 ... 1499] MHZ
+    connect(ui->qline_freq, &QLineEdit::textChanged, this, &MainWindow::checkInputQLine);
+}
+
+void MainWindow::setActionOnButtonClicked()
+{
+    // add start / stop view on button
+    connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::onPushButtonClicked);
+}
+
+void MainWindow::checkInputQLine(const QString &text)
 {
     int pos = 0;
-    QValidator::State validatorState = ui->label_freq_mask->validator()->validate(const_cast<QString&>(text), pos);
-    if (validatorState == QValidator::Acceptable)
+    QValidator::State validatorFreq = ui->qline_freq->validator()->validate(const_cast<QString&>(text), pos);
+    if (validatorFreq  == QValidator::Acceptable)
     {
-        ui->label_freq_mask->setStyleSheet("");
         ui->pushButton->setEnabled(true);
     }
     else
     {
-        ui->label_freq_mask->setStyleSheet("QLineEdit { border: 2px solid red; }");
         ui->pushButton->setEnabled(false);
+    }
+}
+
+void MainWindow::onPushButtonClicked()
+{
+    if (ui->pushButton->text() == "СТАРТ")
+    {
+        ui->pushButton->setText("СТОП");
+    }
+    else
+    {
+        ui->pushButton->setText("СТАРТ");
     }
 }
