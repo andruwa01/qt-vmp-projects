@@ -34,7 +34,6 @@ void MainWindow::setValidationIp()
     QRegularExpressionValidator *ipValidator = new QRegularExpressionValidator(ipStrRegexp, this);
     ui->qline_ip->setValidator(ipValidator);
 
-    // update button when change text
     connect(ui->qline_ip, &QLineEdit::textChanged, this, &MainWindow::validateInputs);
 }
 
@@ -46,7 +45,6 @@ void MainWindow::setValidationPort()
     QRegularExpressionValidator *portValidator = new QRegularExpressionValidator(portStrRegexp, this);
     ui->qline_port->setValidator(portValidator);
 
-    // update button when change text
     connect(ui->qline_port, &QLineEdit::textChanged, this, &MainWindow::validateInputs);
 }
 
@@ -58,7 +56,6 @@ void MainWindow::setValidationFreq()
     QRegularExpressionValidator *freqValidator = new QRegularExpressionValidator(freqStrRegexp, this);
     ui->qline_freq->setValidator(freqValidator);
 
-    // does not allow user input [0 ... 1499] MHZ
      connect(ui->qline_freq, &QLineEdit::textChanged, this, &MainWindow::validateInputs);
 }
 
@@ -70,9 +67,9 @@ void MainWindow::setActionOnButtonClicked()
 
 void MainWindow::validateInputs()
 {
-    bool validStatusIp   = isInputValid(ui->qline_ip);
-    bool validStatusPort = isInputValid(ui->qline_port);
-    bool validStatusFreq = isInputValid(ui->qline_freq);
+    bool validStatusIp   = checkInputValid(ui->qline_ip);
+    bool validStatusPort = checkInputValid(ui->qline_port);
+    bool validStatusFreq = checkInputValid(ui->qline_freq);
 
     if (validStatusIp && validStatusPort && validStatusFreq)
     {
@@ -84,7 +81,7 @@ void MainWindow::validateInputs()
     }
 }
 
-bool MainWindow::isInputValid(QLineEdit *lineEdit)
+bool MainWindow::checkInputValid(QLineEdit *lineEdit)
 {
     if (!lineEdit->validator())
     {

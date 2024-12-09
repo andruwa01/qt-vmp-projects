@@ -25,9 +25,8 @@ private:
     void setValidationPort();
     void setValidationFreq();
     void setActionOnButtonClicked();
-
     void validateInputs();
-    bool isInputValid(QLineEdit *lineEdit);
+    bool checkInputValid(QLineEdit *lineEdit);
     void onPushButtonClicked();
 };
 #endif // MAINWINDOW_H
