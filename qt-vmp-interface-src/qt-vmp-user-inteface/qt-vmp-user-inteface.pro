@@ -13,6 +13,7 @@ SOURCES += \
     mainwindow.cpp
 
 HEADERS += \
+    main.h \
     mainwindow.h
 
 FORMS += \

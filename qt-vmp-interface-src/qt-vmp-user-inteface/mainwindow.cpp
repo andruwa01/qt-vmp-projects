@@ -12,9 +12,6 @@ MainWindow::MainWindow(QWidget *parent)
     setValidationPort();
     setValidationFreq();
     setActionOnButtonClicked();
-
-    // thread socketThread()
-    // socketThread.join()
 }
 
 MainWindow::~MainWindow()
