@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // setup ui
+    // setup ui validation
     setValidationIp();
     setValidationPort();
     setValidationFreq();
