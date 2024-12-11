@@ -80,6 +80,7 @@ void MainWindow::validateInputs()
 
 bool MainWindow::checkInputValid(QLineEdit *lineEdit)
 {
+    // if lineEdit is nullptr
     if (!lineEdit->validator())
     {
         return true;
