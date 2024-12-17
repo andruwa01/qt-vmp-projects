@@ -24,10 +24,10 @@ void MainWindow::setValidationIp()
     // ip mask setup
     // ip address in right format
     QString ipRange = "(([ 0]+)|([ 0]*[0-9] *)|([0-9][0-9] )|([ 0[0-9][0-9])|(1[0-9][0-9])|([2][0-4][0-9])|(25[0-5]))";
-    QRegularExpression ipStrRegexp("^" + ipRange
-                     + "\\." + ipRange
-                     + "\\." + ipRange
-                     + "\\." + ipRange  + "$");
+    QRegularExpression ipStrRegexp("^"  + ipRange
+                                + "\\." + ipRange
+                                + "\\." + ipRange
+                                + "\\." + ipRange  + "$");
     QRegularExpressionValidator *ipValidator = new QRegularExpressionValidator(ipStrRegexp, this);
     ui->qline_ip->setValidator(ipValidator);
 
@@ -53,7 +53,7 @@ void MainWindow::setValidationFreq()
     QRegularExpressionValidator *freqValidator = new QRegularExpressionValidator(freqStrRegexp, this);
     ui->qline_freq->setValidator(freqValidator);
 
-     connect(ui->qline_freq, &QLineEdit::textChanged, this, &MainWindow::validateInputs);
+    connect(ui->qline_freq, &QLineEdit::textChanged, this, &MainWindow::validateInputs);
 }
 
 void MainWindow::setActionOnButtonClicked()
