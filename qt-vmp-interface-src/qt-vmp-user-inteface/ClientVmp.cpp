@@ -56,7 +56,6 @@ int ClientVmp::initSocket(std::string ipv4_vmp, const int port_vmp, const int po
         return -1;
     }
 
-
     // add functionality to send data to vmp (to use send() instead of sendto() )
 
     std::memset(&hints, 0, sizeof(sockaddr_in));
