@@ -1,8 +1,8 @@
 #ifndef CLIENTVMP_H
 #define CLIENTVMP_H
 
-// info with ip
 #include "ipInfo.h"
+#include "vmp_rx_defs.h"
 
 // c/c++
 #include <string>
@@ -20,17 +20,18 @@
 
 class ClientVmp
 {
+
 public:
-    ClientVmp();
+    ClientVmp(std::string ipv4_vmp_new,
+              int vmp_port_ctrl_new,
+              int vmp_port_data_new);
     ~ClientVmp();
 
     bool initSockets();
-    int initSocket(std::string ipv4_vmp,  const int port_vmp, const int port_client = 0);
-//    void makeCommand();
-//    void sendRTCP();
-
 
 private:
+    int initSocket(std::string ipv4_vmp,  const int port_vmp, const int port_client);
+
     std::string ipv4_vmp;
     int vmp_port_ctrl;
     int vmp_port_data;

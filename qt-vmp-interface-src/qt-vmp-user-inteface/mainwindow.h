@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "ClientVmp.h"
+#include "vmp_rx_defs.h"
 
 #include <QIntValidator>
 #include <QRegularExpressionValidator>

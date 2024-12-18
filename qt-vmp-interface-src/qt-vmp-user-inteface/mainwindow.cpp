@@ -13,7 +13,8 @@ MainWindow::MainWindow(QWidget *parent)
     setValidationFreq();
     setActionOnButtonClicked();
 
-    // init sockets
+    ClientVmp *clientVmp = new ClientVmp(IP_VMP, VSYNC_CTRL_PORT, VSYNC_CTRL_PORT - 1);
+    clientVmp->initSockets();
 }
 
 MainWindow::~MainWindow()

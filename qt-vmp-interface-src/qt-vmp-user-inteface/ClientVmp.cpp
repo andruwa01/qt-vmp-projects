@@ -1,10 +1,12 @@
 #include "ClientVmp.h"
 
-ClientVmp::ClientVmp() {}
+ClientVmp::ClientVmp(std::string ipv4_vmp_new, int vmp_port_ctrl_new, int vmp_port_data_new)
+    : ipv4_vmp(ipv4_vmp_new), vmp_port_ctrl(vmp_port_ctrl_new), vmp_port_data(vmp_port_data_new)
+{}
 
 bool ClientVmp::initSockets()
 {
-    rtcp_socket_ctrl = initSocket(ipv4_vmp, vmp_port_ctrl);
+    rtcp_socket_ctrl = initSocket(ipv4_vmp, vmp_port_ctrl, 0);
     if (rtcp_socket_ctrl == -1)
     {
         qCritical() << "initSocket(): " << "failed for ctrl";
