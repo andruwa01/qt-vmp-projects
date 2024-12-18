@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#define TEMP_PORT 5051
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -13,8 +15,12 @@ MainWindow::MainWindow(QWidget *parent)
     setValidationFreq();
     setActionOnButtonClicked();
 
-    ClientVmp *clientVmp = new ClientVmp(IP_VMP, VSYNC_CTRL_PORT, VSYNC_CTRL_PORT - 1);
+    ClientVmp *clientVmp = new ClientVmp(IP_VMP, TEMP_PORT, TEMP_PORT - 1);
     clientVmp->initSockets();
+
+    std::vector<uint8_t> command = {0};
+    clientVmp->makeCommand(command, VPrm::SetRtpCtrl, std::vector<uint8_t>{0});
+    clientVmp->sendRTCP(command);
 }
 
 MainWindow::~MainWindow()

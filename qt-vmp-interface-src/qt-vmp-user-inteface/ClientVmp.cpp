@@ -85,6 +85,8 @@ void ClientVmp::sendRTCP(std::vector<uint8_t> buffer)
     {
         qCritical() << "send(): " << strerror(errno);
     }
+
+    qInfo() << "send(): " << "succeed";
 }
 
 void ClientVmp::makeCommand(std::vector<uint8_t> &command_result, uint8_t mess_id, const std::vector<uint8_t> &buffer_data)
