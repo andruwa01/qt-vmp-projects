@@ -10,11 +10,15 @@ CONFIG += c++11
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    ClientVmp.cpp \
 
 HEADERS += \
     main.h \
-    mainwindow.h
+    mainwindow.h \
+    ClientVmp.h \
+    vmp_rx_defs.h \
+    ipInfo.h
 
 FORMS += \
     mainwindow.ui

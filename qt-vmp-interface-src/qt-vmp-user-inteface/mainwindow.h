@@ -1,9 +1,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "ClientVmp.h"
+
 #include <QIntValidator>
 #include <QRegularExpressionValidator>
-
 #include <QMainWindow>
 #include <QLineEdit>
 
