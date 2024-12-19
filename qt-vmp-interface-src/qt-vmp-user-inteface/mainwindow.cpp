@@ -68,7 +68,7 @@ void MainWindow::setValidationFreq()
 void MainWindow::setActionOnButtonClicked()
 {
     // add start / stop view on button
-    connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::onPushButtonClicked);
+    connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::actionOnButtonClicked);
 }
 
 void MainWindow::validateInputs()
@@ -102,7 +102,7 @@ bool MainWindow::checkInputValid(QLineEdit *lineEdit)
     return state == QValidator::Acceptable;
 }
 
-void MainWindow::onPushButtonClicked()
+void MainWindow::actionOnButtonClicked()
 {
     if (ui->pushButton->text() == "СТАРТ")
     {

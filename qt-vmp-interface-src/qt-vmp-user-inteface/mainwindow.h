@@ -29,6 +29,6 @@ private:
     void setActionOnButtonClicked();
     void validateInputs();
     bool checkInputValid(QLineEdit *lineEdit);
-    void onPushButtonClicked();
+    void actionOnButtonClicked();
 };
 #endif // MAINWINDOW_H
