@@ -42,7 +42,7 @@ int ClientVmp::initSocket(std::string ipv4_vmp, const int port_vmp, const int po
         return -1;
     }
 
-    qInfo() << "socket(): " << "socket was created";
+    qInfo() << "socket(): " << "created";
 
     // add functionality to receive data from vmp (to use recv() instead of recvfrom())
 
@@ -74,63 +74,50 @@ int ClientVmp::initSocket(std::string ipv4_vmp, const int port_vmp, const int po
         return -1;
     }
 
-    qInfo() << "socket bind(), connect() finished successfully";
+    qInfo() << "socket bind(), connect()";
 
     return sockfd;
 }
 
-void ClientVmp::sendRTCP(std::vector<uint8_t> buffer)
+void ClientVmp::sendCommand(std::vector<uint8_t> buffer)
 {
-    if (send(rtcp_socket_data, buffer.data(), buffer.size(), MSG_NOSIGNAL) == -1)
+    if (send(rtcp_socket_ctrl, buffer.data(), buffer.size(), MSG_NOSIGNAL) == -1)
     {
         qCritical() << "send(): " << strerror(errno);
     }
 
-    qInfo() << "send(): " << "succeed";
+    qInfo() << "send(): " << "command " << QString::fromStdString(messToStr(buffer[12])) << "sent";
 }
 
-void ClientVmp::makeCommand(std::vector<uint8_t> &command_result, uint8_t mess_id, const std::vector<uint8_t> &buffer_data)
+void ClientVmp::makeCommand(std::vector<uint8_t> &command_pkg, uint8_t mess_id, const std::vector<uint8_t> &params)
 {
-    qInfo() << "message makeCommand(): " << QString::fromStdString(messToStr(mess_id));
-
-    // all size in bytes - without null terminated symbol
-    // 8 bytes
-    std::size_t size_vprm_rtcp_head      = sizeof(VPRM_RTCP_HEAD) - 1;
-    // 4 bytes
+    std::size_t size_vprm_rtcp_head      = sizeof(VPRM_RTCP_HEAD)     - 1;
     std::size_t size_vprm_rtcp_name_req  = sizeof(VPRM_RTCP_NAME_REQ) - 1;
-    // 4 bytes
-    std::size_t size_command = 4;
+    command_pkg.resize(size_vprm_rtcp_head + size_vprm_rtcp_name_req + 4 + params.size(), 0);
 
-    command_result.resize(size_vprm_rtcp_head + size_vprm_rtcp_name_req + size_command + buffer_data.size(), 0);
+    // initial offset of package
+    int32_t offset  = 0;
 
-    // add RTCP header
-    int32_t index = 0;
-    // 8 bytes
-    std::memcpy(&command_result[index], VPRM_RTCP_HEAD, size_vprm_rtcp_head);
-    index += size_vprm_rtcp_head;
-    // 4 bytes
-    std::memcpy(&command_result[index], VPRM_RTCP_NAME_REQ, size_vprm_rtcp_name_req);
-    index += size_vprm_rtcp_name_req;
-    // 1 byte
-    std::memcpy(&command_result[index], &mess_id, sizeof(mess_id));
-    index += sizeof(mess_id);
-    // 3 bytes step (reserver 3 bytes after mess_id)
-    index += 3 * sizeof(uint8_t);
+    // RTCP_HEAD 8 bytes
+    std::memcpy(&command_pkg[offset], VPRM_RTCP_HEAD, size_vprm_rtcp_head);
+    offset += size_vprm_rtcp_head;
+    // RTCP_NAME_REQ 4 bytes
+    std::memcpy(&command_pkg[offset], VPRM_RTCP_NAME_REQ, size_vprm_rtcp_name_req);
+    offset += size_vprm_rtcp_name_req;
+    // command 4 bytes
+    std::memcpy(&command_pkg[offset], &mess_id, sizeof(mess_id));
+    offset += sizeof(mess_id);
+    offset += 3 * sizeof(uint8_t);
 
-    // add buffer with data
-    std::memcpy(&command_result[index], buffer_data.data(), buffer_data.size());
+    std::memcpy(&command_pkg[offset], params.data(), params.size());
 
-    // Add zeroes until package.size % 4 == 0 because it is requirements of protocol
-    while (command_result.size() % 4 != 0) {
-        command_result.push_back(0);
+    while (command_pkg.size() % 4 != 0)
+    {
+        command_pkg.push_back(0);
     }
 
-    // Calculate full parts
-    if (command_result.size() >= 4) {
-        command_result[3] = command_result.size() / 4 - 1;
-    } else {
-        qCritical() << "command_result does not have enough elements";
-    }
+    // calculate full parts
+    command_pkg[3] = command_pkg.size() / 4 - 1;
 }
 
 std::string ClientVmp::messToStr(uint8_t messId)
