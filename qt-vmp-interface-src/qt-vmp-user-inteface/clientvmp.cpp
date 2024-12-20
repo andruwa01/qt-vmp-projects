@@ -1,4 +1,4 @@
-#include "ClientVmp.h"
+#include "clientvmp.h"
 
 ClientVmp::ClientVmp(std::string ipv4_vmp_new, int vmp_port_ctrl_new, int vmp_port_data_new)
     : ipv4_vmp(ipv4_vmp_new),

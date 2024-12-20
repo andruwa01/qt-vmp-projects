@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "ClientVmp.h"
+#include "clientvmp.h"
 #include "vmp_rx_defs.h"
 
 #include <QIntValidator>
