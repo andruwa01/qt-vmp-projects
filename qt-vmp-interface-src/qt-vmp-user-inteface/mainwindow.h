@@ -32,7 +32,6 @@ private:
     Ui::MainWindow *ui;
 
     SocketWorker socketWorker;
-    QString ip;
 
     void setValidationIp();
     void setValidationPort();

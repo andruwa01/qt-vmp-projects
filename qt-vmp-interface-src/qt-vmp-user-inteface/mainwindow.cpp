@@ -126,9 +126,7 @@ void MainWindow::actionOnButtonClicked()
         ui->qline_port->setEnabled(false);
         ui->qline_freq->setEnabled(false);
 
-        this->ip = ui->qline_ip->text();
-        emit sendIpToThread(this->ip);
-
+        emit sendIpToThread(ui->qline_ip->text());
         qDebug() << "emit";
     }
     else if (ui->pushButton->text() == "СТОП")
