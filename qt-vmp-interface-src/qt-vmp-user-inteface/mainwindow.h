@@ -3,6 +3,7 @@
 
 #include "clientvmp.h"
 #include "vmp_rx_defs.h"
+#include "socketworker.h"
 
 #include <QIntValidator>
 #include <QRegularExpressionValidator>
@@ -20,15 +21,25 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+signals:
+    void sendIpToThread(QString ip);
+
+private slots:
+    void actionOnButtonClicked();
+
 private:
     Ui::MainWindow *ui;
+
+    SocketWorker socketWorker;
+    QString ip;
 
     void setValidationIp();
     void setValidationPort();
     void setValidationFreq();
-    void setActionOnButtonClicked();
+    void setButtonBehaviour();
     void validateInputs();
     bool checkInputValid(QLineEdit *lineEdit);
-    void actionOnButtonClicked();
+
 };
 #endif // MAINWINDOW_H

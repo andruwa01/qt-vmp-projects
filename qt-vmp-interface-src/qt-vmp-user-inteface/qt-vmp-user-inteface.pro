@@ -12,13 +12,13 @@ SOURCES += \
  clientvmp.cpp \
     main.cpp \
     mainwindow.cpp \
- networkthread.cpp
+ socketworker.cpp
 
 HEADERS += \
     clientvmp.h \
     main.h \
     mainwindow.h \
-    networkthread.h \
+    socketworker.h \
     vmp_rx_defs.h \
     ipInfo.h
 

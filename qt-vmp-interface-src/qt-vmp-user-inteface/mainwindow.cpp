@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#define TEMP_PORT 5051
+//#define TEMP_PORT 5051
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -13,7 +13,8 @@ MainWindow::MainWindow(QWidget *parent)
     setValidationIp();
     setValidationPort();
     setValidationFreq();
-    setActionOnButtonClicked();
+    setButtonBehaviour();
+
 
 //    ClientVmp *clientVmp = new ClientVmp(IP_VMP, TEMP_PORT, TEMP_PORT - 1);
 //    clientVmp->initSockets();
@@ -34,6 +35,8 @@ MainWindow::MainWindow(QWidget *parent)
 //    std::memcpy(&params[0], &startRTP, sizeof(startRTP));
 //    clientVmp->makeCommand(command, VPrm::MessId::SetRtpCtrl, params);
 //    clientVmp->sendCommand(command);
+
+
 }
 
 MainWindow::~MainWindow()
@@ -78,9 +81,8 @@ void MainWindow::setValidationFreq()
     connect(ui->qline_freq, &QLineEdit::textChanged, this, &MainWindow::validateInputs);
 }
 
-void MainWindow::setActionOnButtonClicked()
+void MainWindow::setButtonBehaviour()
 {
-    // add start / stop view on button
     connect(ui->pushButton, &QPushButton::clicked, this, &MainWindow::actionOnButtonClicked);
 }
 
@@ -120,9 +122,22 @@ void MainWindow::actionOnButtonClicked()
     if (ui->pushButton->text() == "СТАРТ")
     {
         ui->pushButton->setText("СТОП");
+        ui->qline_ip->setEnabled(false);
+        ui->qline_port->setEnabled(false);
+        ui->qline_freq->setEnabled(false);
+
+        this->ip = ui->qline_ip->text();
+        emit sendIpToThread(this->ip);
+
+        qDebug() << "emit";
     }
-    else
+    else if (ui->pushButton->text() == "СТОП")
     {
         ui->pushButton->setText("СТАРТ");
+        ui->qline_ip->setEnabled(true);
+        ui->qline_port->setEnabled(true);
+        ui->qline_freq->setEnabled(true);
+
+        // emit stopThread()
     }
 }
