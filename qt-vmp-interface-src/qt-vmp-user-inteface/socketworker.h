@@ -3,9 +3,8 @@
 
 #include <QObject>
 #include <QDebug>
-
-#include <thread>
-
+#include <QThread>
+#include <QCoreApplication>
 
 class SocketWorker : public QObject
 {
@@ -15,22 +14,15 @@ public:
     SocketWorker(QObject *parent = nullptr);
     ~SocketWorker();
 
-    void startWorker(const std::string &ip, int port);
-    void stopWorker();
-
-    void initSockets();
-
 signals:
-    void fftCalculated();
+    void workFinished();
 
 public slots:
-    void setIp(const std::string &ip);
+    void startWorker();
+    void stopWorker();
 
 private:
-    std::thread workerThread;
-    std::atomic<bool> running;
-
-    void runThread(const std::string &ip, int port);
+    bool stopFlag;
 };
 
 #endif // SOCKETWORKER_H

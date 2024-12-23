@@ -23,7 +23,7 @@ public:
     ~MainWindow();
 
 signals:
-    void sendIpToThread(QString ip);
+    void stopWorker();
 
 private slots:
     void actionOnButtonClicked();
@@ -31,7 +31,11 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    SocketWorker socketWorker;
+// old way
+    QThread *socketWorkerThread = nullptr;
+    SocketWorker *socketWorker = nullptr;
+//    QThread socketWorkerThread;
+//    SocketWorker socketWorker;
 
     void setValidationIp();
     void setValidationPort();

@@ -15,7 +15,6 @@ MainWindow::MainWindow(QWidget *parent)
     setValidationFreq();
     setButtonBehaviour();
 
-
 //    ClientVmp *clientVmp = new ClientVmp(IP_VMP, TEMP_PORT, TEMP_PORT - 1);
 //    clientVmp->initSockets();
 
@@ -41,6 +40,20 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    qDebug() << "start destructor";
+    if (socketWorkerThread && socketWorkerThread->isRunning())
+    {
+        emit stopWorker();
+        qDebug() << "stop worker emitted from main thread";
+
+        socketWorkerThread->quit();
+        socketWorkerThread->wait();
+
+        delete socketWorkerThread;
+        socketWorkerThread = nullptr;
+    }
+
+    qDebug() << "main window was closed";
     delete ui;
 }
 
@@ -126,16 +139,27 @@ void MainWindow::actionOnButtonClicked()
         ui->qline_port->setEnabled(false);
         ui->qline_freq->setEnabled(false);
 
-        emit sendIpToThread(ui->qline_ip->text());
-        qDebug() << "emit";
+        socketWorkerThread = new QThread(this);
+        socketWorker = new SocketWorker();
+        socketWorker->moveToThread(socketWorkerThread);
+
+        connect(this, &MainWindow::stopWorker, socketWorker, &SocketWorker::stopWorker);
+        connect(socketWorkerThread, &QThread::started, socketWorker, &SocketWorker::startWorker);
+
+        connect(socketWorker, &SocketWorker::workFinished, socketWorkerThread, &QThread::quit);
+        connect(socketWorker, &SocketWorker::workFinished, socketWorker, &SocketWorker::deleteLater);
+
+        connect(socketWorkerThread, &QThread::finished, socketWorkerThread, &QThread::deleteLater);
+
+        socketWorkerThread->start();
     }
     else if (ui->pushButton->text() == "СТОП")
     {
+        emit stopWorker();
+
         ui->pushButton->setText("СТАРТ");
         ui->qline_ip->setEnabled(true);
         ui->qline_port->setEnabled(true);
         ui->qline_freq->setEnabled(true);
-
-        // emit stopThread()
     }
 }

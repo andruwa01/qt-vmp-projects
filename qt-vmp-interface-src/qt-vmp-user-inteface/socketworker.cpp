@@ -1,31 +1,22 @@
 #include "socketworker.h"
 
-SocketWorker::SocketWorker(QObject *parent) : QObject(parent),
-    running(false)
-{
-
-}
-
+SocketWorker::SocketWorker(QObject *parent) : QObject(parent), stopFlag(false){}
 SocketWorker::~SocketWorker(){}
 
-void SocketWorker::startWorker(const std::string &ip, int port)
+void SocketWorker::startWorker()
 {
-    running = true;
-    workerThread = std::thread(&SocketWorker::runThread, this, ip, port);
+    while(!stopFlag)
+    {
+        qDebug() << "worker is working in thread " << QThread::currentThreadId();
+        QThread::sleep(1);
+
+        QCoreApplication::processEvents();
+    }
+
+    emit workFinished();
 }
 
 void SocketWorker::stopWorker()
 {
-    running = false;
-    if (workerThread.joinable())
-    {
-        workerThread.join();
-    }
+    stopFlag = true;
 }
-
-void SocketWorker::runThread(const std::string &ip, int port)
-{
-    qInfo() << "second thread is running";
-}
-
-void SocketWorker::setIp(const std::string &ip){}

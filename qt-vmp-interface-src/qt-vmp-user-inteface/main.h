@@ -3,5 +3,6 @@
 
 #include "mainwindow.h"
 #include <QApplication>
+#include <QThread>
 
 #endif // MAIN_H
