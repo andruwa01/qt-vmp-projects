@@ -172,4 +172,11 @@ std::string ClientVmp::messToStr(uint8_t messId)
     if(messId == VPrm::MessId::AckAntCtrl) 			return "AckAntCtrl";
     if(messId == VPrm::MessId::AnsRefFreqTrimmer) 	return "AnsRefFreqTrimmer";
     if(messId == VPrm::MessId::Error) 				return "Error";
+    return "unknown messId: 0x" + messIdToHex(messId);
+}
+
+std::string ClientVmp::messIdToHex(uint8_t messId) {
+    std::ostringstream oss;
+    oss << std::hex << std::uppercase << std::setw(2) << std::setfill('0') << static_cast<int>(messId);
+    return oss.str();
 }

@@ -8,6 +8,8 @@
 #include <string>
 #include <cstring>  // std::strerror
 #include <unistd.h> // close
+#include <sstream>
+#include <iomanip>
 
 // Networking libraries
 #include <sys/types.h>	// size_t
@@ -35,6 +37,7 @@ private:
     int initSocket(std::string ipv4_vmp,  const int port_vmp, const int port_client);
 
     std::string messToStr(uint8_t messId);
+    std::string messIdToHex(uint8_t messId);
 
     std::string ipv4_vmp;
     int vmp_port_ctrl;
