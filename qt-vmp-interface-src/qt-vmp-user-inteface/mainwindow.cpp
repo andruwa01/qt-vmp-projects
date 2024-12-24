@@ -166,6 +166,7 @@ void MainWindow::actionOnButtonClicked()
     {
         qDebug() << "stop button pressed";
 
+        // stop data flow from prm
         if (socketWorkerThread && socketWorkerThread->isRunning())
         {
             emit stopWorker();

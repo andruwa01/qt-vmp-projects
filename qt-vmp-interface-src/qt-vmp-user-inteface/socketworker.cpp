@@ -34,13 +34,13 @@ void SocketWorker::startWorker()
     clientVmp->makeCommand(command, VPrm::MessId::GetCurrentState, params);
     clientVmp->sendCommand(command);
 
-//    command.clear();
-//    params.clear();
-//    params.resize(4);
-//    uint8_t startRTP = 1;
-//    std::memcpy(&params[0], &startRTP, sizeof(startRTP));
-//    clientVmp->makeCommand(command, VPrm::MessId::SetRtpCtrl, params);
-//    clientVmp->sendCommand(command);
+    command.clear();
+    params.clear();
+    params.resize(4);
+    uint8_t startRTP = 1;
+    std::memcpy(&params[0], &startRTP, sizeof(startRTP));
+    clientVmp->makeCommand(command, VPrm::MessId::SetRtpCtrl, params);
+    clientVmp->sendCommand(command);
 
     while(!stopWork)
     {
@@ -55,4 +55,15 @@ void SocketWorker::startWorker()
 void SocketWorker::stopWorker()
 {
     stopWork = true;
+
+    std::vector<uint8_t> command;
+    std::vector<uint8_t> params;
+
+    command.clear();
+    params.clear();
+    params.resize(4);
+    uint8_t RTPFlow = 0;
+    std::memcpy(&params[0], &RTPFlow, sizeof(RTPFlow));
+    clientVmp->makeCommand(command, VPrm::MessId::SetRtpCtrl, params);
+    clientVmp->sendCommand(command);
 }
