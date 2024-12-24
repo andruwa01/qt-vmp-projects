@@ -39,8 +39,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    qDebug() << "start destructor";
-
     if (socketWorkerThread && socketWorkerThread->isRunning())
     {
         emit stopWorker();
@@ -48,9 +46,6 @@ MainWindow::~MainWindow()
 
         socketWorkerThread->quit();
         socketWorkerThread->wait();
-
-        delete socketWorkerThread;
-        socketWorkerThread = nullptr;
     }
 
     qDebug() << "main window was closed";
@@ -143,6 +138,15 @@ void MainWindow::actionOnButtonClicked()
         socketWorker = new SocketWorker();
         socketWorker->moveToThread(socketWorkerThread);
 
+        connect(socketWorkerThread, &QObject::destroyed, []()
+        {
+            qDebug() << "workerThread destroyed";
+        });
+        connect(socketWorker, &QObject::destroyed, []()
+        {
+            qDebug() << "worker destroyed";
+        });
+
         connect(this, 				&MainWindow::stopWorker, 	 socketWorker, 		 &SocketWorker::stopWorker);
         connect(socketWorkerThread, &QThread::started, 		 	 socketWorker, 		 &SocketWorker::startWorker);
         connect(socketWorker, 		&SocketWorker::workFinished, socketWorkerThread, &QThread::quit);
@@ -162,10 +166,10 @@ void MainWindow::actionOnButtonClicked()
 
             socketWorkerThread->quit();
             socketWorkerThread->wait();
-
-            delete socketWorkerThread;
-            socketWorkerThread = nullptr;
         }
+
+        socketWorkerThread = nullptr;
+        socketWorker = nullptr;
 
         ui->pushButton->setText("СТАРТ");
         ui->qline_ip->setEnabled(true);
