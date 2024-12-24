@@ -37,8 +37,8 @@ void SocketWorker::startWorker()
     command.clear();
     params.clear();
     params.resize(4);
-    uint8_t startRTP = 1;
-    std::memcpy(&params[0], &startRTP, sizeof(startRTP));
+    uint8_t RTPFlow = 1;
+    std::memcpy(&params[0], &RTPFlow, sizeof(RTPFlow));
     clientVmp->makeCommand(command, VPrm::MessId::SetRtpCtrl, params);
     clientVmp->sendCommand(command);
 

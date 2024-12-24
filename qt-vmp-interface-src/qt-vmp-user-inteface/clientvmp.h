@@ -31,6 +31,7 @@ public:
     bool initSockets();
     void sendCommand(std::vector<uint8_t> buffer);
     void makeCommand(std::vector<uint8_t>& command_result, uint8_t mess_id, const std::vector<uint8_t> &buffer_data);
+    void parseIQPkg(std::vector<uint8_t>& ip_pkg, uint32_t pkg_size);
 
     std::string getVmpIp();
     int getVmpCtrlPort();

@@ -130,6 +130,18 @@ void ClientVmp::makeCommand(std::vector<uint8_t> &command_pkg, uint8_t mess_id, 
     command_pkg[3] = command_pkg.size() / 4 - 1;
 }
 
+void ClientVmp::parseIQPkg(std::vector<uint8_t> &ip_pkg, uint32_t pkg_size)
+{
+    uint32_t offset = 0;
+    int step = sizeof(uint32_t);
+    int32_t subpkg_size = 0;
+    do
+    {
+        offset += subpkg_size + step;
+    }
+    while (offset < pkg_size);
+}
+
 std::string ClientVmp::getVmpIp()
 {
     return ipv4_vmp;
