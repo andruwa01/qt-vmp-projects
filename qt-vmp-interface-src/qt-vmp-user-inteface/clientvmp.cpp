@@ -1,10 +1,19 @@
 #include "clientvmp.h"
 
-ClientVmp::ClientVmp(std::string ipv4_vmp_new, int vmp_port_ctrl_new, int vmp_port_data_new)
+ClientVmp::ClientVmp(std::string ipv4_vmp_new
+                    , int vmp_port_ctrl_new
+                    , int vmp_port_data_new)
     : ipv4_vmp(ipv4_vmp_new),
       vmp_port_ctrl(vmp_port_ctrl_new),
       vmp_port_data(vmp_port_data_new)
-{}
+{
+    qDebug() << "ClientVmp constructor called";
+}
+
+ClientVmp::~ClientVmp()
+{
+    qDebug() << "ClientVmp destructor called";
+}
 
 bool ClientVmp::initSockets()
 {
@@ -119,6 +128,21 @@ void ClientVmp::makeCommand(std::vector<uint8_t> &command_pkg, uint8_t mess_id, 
 
     // calculate full parts
     command_pkg[3] = command_pkg.size() / 4 - 1;
+}
+
+std::string ClientVmp::getVmpIp()
+{
+    return ipv4_vmp;
+}
+
+int ClientVmp::getVmpCtrlPort()
+{
+    return vmp_port_ctrl;
+}
+
+int ClientVmp::getVmpDataPort()
+{
+    return vmp_port_data;
 }
 
 std::string ClientVmp::messToStr(uint8_t messId)

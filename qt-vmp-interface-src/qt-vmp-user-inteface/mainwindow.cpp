@@ -135,7 +135,12 @@ void MainWindow::actionOnButtonClicked()
         ui->qline_freq->setEnabled(false);
 
         socketWorkerThread = new QThread(this);
-        socketWorker = new SocketWorker();
+
+        std::string ipVmp = ui->qline_ip->text().toStdString();
+        int portVmp = ui->qline_port->text().toInt();
+        // TODO: add frequency
+
+        socketWorker = new SocketWorker(this, ipVmp, portVmp, portVmp - 1);
         socketWorker->moveToThread(socketWorkerThread);
 
         // <===== debug connections ==================================>

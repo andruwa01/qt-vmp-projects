@@ -22,16 +22,19 @@
 
 class ClientVmp
 {
-
 public:
-    ClientVmp(std::string ipv4_vmp_new,
-              int vmp_port_ctrl_new,
-              int vmp_port_data_new);
+    ClientVmp(std::string ipv4_vmp_new = IP_VMP
+              , int vmp_port_ctrl_new  = PORT_CTRL
+              , int vmp_port_data_new  = PORT_DATA);
     ~ClientVmp();
 
     bool initSockets();
     void sendCommand(std::vector<uint8_t> buffer);
     void makeCommand(std::vector<uint8_t>& command_result, uint8_t mess_id, const std::vector<uint8_t> &buffer_data);
+
+    std::string getVmpIp();
+    int getVmpCtrlPort();
+    int getVmpDataPort();
 
 private:
     int initSocket(std::string ipv4_vmp,  const int port_vmp, const int port_client);
