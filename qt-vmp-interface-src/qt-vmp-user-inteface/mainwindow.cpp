@@ -143,11 +143,11 @@ void MainWindow::actionOnButtonClicked()
         socketWorker = new SocketWorker();
         socketWorker->moveToThread(socketWorkerThread);
 
-        connect(this, &MainWindow::stopWorker, socketWorker, &SocketWorker::stopWorker);
-        connect(socketWorkerThread, &QThread::started, socketWorker, &SocketWorker::startWorker);
-        connect(socketWorker, &SocketWorker::workFinished, socketWorkerThread, &QThread::quit);
-        connect(socketWorker, &SocketWorker::workFinished, socketWorker, &SocketWorker::deleteLater);
-        connect(socketWorkerThread, &QThread::finished, socketWorkerThread, &QThread::deleteLater);
+        connect(this, 				&MainWindow::stopWorker, 	 socketWorker, 		 &SocketWorker::stopWorker);
+        connect(socketWorkerThread, &QThread::started, 		 	 socketWorker, 		 &SocketWorker::startWorker);
+        connect(socketWorker, 		&SocketWorker::workFinished, socketWorkerThread, &QThread::quit);
+        connect(socketWorker, 		&SocketWorker::workFinished, socketWorker, 		 &SocketWorker::deleteLater);
+        connect(socketWorkerThread, &QThread::finished, 		 socketWorkerThread, &QThread::deleteLater);
 
         socketWorkerThread->start();
     }

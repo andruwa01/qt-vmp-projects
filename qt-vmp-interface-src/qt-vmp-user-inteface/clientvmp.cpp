@@ -86,7 +86,8 @@ void ClientVmp::sendCommand(std::vector<uint8_t> buffer)
         qCritical() << "send(): " << strerror(errno);
     }
 
-    qInfo() << "send(): " << "command " << QString::fromStdString(messToStr(buffer[12])) << "sent";
+    QString commandHex = QString::fromStdString(messToStr(buffer[12]));
+    qInfo() << "send(): " << "command " << commandHex << " sent";
 }
 
 void ClientVmp::makeCommand(std::vector<uint8_t> &command_pkg, uint8_t mess_id, const std::vector<uint8_t> &params)
