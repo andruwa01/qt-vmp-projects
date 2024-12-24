@@ -130,16 +130,81 @@ void ClientVmp::makeCommand(std::vector<uint8_t> &command_pkg, uint8_t mess_id, 
     command_pkg[3] = command_pkg.size() / 4 - 1;
 }
 
-void ClientVmp::parseIQPkg(std::vector<uint8_t> &ip_pkg, uint32_t pkg_size)
+uint32_t ClientVmp::parseIQPkg(std::vector<uint8_t> &iq_pkg, uint32_t pkg_size)
 {
-    uint32_t offset = 0;
-    int step = sizeof(uint32_t);
-    int32_t subpkg_size = 0;
+    uint32_t offset = 0; 		 // offset for stepping in pkg
+    int step = sizeof(uint32_t); // 4 bytes step
+    int32_t subpkg_size = 0;	 // track package size up to start of each iteration
     do
     {
+        qDebug() << "offset: " << offset;
+
+        // check if we have enough data to read 4 bytes
+        if (pkg_size < step + offset)
+        {
+            return offset;
+        }
+
+        // check if we have enough data to read all package
+        subpkg_size = *(int32_t*)(iq_pkg.data() + offset);
+        if (pkg_size < offset + step + subpkg_size)
+        {
+            return offset;
+        }
+
+        // header 12 bytes
+
+        // swap (endianess)
+        std::swap(iq_pkg[offset + step + 2], iq_pkg[offset + step + 3]);
+        uint16_t seq_package_num = *(uint16_t*)&iq_pkg[offset + step + 2];
+
+        qDebug() << "seq_package_num" << seq_package_num;
+
+        if (iq_pkg[offset + step] 	  != (uint8_t)0x80 ||
+            iq_pkg[offset + step + 1] != (uint8_t)0x7F ||
+            subpkg_size != package_data_and_header_size)
+        {
+            return offset;
+        }
+
+        // Filing zeroes if there are missed packets
+        if (seq_package_num != uint16_t(last_seq_package_num + 1))
+        {
+            int32_t missed_packages_cnt = 0;
+            if (missed_packages_cnt >= last_seq_package_num)
+            {
+                missed_packages_cnt = missed_packages_cnt - last_seq_package_num - 1;
+            }
+
+            else
+            {
+                // in case seq_package_num counter was enter 65535 - we start counting missed packages
+                // from UINT16_MAX (65535) - last_seq_package_num
+                missed_packages_cnt = UINT16_MAX - last_seq_package_num + seq_package_num;
+            }
+
+            qInfo() << "PRM DROPOUT: " << missed_packages_cnt;
+
+            if (missed_packages_cnt < 30)
+            {
+                if (zero_buffer.size() < (package_data_and_header_size - 12) * missed_packages_cnt)
+                {
+                    zero_buffer.resize(  (package_data_and_header_size - 12) * missed_packages_cnt, 0);
+                }
+
+                qInfo() << "zero filled: " << missed_packages_cnt;
+            }
+        }
+
+        last_seq_package_num = seq_package_num;
+
+        // send data to gui
+
         offset += subpkg_size + step;
     }
     while (offset < pkg_size);
+
+    return offset;
 }
 
 std::string ClientVmp::getVmpIp()

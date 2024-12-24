@@ -31,7 +31,7 @@ public:
     bool initSockets();
     void sendCommand(std::vector<uint8_t> buffer);
     void makeCommand(std::vector<uint8_t>& command_result, uint8_t mess_id, const std::vector<uint8_t> &buffer_data);
-    void parseIQPkg(std::vector<uint8_t>& ip_pkg, uint32_t pkg_size);
+    uint32_t parseIQPkg(std::vector<uint8_t>& iq_pkg, uint32_t pkg_size);
 
     std::string getVmpIp();
     int getVmpCtrlPort();
@@ -42,6 +42,10 @@ private:
 
     std::string messToStr(uint8_t messId);
     std::string messIdToHex(uint8_t messId);
+
+    const uint32_t package_data_and_header_size = FULL_PACKAGE_SIZE;
+    uint16_t last_seq_package_num = -1;
+    std::vector<uint8_t> zero_buffer;
 
     std::string ipv4_vmp;
     int vmp_port_ctrl;
