@@ -9,7 +9,6 @@ void SocketWorker::startWorker()
     {
         qDebug() << "worker is working in thread " << QThread::currentThreadId();
         QThread::sleep(1);
-
         QCoreApplication::processEvents();
     }
 

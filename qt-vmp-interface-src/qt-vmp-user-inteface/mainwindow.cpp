@@ -35,12 +35,12 @@ MainWindow::MainWindow(QWidget *parent)
 //    clientVmp->makeCommand(command, VPrm::MessId::SetRtpCtrl, params);
 //    clientVmp->sendCommand(command);
 
-
 }
 
 MainWindow::~MainWindow()
 {
     qDebug() << "start destructor";
+
     if (socketWorkerThread && socketWorkerThread->isRunning())
     {
         emit stopWorker();
@@ -145,17 +145,27 @@ void MainWindow::actionOnButtonClicked()
 
         connect(this, &MainWindow::stopWorker, socketWorker, &SocketWorker::stopWorker);
         connect(socketWorkerThread, &QThread::started, socketWorker, &SocketWorker::startWorker);
-
         connect(socketWorker, &SocketWorker::workFinished, socketWorkerThread, &QThread::quit);
         connect(socketWorker, &SocketWorker::workFinished, socketWorker, &SocketWorker::deleteLater);
-
         connect(socketWorkerThread, &QThread::finished, socketWorkerThread, &QThread::deleteLater);
 
         socketWorkerThread->start();
     }
     else if (ui->pushButton->text() == "СТОП")
     {
-        emit stopWorker();
+        qDebug() << "stop button pressed";
+
+        if (socketWorkerThread && socketWorkerThread->isRunning())
+        {
+            emit stopWorker();
+            qDebug() << "stop worker emitted from stop button";
+
+            socketWorkerThread->quit();
+            socketWorkerThread->wait();
+
+            delete socketWorkerThread;
+            socketWorkerThread = nullptr;
+        }
 
         ui->pushButton->setText("СТАРТ");
         ui->qline_ip->setEnabled(true);
