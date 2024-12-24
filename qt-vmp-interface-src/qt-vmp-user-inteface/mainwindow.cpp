@@ -138,6 +138,7 @@ void MainWindow::actionOnButtonClicked()
         socketWorker = new SocketWorker();
         socketWorker->moveToThread(socketWorkerThread);
 
+        // <===== debug connections ==================================>
         connect(socketWorkerThread, &QObject::destroyed, []()
         {
             qDebug() << "workerThread destroyed";
@@ -146,12 +147,13 @@ void MainWindow::actionOnButtonClicked()
         {
             qDebug() << "worker destroyed";
         });
+        // <==========================================================>
 
-        connect(this, 				&MainWindow::stopWorker, 	 socketWorker, 		 &SocketWorker::stopWorker);
-        connect(socketWorkerThread, &QThread::started, 		 	 socketWorker, 		 &SocketWorker::startWorker);
-        connect(socketWorker, 		&SocketWorker::workFinished, socketWorkerThread, &QThread::quit);
-        connect(socketWorker, 		&SocketWorker::workFinished, socketWorker, 		 &SocketWorker::deleteLater);
-        connect(socketWorkerThread, &QThread::finished, 		 socketWorkerThread, &QThread::deleteLater);
+        connect(this, 				&MainWindow::stopWorker, 	 socketWorker, 		 &SocketWorker::stopWorker,  Qt::UniqueConnection);
+        connect(socketWorkerThread, &QThread::started, 		 	 socketWorker, 		 &SocketWorker::startWorker, Qt::UniqueConnection);
+        connect(socketWorker, 		&SocketWorker::workFinished, socketWorkerThread, &QThread::quit,			 Qt::UniqueConnection);
+        connect(socketWorker, 		&SocketWorker::workFinished, socketWorker, 		 &SocketWorker::deleteLater, Qt::UniqueConnection);
+        connect(socketWorkerThread, &QThread::finished, 		 socketWorkerThread, &QThread::deleteLater, 	 Qt::UniqueConnection);
 
         socketWorkerThread->start();
     }
@@ -169,7 +171,7 @@ void MainWindow::actionOnButtonClicked()
         }
 
         socketWorkerThread = nullptr;
-        socketWorker = nullptr;
+        socketWorker 	   = nullptr;
 
         ui->pushButton->setText("СТАРТ");
         ui->qline_ip->setEnabled(true);
