@@ -170,10 +170,10 @@ ssize_t ClientVmp::receiveRespFromCommand(const uint8_t &command)
     return read_size;
 }
 
-ssize_t ClientVmp::receiveDataPkg()
+ssize_t ClientVmp::receiveDataPkg(std::vector<uint8_t> pkg)
 {
-    std::vector<uint8_t> pkg_data(FULL_PACKAGE_SIZE);
-    ssize_t read_size = recv(rtcp_socket_data, pkg_data.data(), FULL_PACKAGE_SIZE, 0);
+//    std::vector<uint8_t> pkg_data(FULL_PACKAGE_SIZE);
+    ssize_t read_size = recv(rtcp_socket_data, pkg.data(), FULL_PACKAGE_SIZE, 0);
     if (read_size == -1)
     {
         qCritical() << "data pkg recv():" << strerror(errno);
@@ -182,7 +182,7 @@ ssize_t ClientVmp::receiveDataPkg()
 
     qInfo() << "data pkg recv():" << "get" << read_size << "bytes";
 
-    debugPrintHexPkg(pkg_data);
+    debugPrintHexPkg(pkg);
 
     return read_size;
 }

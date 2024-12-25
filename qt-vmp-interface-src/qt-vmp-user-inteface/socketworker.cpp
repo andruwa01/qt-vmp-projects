@@ -44,12 +44,16 @@ void SocketWorker::startWorker()
     clientVmp->makeCommand(command, VPrm::MessId::SetRtpCtrl, params);
     clientVmp->sendCommand(command);
 
-//    std::vector<char> pkg_data(FULL_PACKAGE_SIZE);
+    std::vector<uint8_t> pkg_data(FULL_PACKAGE_SIZE);
     while(!stopWork)
     {
         qDebug() << "worker is working in thread working . . .";
+
+        pkg_data.clear();
+        pkg_data.resize(FULL_PACKAGE_SIZE);
+
         // get pkg
-        clientVmp->receiveDataPkg();
+        clientVmp->receiveDataPkg(pkg_data);
 
         // calculate fft on pkg, shift freq etc
 
