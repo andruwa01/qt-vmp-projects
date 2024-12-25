@@ -35,7 +35,7 @@ public:
 
     ssize_t receiveRespFromCommand(const uint8_t &command);
     ssize_t receiveDataPkg(std::vector<uint8_t> pkg);
-    void calculateFFT();
+    void calculateFFT(std::vector<uint8_t> &pkg);
     uint32_t parseIQBuffer(std::vector<uint8_t>& iq_pkg, uint32_t pkg_size);
 
     std::string getVmpIp();

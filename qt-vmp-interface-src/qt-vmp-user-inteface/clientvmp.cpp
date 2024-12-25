@@ -186,7 +186,7 @@ ssize_t ClientVmp::receiveDataPkg(std::vector<uint8_t> pkg)
     return read_size;
 }
 
-void ClientVmp::calculateFFT()
+void ClientVmp::calculateFFT(std::vector<uint8_t> &pkg)
 {}
 
 uint32_t ClientVmp::parseIQBuffer(std::vector<uint8_t> &iq_buffer, uint32_t iq_buffer_size)

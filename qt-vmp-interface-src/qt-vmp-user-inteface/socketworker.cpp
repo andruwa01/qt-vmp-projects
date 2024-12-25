@@ -54,8 +54,8 @@ void SocketWorker::startWorker()
 
         // get pkg
         clientVmp->receiveDataPkg(pkg_data);
-
         // calculate fft on pkg, shift freq etc
+        clientVmp->calculateFFT(pkg_data);
 
         // send data to ui (emit signal with data)
 
