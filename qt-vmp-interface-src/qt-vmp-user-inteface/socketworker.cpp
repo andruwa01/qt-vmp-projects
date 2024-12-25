@@ -28,19 +28,24 @@ void SocketWorker::startWorker()
     std::vector<uint8_t> command;
     std::vector<uint8_t> params;
 
+    // Send command to check state of prm
+
     command.clear();
     params.clear();
     params.resize(4);
     clientVmp->makeCommand(command, VPrm::MessId::GetCurrentState, params);
     clientVmp->sendCommand(command);
 
-    command.clear();
-    params.clear();
-    params.resize(4);
-    uint8_t RTPFlow = 1;
-    std::memcpy(&params[0], &RTPFlow, sizeof(RTPFlow));
-    clientVmp->makeCommand(command, VPrm::MessId::SetRtpCtrl, params);
-    clientVmp->sendCommand(command);
+    // check respose
+    clientVmp->receiveRespFromCommand(VPrm::MessId::GetCurrentState);
+
+//    command.clear();
+//    params.clear();
+//    params.resize(4);
+//    uint8_t RTPFlow = 1;
+//    std::memcpy(&params[0], &RTPFlow, sizeof(RTPFlow));
+//    clientVmp->makeCommand(command, VPrm::MessId::SetRtpCtrl, params);
+//    clientVmp->sendCommand(command);
 
     while(!stopWork)
     {

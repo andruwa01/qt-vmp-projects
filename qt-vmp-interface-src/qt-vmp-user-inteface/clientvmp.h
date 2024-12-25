@@ -5,6 +5,7 @@
 #include "vmp_rx_defs.h"
 
 // c/c++
+#include <iostream>
 #include <string>
 #include <cstring>  // std::strerror
 #include <unistd.h> // close
@@ -31,6 +32,8 @@ public:
     bool initSockets();
     void sendCommand(std::vector<uint8_t> buffer);
     void makeCommand(std::vector<uint8_t>& command_result, uint8_t mess_id, const std::vector<uint8_t> &buffer_data);
+
+    ssize_t receiveRespFromCommand(const uint8_t &command);
     uint32_t parseIQBuffer(std::vector<uint8_t>& iq_pkg, uint32_t pkg_size);
 
     std::string getVmpIp();
@@ -42,6 +45,7 @@ private:
 
     std::string messToStr(uint8_t messId);
     std::string messIdToHex(uint8_t messId);
+    void debugPrintHexPkg(std::vector<char> pkg);
 
     const uint32_t package_data_and_header_size = FULL_PACKAGE_SIZE;
     uint16_t last_seq_package_num = -1;
