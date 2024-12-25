@@ -21,6 +21,7 @@
 #include <fftw3.h>
 #include <vector>
 #include <complex>
+#include <math.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

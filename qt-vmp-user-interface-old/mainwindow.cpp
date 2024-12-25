@@ -124,7 +124,7 @@ void MainWindow::plotSinWave()
     series->setColor(randomColor);
 
     const int 	N 			= 1024; // number of singal's points
-    const qreal frequency	= 5;
+    const qreal frequency	= 0.1;
     const qreal amplitude 	= 1.0;
     const qreal sampleRate	= 60;
 
@@ -132,9 +132,10 @@ void MainWindow::plotSinWave()
     std::vector<qreal> signal(N);
     for (int i = 0; i < N; i++) {
         qreal t = i * 1 / sampleRate;
-        signal[i] = amplitude * qSin(2 * M_PI * frequency * t);
+
+        signal[i] = amplitude * sin(2 * M_PI * frequency * t) + amplitude * sin(2 * M_PI * frequency + 5 * t);
 //         draw signal on series
-//        series->append(t, signal[i])
+        series->append(t, signal[i]);
     }
 
     // calculate fft
@@ -148,13 +149,13 @@ void MainWindow::plotSinWave()
         qreal freq = i * sampleRate / N;
         qreal real = out[i][0];
         qreal imag = out[i][1];
-        powerSpectrum[i] = real * real + imag * imag;
+        powerSpectrum[i] = 10 * log10((real * real + imag * imag));
         series->append(freq, powerSpectrum[i]);
     }
 
     // clean previous series from plot
     chart->removeAllSeries();
-    // add new series
+//    // add new series
     chart->addSeries(series);
     chart->setTitle("Sin wave");
     chart->createDefaultAxes();
@@ -167,9 +168,9 @@ void MainWindow::plotSinWave()
 
     chartView->setChart(chart);
 
-    // clean resources of fftw3
-    fftw_destroy_plan(plan);
-    fftw_free(out);
+//    // clean resources of fftw3
+//    fftw_destroy_plan(plan);
+//    fftw_free(out);
 }
 
 void MainWindow::cleanPlot()
