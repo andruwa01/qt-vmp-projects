@@ -97,7 +97,7 @@ void ClientVmp::sendCommand(std::vector<uint8_t> buffer)
 
     QString commandHex = QString::fromStdString(messToStr(buffer[12]));
 
-    qInfo() << "============================>>>" << commandHex;
+    qInfo() << "====================================================================>>>" << commandHex;
 }
 
 void ClientVmp::makeCommand(std::vector<uint8_t> &command_pkg, uint8_t mess_id, const std::vector<uint8_t> &params)
@@ -166,7 +166,7 @@ ssize_t ClientVmp::receiveRespFromCommand(const uint8_t &command)
     }
 
     QString respByteHex = QString::fromStdString(messToStr(command));
-    qInfo() << "<<<========================" << respByteHex;
+    qInfo() << "<<<====================================================================" << respByteHex;
     return read_size;
 }
 
