@@ -88,7 +88,7 @@ int ClientVmp::initSocket(std::string ipv4_vmp, const int port_vmp, const int po
     return sockfd;
 }
 
-void ClientVmp::sendCommand(std::vector<uint8_t> buffer)
+void ClientVmp::sendCommand(std::vector<uint8_t> &buffer)
 {
     if (send(rtcp_socket_ctrl, buffer.data(), buffer.size(), MSG_NOSIGNAL) == -1)
     {

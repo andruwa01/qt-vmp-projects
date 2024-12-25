@@ -30,7 +30,7 @@ public:
     ~ClientVmp();
 
     bool initSockets();
-    void sendCommand(std::vector<uint8_t> buffer);
+    void sendCommand(std::vector<uint8_t> &buffer);
     void makeCommand(std::vector<uint8_t>& command_result, uint8_t mess_id, const std::vector<uint8_t> &buffer_data);
 
     ssize_t receiveRespFromCommand(const uint8_t &command);
