@@ -7,6 +7,7 @@
 #include <QObject>
 #include <QDebug>
 #include <QThread>
+#include <QThreadPool>
 #include <QCoreApplication>
 #include <QString>
 

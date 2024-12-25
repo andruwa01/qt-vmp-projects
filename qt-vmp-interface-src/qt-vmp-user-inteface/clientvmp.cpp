@@ -96,7 +96,8 @@ void ClientVmp::sendCommand(std::vector<uint8_t> buffer)
     }
 
     QString commandHex = QString::fromStdString(messToStr(buffer[12]));
-    qInfo() << "send(): " << "command " << commandHex << " sent";
+
+    qInfo() << "============================>>>" << commandHex;
 }
 
 void ClientVmp::makeCommand(std::vector<uint8_t> &command_pkg, uint8_t mess_id, const std::vector<uint8_t> &params)
@@ -137,16 +138,15 @@ ssize_t ClientVmp::receiveRespFromCommand(const uint8_t &command)
     ssize_t read_size = recv(rtcp_socket_ctrl, resp.data(), COMMAND_RESP_SIZE, 0);
     if (read_size == -1)
     {
-        qCritical() << "responseOnCommand recv(): " << strerror(errno);
+        qCritical() << QString::fromStdString(messToStr(command)) << " answer recv():" << strerror(errno);
         return -1;
     }
 
-    qInfo() << "responseOnCommand recv(): " << "get" << read_size << "bytes";
+    qInfo()  << QString::fromStdString(messToStr(command)) << " answer recv():" << "get" << read_size << "bytes";
 
     debugPrintHexPkg(resp);
 
     uint8_t ackByte = resp[12];
-
     if (command == VPrm::MessId::GetCurrentState)
     {
         if (ackByte != VPrm::MessId::AnsCurrentState)
@@ -164,6 +164,25 @@ ssize_t ClientVmp::receiveRespFromCommand(const uint8_t &command)
             return -1;
         }
     }
+
+    QString respByteHex = QString::fromStdString(messToStr(command));
+    qInfo() << "<<<========================" << respByteHex;
+    return read_size;
+}
+
+ssize_t ClientVmp::receiveDataPkg()
+{
+    std::vector<char> pkg_data(FULL_PACKAGE_SIZE);
+    ssize_t read_size = recv(rtcp_socket_data, pkg_data.data(), FULL_PACKAGE_SIZE, 0);
+    if (read_size == -1)
+    {
+        qCritical() << "data pkg recv():" << strerror(errno);
+        return -1;
+    }
+
+    qInfo() << "data pkg recv():" << "get" << read_size << "bytes";
+
+    debugPrintHexPkg(pkg_data);
 
     return read_size;
 }
