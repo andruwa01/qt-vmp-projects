@@ -51,8 +51,8 @@ void SocketWorker::startWorker()
         // get pkg
         clientVmp->receiveDataPkg();
 
-        // parse pkg
-        // calculate fft , shift freq etc
+        // calculate fft on pkg, shift freq etc
+
         // send data to ui (emit signal with data)
 
         QThread::sleep(1);
