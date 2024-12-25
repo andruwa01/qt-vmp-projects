@@ -130,24 +130,25 @@ void ClientVmp::makeCommand(std::vector<uint8_t> &command_pkg, uint8_t mess_id, 
     command_pkg[3] = command_pkg.size() / 4 - 1;
 }
 
-uint32_t ClientVmp::parseIQPkg(std::vector<uint8_t> &iq_pkg, uint32_t pkg_size)
+uint32_t ClientVmp::parseIQBuffer(std::vector<uint8_t> &iq_buffer, uint32_t iq_buffer_size)
 {
-    uint32_t offset = 0; 		 // offset for stepping in pkg
+    uint32_t offset = 0; 		 // offset for stepping in buffer
     int step = sizeof(uint32_t); // 4 bytes step
-    int32_t subpkg_size = 0;	 // track package size up to start of each iteration
+    int32_t subbuffer_size = 0;	 // track package size up to start of each iteration
+
     do
     {
         qDebug() << "offset: " << offset;
 
         // check if we have enough data to read 4 bytes
-        if (pkg_size < step + offset)
+        if ( iq_buffer_size < step + offset)
         {
             return offset;
         }
 
         // check if we have enough data to read all package
-        subpkg_size = *(int32_t*)(iq_pkg.data() + offset);
-        if (pkg_size < offset + step + subpkg_size)
+        subbuffer_size  = *(int32_t*)(iq_buffer.data() + offset);
+        if ( iq_buffer_size < offset + step + subbuffer_size )
         {
             return offset;
         }
@@ -155,14 +156,14 @@ uint32_t ClientVmp::parseIQPkg(std::vector<uint8_t> &iq_pkg, uint32_t pkg_size)
         // header 12 bytes
 
         // swap (endianess)
-        std::swap(iq_pkg[offset + step + 2], iq_pkg[offset + step + 3]);
-        uint16_t seq_package_num = *(uint16_t*)&iq_pkg[offset + step + 2];
+        std::swap(iq_buffer[offset + step + 2], iq_buffer[offset + step + 3]);
+        uint16_t seq_package_num = *(uint16_t*)&iq_buffer[offset + step + 2];
 
         qDebug() << "seq_package_num" << seq_package_num;
 
-        if (iq_pkg[offset + step] 	  != (uint8_t)0x80 ||
-            iq_pkg[offset + step + 1] != (uint8_t)0x7F ||
-            subpkg_size != package_data_and_header_size)
+        if (iq_buffer[offset + step]     != (uint8_t)0x80 ||
+            iq_buffer[offset + step + 1] != (uint8_t)0x7F ||
+            subbuffer_size  != package_data_and_header_size)
         {
             return offset;
         }
@@ -200,9 +201,9 @@ uint32_t ClientVmp::parseIQPkg(std::vector<uint8_t> &iq_pkg, uint32_t pkg_size)
 
         // send data to gui
 
-        offset += subpkg_size + step;
+        offset += subbuffer_size  + step;
     }
-    while (offset < pkg_size);
+    while (offset <  iq_buffer_size);
 
     return offset;
 }
