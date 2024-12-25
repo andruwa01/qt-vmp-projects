@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
 
     qSetMessagePattern("%{time [yyyy.MM.dd]} %{time [hh:mm:ss]} %{type} ====> %{message} ");
 
-//    MainWindow w;
-//    w.show();
+    MainWindow w;
+    w.show();
     return a.exec();
 }

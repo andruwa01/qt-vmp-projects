@@ -22,6 +22,7 @@ HEADERS += \
  main.h
 
 FORMS += \
+ mainwindow.ui \
  mainwindow.ui
 
 # Path to header files of fftw3
