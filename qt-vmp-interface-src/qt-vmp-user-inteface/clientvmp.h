@@ -35,6 +35,7 @@ public:
 
     ssize_t receiveRespFromCommand(const uint8_t &command);
     ssize_t receiveDataPkg();
+    void calculateFFT();
     uint32_t parseIQBuffer(std::vector<uint8_t>& iq_pkg, uint32_t pkg_size);
 
     std::string getVmpIp();
@@ -46,7 +47,7 @@ private:
 
     std::string messToStr(uint8_t messId);
     std::string messIdToHex(uint8_t messId);
-    void debugPrintHexPkg(std::vector<char> pkg);
+    void debugPrintHexPkg(std::vector<uint8_t> pkg);
 
     const uint32_t package_data_and_header_size = FULL_PACKAGE_SIZE;
     uint16_t last_seq_package_num = -1;

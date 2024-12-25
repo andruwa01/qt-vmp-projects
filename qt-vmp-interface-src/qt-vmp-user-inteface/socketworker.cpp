@@ -44,10 +44,10 @@ void SocketWorker::startWorker()
     clientVmp->makeCommand(command, VPrm::MessId::SetRtpCtrl, params);
     clientVmp->sendCommand(command);
 
+//    std::vector<char> pkg_data(FULL_PACKAGE_SIZE);
     while(!stopWork)
     {
         qDebug() << "worker is working in thread working . . .";
-
         // get pkg
         clientVmp->receiveDataPkg();
 

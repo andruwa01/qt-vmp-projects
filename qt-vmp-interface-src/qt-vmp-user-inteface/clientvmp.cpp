@@ -134,7 +134,7 @@ void ClientVmp::makeCommand(std::vector<uint8_t> &command_pkg, uint8_t mess_id, 
 
 ssize_t ClientVmp::receiveRespFromCommand(const uint8_t &command)
 {
-    std::vector<char> resp(COMMAND_RESP_SIZE);
+    std::vector<uint8_t> resp(COMMAND_RESP_SIZE);
     ssize_t read_size = recv(rtcp_socket_ctrl, resp.data(), COMMAND_RESP_SIZE, 0);
     if (read_size == -1)
     {
@@ -172,7 +172,7 @@ ssize_t ClientVmp::receiveRespFromCommand(const uint8_t &command)
 
 ssize_t ClientVmp::receiveDataPkg()
 {
-    std::vector<char> pkg_data(FULL_PACKAGE_SIZE);
+    std::vector<uint8_t> pkg_data(FULL_PACKAGE_SIZE);
     ssize_t read_size = recv(rtcp_socket_data, pkg_data.data(), FULL_PACKAGE_SIZE, 0);
     if (read_size == -1)
     {
@@ -186,6 +186,9 @@ ssize_t ClientVmp::receiveDataPkg()
 
     return read_size;
 }
+
+void ClientVmp::calculateFFT()
+{}
 
 uint32_t ClientVmp::parseIQBuffer(std::vector<uint8_t> &iq_buffer, uint32_t iq_buffer_size)
 {
@@ -341,7 +344,7 @@ std::string ClientVmp::messIdToHex(uint8_t messId) {
     return oss.str();
 }
 
-void ClientVmp::debugPrintHexPkg(std::vector<char> pkg)
+void ClientVmp::debugPrintHexPkg(std::vector<uint8_t> pkg)
 {
     qDebug() << "pkg data: <=========================================================>" << "\n";
 
