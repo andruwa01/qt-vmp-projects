@@ -165,7 +165,7 @@ ssize_t ClientVmp::receiveRespFromCommand(const uint8_t &command)
         }
     }
 
-    QString respByteHex = QString::fromStdString(messToStr(command));
+    QString respByteHex = QString::fromStdString(messToStr(ackByte));
     qInfo() << "<<<====================================================================" << respByteHex;
     return read_size;
 }
