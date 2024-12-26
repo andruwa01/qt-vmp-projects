@@ -202,20 +202,31 @@ void MainWindow::setChartView()
     ui->graphicsView->setChart(chart);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);
 
-//    series->append(0.0, 0.0);
-//    series->append(0.5, 0.2);
-//    series->append(1.0, 1.0);
-//    series->append(2.0, 2.0);
-//    series->append(3.0, 3.0);
-//    series->append(15.0, 15.0);
+    series->append(0.0, 0.0);
+    series->append(0.5, 0.2);
+    series->append(1.0, 1.0);
+    series->append(2.0, 2.0);
+    series->append(3.0, 3.0);
+    series->append(15.0, 15.0);
 
     chart->addSeries(series);
 
     chart->createDefaultAxes();
     // horizontal
-    chart->axes(Qt::Horizontal).back()->setTitleText("Frequency, KHz");
+    chart->axes(Qt::Horizontal).back()->setTitleText("Frequency, kHz");
     // vertical
     chart->axes(Qt::Vertical).back()->setTitleText("Power, Db");
+
+    series->clear();
+
+    series->append(5.0, 5.0);
+    series->append(10.0, 10.0);
+
+    series->clear();
+
+    series->append(1.0, 2.0);
+    series->append(5.0, 10.0);
+
 }
 
 void MainWindow::drawPowerSpectrum(std::vector<float> &powerSpectrumShifted)
