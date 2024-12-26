@@ -142,7 +142,7 @@ ssize_t ClientVmp::receiveRespFromCommand(const uint8_t &command)
         return -1;
     }
 
-    qInfo()  << QString::fromStdString(messToStr(command)) << " answer recv():" << "get" << read_size << "bytes";
+    qDebug()  << QString::fromStdString(messToStr(command)) << " answer recv():" << "get" << read_size << "bytes";
 
     debugPrintHexPkg(resp);
 
@@ -170,7 +170,7 @@ ssize_t ClientVmp::receiveRespFromCommand(const uint8_t &command)
     return read_size;
 }
 
-ssize_t ClientVmp::receiveDataPkg(std::vector<uint8_t> pkg)
+ssize_t ClientVmp::receiveDataPkg(std::vector<uint8_t> &pkg)
 {
     ssize_t read_size = recv(rtcp_socket_data, pkg.data(), FULL_PACKAGE_SIZE, 0);
     if (read_size == -1)
