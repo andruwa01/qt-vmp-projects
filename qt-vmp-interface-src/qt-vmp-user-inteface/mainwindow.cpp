@@ -195,20 +195,20 @@ void MainWindow::setChartView()
 
     chart->setTitle("Power Spectrum");
 
-    QColor blueColor = QColor::fromRgb(0, 0, 255);
+    QColor blueColor = QColor::fromRgb(0, 16, 255);
     plotColor = blueColor;
     series->setColor(blueColor);
-
 
     ui->graphicsView->setChart(chart);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);
 
-    series->append(0.0, 0.0);
-    series->append(0.5, 0.2);
-    series->append(1.0, 1.0);
-    series->append(2.0, 2.0);
-    series->append(3.0, 3.0);
-    series->append(15.0, 15.0);
+//    series->append(0.0, 0.0);
+//    series->append(0.5, 0.2);
+//    series->append(1.0, 1.0);
+//    series->append(2.0, 2.0);
+//    series->append(3.0, 3.0);
+//    series->append(15.0, 15.0);
+
     chart->addSeries(series);
 
     chart->createDefaultAxes();
