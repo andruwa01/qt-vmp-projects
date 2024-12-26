@@ -38,6 +38,10 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
+    QColor 		plotColor;
+    QLineSeries *series    = nullptr;
+    QChart		*chart	   = nullptr;
+
 // old way
     QThread *socketWorkerThread = nullptr;
     SocketWorker *socketWorker = nullptr;

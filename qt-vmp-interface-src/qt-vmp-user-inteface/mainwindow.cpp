@@ -190,12 +190,32 @@ void MainWindow::actionOnButtonClicked()
 
 void MainWindow::setChartView()
 {
-    QLineSeries *series = new QLineSeries();
+    chart = new QChart();
+    series = new QLineSeries();
+
+    chart->setTitle("Power Spectrum");
+
     QColor blueColor = QColor::fromRgb(0, 0, 255);
+    plotColor = blueColor;
     series->setColor(blueColor);
 
-    ui->graphicsView->
 
+    ui->graphicsView->setChart(chart);
+    ui->graphicsView->setRenderHint(QPainter::Antialiasing);
+
+    series->append(0.0, 0.0);
+    series->append(0.5, 0.2);
+    series->append(1.0, 1.0);
+    series->append(2.0, 2.0);
+    series->append(3.0, 3.0);
+    series->append(15.0, 15.0);
+    chart->addSeries(series);
+
+    chart->createDefaultAxes();
+    // horizontal
+    chart->axes(Qt::Horizontal).back()->setTitleText("Frequency, KHz");
+    // vertical
+    chart->axes(Qt::Vertical).back()->setTitleText("Power, Db");
 }
 
 void MainWindow::drawPowerSpectrum(std::vector<float> &powerSpectrumShifted)
