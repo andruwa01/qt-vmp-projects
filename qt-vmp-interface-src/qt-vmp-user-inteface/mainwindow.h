@@ -5,6 +5,8 @@
 #include "vmp_rx_defs.h"
 #include "socketworker.h"
 
+#include <cmath>
+
 #include <QIntValidator>
 #include <QRegularExpressionValidator>
 #include <QMainWindow>
@@ -30,7 +32,7 @@ signals:
     void stopWorker();
 
 public slots:
-    void drawPowerSpectrum(std::vector<float> &powerSpectrumShifted);
+    void drawPowerSpectrum(const std::vector<float> &powerSpectrumShifted);
 
 private slots:
     void actionOnButtonClicked();

@@ -162,6 +162,8 @@ void MainWindow::actionOnButtonClicked()
         connect(socketWorker, 		&SocketWorker::workFinished, socketWorker, 		 &SocketWorker::deleteLater, Qt::UniqueConnection);
         connect(socketWorkerThread, &QThread::finished, 		 socketWorkerThread, &QThread::deleteLater, 	 Qt::UniqueConnection);
 
+        connect(socketWorker, &SocketWorker::fftCalculated, this, &MainWindow::drawPowerSpectrum);
+
         socketWorkerThread->start();
     }
     else if (ui->pushButton->text() == "СТОП")
@@ -198,17 +200,6 @@ void MainWindow::setChartView()
     QColor blueColor = QColor::fromRgb(0, 16, 255);
     plotColor = blueColor;
     series->setColor(blueColor);
-
-    ui->graphicsView->setChart(chart);
-    ui->graphicsView->setRenderHint(QPainter::Antialiasing);
-
-//    series->append(0.0, 0.0);
-//    series->append(0.5, 0.2);
-//    series->append(1.0, 1.0);
-//    series->append(2.0, 2.0);
-//    series->append(3.0, 3.0);
-//    series->append(15.0, 15.0);
-
     chart->addSeries(series);
 
     chart->createDefaultAxes();
@@ -217,17 +208,30 @@ void MainWindow::setChartView()
     // vertical
     chart->axes(Qt::Vertical).back()->setTitleText("Power, Db");
 
-//    series->clear();
-
-//    series->append(5.0, 5.0);
-//    series->append(10.0, 10.0);
-
-//    series->clear();
-
-//    series->append(1.0, 2.0);
-//    series->append(5.0, 10.0);
-
+    ui->graphicsView->setChart(chart);
+    ui->graphicsView->setRenderHint(QPainter::Antialiasing);
 }
 
-void MainWindow::drawPowerSpectrum(std::vector<float> &powerSpectrumShifted)
-{}
+void MainWindow::drawPowerSpectrum(const std::vector<float> &powerSpectrumShifted)
+{
+    qDebug() << "start drawing power spectrum";
+
+//    series->clear();
+
+//    int sampleRate = 100; // kHz
+//    for (size_t i = 0; i < powerSpectrumShifted.size(); i++)
+//    {
+//        float freq = ( i * sampleRate ) / powerSpectrumShifted.size();
+
+//        if (!(isinf(freq) || isinf(powerSpectrumShifted[i])))
+//        {
+//            series->append(freq, powerSpectrumShifted[i]);
+//        }
+//    }
+
+//    chart->removeAllSeries();
+//    chart->addSeries(series);
+//    chart->createDefaultAxes();
+
+
+}

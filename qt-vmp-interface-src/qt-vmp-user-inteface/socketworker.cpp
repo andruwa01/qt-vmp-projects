@@ -52,11 +52,8 @@ void SocketWorker::startWorker()
         pkg_data.clear();
         pkg_data.resize(FULL_PACKAGE_SIZE);
 
-        // get pkg
         clientVmp->receiveDataPkg(pkg_data);
-        // calculate fft on pkg, shift freq etc
         calculateFFTsendToUi(pkg_data);
-        // send data to ui (emit signal with data)
 
         QThread::sleep(5);
         QCoreApplication::processEvents();
@@ -98,8 +95,8 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg)
         float imag = (float)*reinterpret_cast<int32_t*>(&pkg[offset]);
         float real = (float)*reinterpret_cast<int32_t*>(&pkg[offset + 4]);
 
-        qDebug() << "imag: " << imag;
-        qDebug() << "real: " << real;
+//        qDebug() << "imag: " << imag;
+//        qDebug() << "real: " << real;
 
         in[fftwIndex][0] = real;
         in[fftwIndex][1] = imag;
@@ -120,7 +117,7 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg)
         float imag = out[i][1];
         powerSpectrum[i] = 10 * log10(real * real + imag * imag);
 
-        qDebug() << "powerSpectrum[i]" << powerSpectrum[i];
+//        qDebug() << "powerSpectrum[i]" << powerSpectrum[i];
     }
 
     std::vector<float> powerSpectrumShifted(N);
@@ -128,7 +125,11 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg)
     {
         powerSpectrumShifted[i] = powerSpectrum[N / 2 + i];
         powerSpectrumShifted[N / 2 + i] = powerSpectrum[i];
+
     }
 
+    qDebug() << "powerSpectrumShifted: " << powerSpectrumShifted;
+
     emit fftCalculated(powerSpectrumShifted);
+    qDebug() << "fft calculated";
 }
