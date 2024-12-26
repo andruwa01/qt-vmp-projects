@@ -185,3 +185,8 @@ void MainWindow::actionOnButtonClicked()
         ui->qline_freq->setEnabled(true);
     }
 }
+
+
+void MainWindow::drawPowerSpectrum(std::vector<float> &powerSpectrumShifted)
+{
+}

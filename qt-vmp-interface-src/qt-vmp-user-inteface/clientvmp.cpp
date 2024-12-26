@@ -186,9 +186,6 @@ ssize_t ClientVmp::receiveDataPkg(std::vector<uint8_t> &pkg)
     return read_size;
 }
 
-void ClientVmp::calculateFFT(std::vector<uint8_t> &pkg)
-{}
-
 uint32_t ClientVmp::parseIQBuffer(std::vector<uint8_t> &iq_buffer, uint32_t iq_buffer_size)
 {
     uint32_t offset = 0; 		 // offset for stepping in buffer by one package with data

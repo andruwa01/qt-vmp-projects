@@ -10,6 +10,10 @@
 #include <QMainWindow>
 #include <QLineEdit>
 
+#include <QtCharts/QChartView>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QValueAxis>
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -24,6 +28,9 @@ public:
 
 signals:
     void stopWorker();
+
+public slots:
+    void drawPowerSpectrum(std::vector<float> &powerSpectrumShifted);
 
 private slots:
     void actionOnButtonClicked();

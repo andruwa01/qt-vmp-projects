@@ -25,6 +25,11 @@ HEADERS += \
 FORMS += \
     mainwindow.ui
 
+# Path to header files of fftw3f
+INCLUDEPATH += /usr/include
+# Path to libraries fftw3f
+LIBS += -L/usr/lib -lfftw3f
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin

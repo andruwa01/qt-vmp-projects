@@ -55,11 +55,10 @@ void SocketWorker::startWorker()
         // get pkg
         clientVmp->receiveDataPkg(pkg_data);
         // calculate fft on pkg, shift freq etc
-        clientVmp->calculateFFT(pkg_data);
-
+        calculateFFTsendToUi(pkg_data);
         // send data to ui (emit signal with data)
 
-        QThread::sleep(1);
+        QThread::sleep(5);
         QCoreApplication::processEvents();
     }
 
@@ -82,4 +81,54 @@ void SocketWorker::stopWorker()
     clientVmp->sendCommand(command);
 
     clientVmp->receiveRespFromCommand(VPrm::MessId::SetRtpCtrl);
+}
+
+void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg)
+{
+    const size_t N = (pkg.size() - PACKAGE_HEADER_SIZE) / (sizeof(float) * 2);
+
+    fftwf_complex *in  = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * N);
+    fftwf_complex *out = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * N);
+    // FFTW_MEASURE could be added
+    fftwf_plan plan = fftwf_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
+
+    size_t fftwIndex = 0;
+    for (size_t offset = PACKAGE_HEADER_SIZE; offset < pkg.size(); offset += 8)
+    {
+        float imag = (float)*reinterpret_cast<int32_t*>(&pkg[offset]);
+        float real = (float)*reinterpret_cast<int32_t*>(&pkg[offset + 4]);
+
+        qDebug() << "imag: " << imag;
+        qDebug() << "real: " << real;
+
+        in[fftwIndex][0] = real;
+        in[fftwIndex][1] = imag;
+
+        fftwIndex++;
+    }
+
+    fftwf_execute(plan);
+
+    fftwf_destroy_plan(plan);
+    fftwf_free(in);
+    fftwf_free(out);
+
+    std::vector<float> powerSpectrum(N);
+    for (size_t i = 0; i < N; i++)
+    {
+        float real = out[i][0];
+        float imag = out[i][1];
+        powerSpectrum[i] = 10 * log10(real * real + imag * imag);
+
+        qDebug() << "powerSpectrum[i]" << powerSpectrum[i];
+    }
+
+    std::vector<float> powerSpectrumShifted(N);
+    for (size_t i = 0; i < N / 2; i++)
+    {
+        powerSpectrumShifted[i] = powerSpectrum[N / 2 + i];
+        powerSpectrumShifted[N / 2 + i] = powerSpectrum[i];
+    }
+
+    emit fftCalculated(powerSpectrumShifted);
 }

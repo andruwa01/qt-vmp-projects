@@ -11,6 +11,9 @@
 #include <QCoreApplication>
 #include <QString>
 
+#include <fftw3.h>
+#include <math.h>
+
 class SocketWorker : public QObject
 {
     Q_OBJECT
@@ -24,12 +27,15 @@ public:
 
 signals:
     void workFinished();
+    void fftCalculated(std::vector<float> &powerSpectrumShifted);
 
 public slots:
     void startWorker();
     void stopWorker();
 
 private:
+    void calculateFFTsendToUi(std::vector<uint8_t> &pkg);
+
     bool stopWork;
     ClientVmp *clientVmp = nullptr;
 };
