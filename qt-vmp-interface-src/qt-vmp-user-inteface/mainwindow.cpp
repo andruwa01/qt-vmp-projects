@@ -9,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    setChartView();
+
     // setup ui validation
     setValidationIp();
     setValidationPort();
@@ -186,7 +188,15 @@ void MainWindow::actionOnButtonClicked()
     }
 }
 
+void MainWindow::setChartView()
+{
+    QLineSeries *series = new QLineSeries();
+    QColor blueColor = QColor::fromRgb(0, 0, 255);
+    series->setColor(blueColor);
+
+    ui->graphicsView->
+
+}
 
 void MainWindow::drawPowerSpectrum(std::vector<float> &powerSpectrumShifted)
-{
-}
+{}

@@ -51,5 +51,7 @@ private:
     void validateInputs();
     bool checkInputValid(QLineEdit *lineEdit);
 
+    void setChartView();
+
 };
 #endif // MAINWINDOW_H
