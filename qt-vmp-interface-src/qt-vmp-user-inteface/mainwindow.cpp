@@ -193,6 +193,7 @@ void MainWindow::actionOnButtonClicked()
 void MainWindow::setChartView()
 {
     auto series = new QLineSeries;
+
 //    series->setName("series");
 
 //    series->append(0, 6);
@@ -206,7 +207,9 @@ void MainWindow::setChartView()
     chart->addSeries(series);
     chart->setTitle("Simple Spline Chart");
     chart->createDefaultAxes();
-    chart->axes(Qt::Vertical).first()->setRange(0, 10);
+    chart->axes(Qt::Horizontal).back()->setTitleText("Frequency, ?");
+    chart->axes(Qt::Vertical).first()->setRange(0, 100);
+    chart->axes(Qt::Vertical).back()->setTitleText("Power, dB");
 
     ui->graphicsView->setChart(chart);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);
@@ -241,7 +244,9 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> &powerSpectrumShifte
     chart->addSeries(series);
     chart->setTitle("Simple Spline Chart");
     chart->createDefaultAxes();
+    chart->axes(Qt::Horizontal).back()->setTitleText("Frequency, ?");
     chart->axes(Qt::Vertical).first()->setRange(0, 100);
+    chart->axes(Qt::Vertical).back()->setTitleText("Power, dB");
 
     ui->graphicsView->setChart(chart);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);
