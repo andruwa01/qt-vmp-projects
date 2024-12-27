@@ -236,7 +236,6 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> &powerSpectrumShifte
     }
 
     auto chart = new QChart;
-
     chart->legend()->hide();
     chart->addSeries(series);
     chart->setTitle("Simple Spline Chart");
