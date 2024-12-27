@@ -145,7 +145,7 @@ void MainWindow::actionOnButtonClicked()
         socketWorker = new SocketWorker(this, ipVmp, portVmp, portVmp - 1);
         socketWorker->moveToThread(socketWorkerThread);
 
-        // <===== debug connections ==================================>
+        // <===== debug connections ==================================> //
         connect(socketWorkerThread, &QObject::destroyed, []()
         {
             qDebug() << "workerThread destroyed";
@@ -154,7 +154,7 @@ void MainWindow::actionOnButtonClicked()
         {
             qDebug() << "worker destroyed";
         });
-        // <==========================================================>
+        // <==========================================================> //
 
         connect(this, 				&MainWindow::stopWorker, 	 socketWorker, 		 &SocketWorker::stopWorker,  Qt::UniqueConnection);
         connect(socketWorkerThread, &QThread::started, 		 	 socketWorker, 		 &SocketWorker::startWorker, Qt::UniqueConnection);
