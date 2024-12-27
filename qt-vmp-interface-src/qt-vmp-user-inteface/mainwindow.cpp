@@ -224,10 +224,10 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> &powerSpectrumShifte
     auto series = new QLineSeries;
     series->setName("series");
 
-    int sampleRate = 48000;  // kHz
+    int freqRange = 48000;  // Hz
     for (size_t i = 0; i < powerSpectrumShifted.size(); i++)
     {
-        float freq = int(( i * sampleRate ) / powerSpectrumShifted.size()) - sampleRate / 2;
+        float freq = int(( i * freqRange  ) / powerSpectrumShifted.size()) - freqRange / 2;
 
         if (!(isinf(freq) || isinf(powerSpectrumShifted[i])))
         {
@@ -241,7 +241,7 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> &powerSpectrumShifte
     chart->addSeries(series);
     chart->setTitle("Simple Spline Chart");
     chart->createDefaultAxes();
-    chart->axes(Qt::Horizontal).back()->setTitleText("Frequency, ?");
+    chart->axes(Qt::Horizontal).back()->setTitleText("Frequency, Hz");
 //    chart->axes(Qt::Horizontal).back()->setRange(-30000, 30000);
     chart->axes(Qt::Vertical).first()->setRange(0, 100);
     chart->axes(Qt::Vertical).back()->setTitleText("Power, dB");
