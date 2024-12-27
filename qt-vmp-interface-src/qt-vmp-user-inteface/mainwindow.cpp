@@ -156,13 +156,13 @@ void MainWindow::actionOnButtonClicked()
         });
         // <==========================================================> //
 
-        connect(this, 				&MainWindow::stopWorker, 	 socketWorker, 		 &SocketWorker::stopWorker,  Qt::UniqueConnection);
-        connect(socketWorkerThread, &QThread::started, 		 	 socketWorker, 		 &SocketWorker::startWorker, Qt::UniqueConnection);
-        connect(socketWorker, 		&SocketWorker::workFinished, socketWorkerThread, &QThread::quit,			 Qt::UniqueConnection);
-        connect(socketWorker, 		&SocketWorker::workFinished, socketWorker, 		 &SocketWorker::deleteLater, Qt::UniqueConnection);
-        connect(socketWorkerThread, &QThread::finished, 		 socketWorkerThread, &QThread::deleteLater, 	 Qt::UniqueConnection);
+        connect(this, 				&MainWindow::stopWorker, 	  socketWorker, 	  &SocketWorker::stopWorker,  Qt::UniqueConnection);
+        connect(socketWorkerThread, &QThread::started, 		 	  socketWorker, 	  &SocketWorker::startWorker, Qt::UniqueConnection);
+        connect(socketWorker, 		&SocketWorker::workFinished,  socketWorkerThread, &QThread::quit,			  Qt::UniqueConnection);
+        connect(socketWorker, 		&SocketWorker::workFinished,  socketWorker, 	  &SocketWorker::deleteLater, Qt::UniqueConnection);
+        connect(socketWorkerThread, &QThread::finished, 		  socketWorkerThread, &QThread::deleteLater, 	  Qt::UniqueConnection);
 
-        connect(socketWorker, &SocketWorker::fftCalculated, this, &MainWindow::drawPowerSpectrum);
+        connect(socketWorker, 		&SocketWorker::fftCalculated, this, 			  &MainWindow::drawPowerSpectrum);
 
         socketWorkerThread->start();
     }
