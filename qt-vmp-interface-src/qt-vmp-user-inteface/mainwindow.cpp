@@ -192,16 +192,14 @@ void MainWindow::actionOnButtonClicked()
 
 void MainWindow::setChartView()
 {
-    chart = new QChart();
     series = new QLineSeries();
-
-    chart->setTitle("Power Spectrum");
-
     QColor blueColor = QColor::fromRgb(0, 16, 255);
     plotColor = blueColor;
     series->setColor(blueColor);
-    chart->addSeries(series);
 
+    chart = new QChart();
+    chart->setTitle("Power Spectrum");
+    chart->addSeries(series);
     chart->createDefaultAxes();
     // horizontal
     chart->axes(Qt::Horizontal).back()->setTitleText("Frequency, kHz");
