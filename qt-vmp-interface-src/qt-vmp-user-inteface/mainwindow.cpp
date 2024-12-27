@@ -222,7 +222,9 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> &powerSpectrumShifte
     auto series = new QSplineSeries;
     series->setName("series");
 
-    int sampleRate = 100000; // kHz
+//    int sampleRate = 100000; // kHz
+    int sampleRate = 48000;  // kHz
+
     for (size_t i = 0; i < powerSpectrumShifted.size(); i++)
     {
         float freq = ( i * sampleRate ) / powerSpectrumShifted.size();
