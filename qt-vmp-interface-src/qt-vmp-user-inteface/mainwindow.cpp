@@ -192,17 +192,18 @@ void MainWindow::actionOnButtonClicked()
 
 void MainWindow::setChartView()
 {
-    auto series = new QLineSeries;
-    series->setName("series");
+    auto series = new QSplineSeries;
+//    series->setName("series");
 
-    series->append(0, 6);
-    series->append(2, 4);
-    series->append(3, 8);
-    series->append(7, 4);
-    series->append(10, 5);
+//    series->append(0, 6);
+//    series->append(2, 4);
+//    series->append(3, 8);
+//    series->append(7, 4);
+//    series->append(10, 5);
 
     auto chart = new QChart;
     chart->legend()->hide();
+
     chart->addSeries(series);
     chart->setTitle("Simple Spline Chart");
     chart->createDefaultAxes();
@@ -218,10 +219,10 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> &powerSpectrumShifte
 
     qDebug() << powerSpectrumShifted;
 
-    auto series = new QLineSeries;
+    auto series = new QSplineSeries;
     series->setName("series");
 
-       int sampleRate = 48000; // kHz
+    int sampleRate = 100000; // kHz
     for (size_t i = 0; i < powerSpectrumShifted.size(); i++)
     {
         float freq = ( i * sampleRate ) / powerSpectrumShifted.size();
@@ -238,7 +239,7 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> &powerSpectrumShifte
     chart->addSeries(series);
     chart->setTitle("Simple Spline Chart");
     chart->createDefaultAxes();
-//    chart->axes(Qt::Vertical).first()->setRange(0, 10);
+    chart->axes(Qt::Vertical).first()->setRange(0, 100);
 
     ui->graphicsView->setChart(chart);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);

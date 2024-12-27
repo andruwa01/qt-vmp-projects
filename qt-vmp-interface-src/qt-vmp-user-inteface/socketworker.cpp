@@ -115,7 +115,9 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg)
     {
         float real = out[i][0];
         float imag = out[i][1];
-        powerSpectrum[i] = 10 * log10(real * real + imag * imag);
+        // Power spectre db
+        powerSpectrum[i] = 20 * log10(std::sqrt(real * real + imag * imag));
+//        powerSpectrum[i] = 10 * log10(real * real + imag * imag);
     }
 
     qDebug() << "powerSpectrum: " << powerSpectrum;
