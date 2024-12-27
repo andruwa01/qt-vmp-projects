@@ -207,7 +207,7 @@ void MainWindow::setChartView()
     chart->addSeries(series);
     chart->setTitle("Simple Spline Chart");
     chart->createDefaultAxes();
-    chart->axes(Qt::Horizontal).back()->setTitleText("Frequency, ?");
+    chart->axes(Qt::Horizontal).back()->setTitleText("Frequency, Hz");
     chart->axes(Qt::Vertical).first()->setRange(0, 100);
     chart->axes(Qt::Vertical).back()->setTitleText("Power, dB");
 
