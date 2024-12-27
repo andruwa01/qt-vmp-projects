@@ -192,7 +192,7 @@ void MainWindow::actionOnButtonClicked()
 
 void MainWindow::setChartView()
 {
-    auto series = new QSplineSeries;
+    auto series = new QLineSeries;
 //    series->setName("series");
 
 //    series->append(0, 6);
@@ -219,7 +219,7 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> &powerSpectrumShifte
 
     qDebug() << powerSpectrumShifted;
 
-    auto series = new QSplineSeries;
+    auto series = new QLineSeries;
     series->setName("series");
 
 //    int sampleRate = 100000; // kHz
