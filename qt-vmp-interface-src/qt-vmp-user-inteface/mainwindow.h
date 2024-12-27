@@ -14,6 +14,7 @@
 
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
+#include <QtCharts/QSplineSeries>
 #include <QtCharts/QValueAxis>
 
 QT_BEGIN_NAMESPACE
@@ -41,7 +42,6 @@ private:
     Ui::MainWindow *ui;
 
     QColor 		plotColor;
-    QLineSeries *series    = nullptr;
     QChart		*chart	   = nullptr;
 
 // old way

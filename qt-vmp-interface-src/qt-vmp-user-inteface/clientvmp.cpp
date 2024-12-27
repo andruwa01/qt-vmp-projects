@@ -144,7 +144,7 @@ ssize_t ClientVmp::receiveRespFromCommand(const uint8_t &command)
 
     qDebug()  << QString::fromStdString(messToStr(command)) << " answer recv():" << "get" << read_size << "bytes";
 
-    debugPrintHexPkg(resp);
+//    debugPrintHexPkg(resp);
 
     uint8_t ackByte = resp[12];
     if (command == VPrm::MessId::GetCurrentState)
@@ -181,7 +181,7 @@ ssize_t ClientVmp::receiveDataPkg(std::vector<uint8_t> &pkg)
 
     qInfo() << "data pkg recv():" << "get" << read_size << "bytes";
 
-    debugPrintHexPkg(pkg);
+//    debugPrintHexPkg(pkg);
 
     return read_size;
 }

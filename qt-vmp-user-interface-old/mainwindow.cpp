@@ -135,7 +135,7 @@ void MainWindow::plotSinWave()
 
         signal[i] = amplitude * sin(2 * M_PI * frequency * t) + amplitude * sin(2 * M_PI * frequency + 5 * t);
 //         draw signal on series
-        series->append(t, signal[i]);
+//        series->append(t, signal[i]);
     }
 
     // calculate fft
