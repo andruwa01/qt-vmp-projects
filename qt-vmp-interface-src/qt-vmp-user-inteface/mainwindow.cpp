@@ -203,7 +203,6 @@ void MainWindow::setChartView()
 
     auto chart = new QChart;
     chart->legend()->hide();
-
     chart->addSeries(series);
     chart->setTitle("Simple Spline Chart");
     chart->createDefaultAxes();
@@ -217,13 +216,14 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> &powerSpectrumShifte
 {
     qDebug() << "start drawing power spectrum";
 
-    qDebug() << powerSpectrumShifted;
+//    qDebug() << powerSpectrumShifted;
 
     auto series = new QLineSeries;
     series->setName("series");
 
 //    int sampleRate = 100000; // kHz
     int sampleRate = 48000;  // kHz
+//    int sampleRate = 120000;
 
     for (size_t i = 0; i < powerSpectrumShifted.size(); i++)
     {
@@ -245,5 +245,4 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> &powerSpectrumShifte
 
     ui->graphicsView->setChart(chart);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);
-
 }
