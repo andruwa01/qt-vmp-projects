@@ -238,7 +238,7 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> &powerSpectrumShifte
     auto chart = new QChart;
     chart->legend()->hide();
     chart->addSeries(series);
-    chart->setTitle("Simple Spline Chart");
+    chart->setTitle("Signal spectre");
     chart->createDefaultAxes();
     chart->axes(Qt::Horizontal).back()->setTitleText("Frequency, Hz");
 //    chart->axes(Qt::Horizontal).back()->setRange(-30000, 30000);
