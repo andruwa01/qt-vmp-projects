@@ -205,7 +205,7 @@ void MainWindow::setChartView()
     auto chart = new QChart;
     chart->legend()->hide();
     chart->addSeries(series);
-    chart->setTitle("Simple Spline Chart");
+    chart->setTitle("Signal spectre");
     chart->createDefaultAxes();
     chart->axes(Qt::Horizontal).back()->setTitleText("Frequency, Hz");
     chart->axes(Qt::Vertical).first()->setRange(0, 100);

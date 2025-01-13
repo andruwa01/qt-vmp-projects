@@ -22,7 +22,6 @@ void SocketWorker::startWorker()
     qDebug() << "VmpCtrlPort: " << clientVmp->getVmpCtrlPort();
     qDebug() << "VmpDataPort: " << clientVmp->getVmpDataPort();
 
-    // socketCode
     clientVmp->initSockets();
 
     std::vector<uint8_t> command;
