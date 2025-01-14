@@ -227,6 +227,7 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> &powerSpectrumShifte
     int freqRange = 48000;  // Hz
     for (size_t i = 0; i < powerSpectrumShifted.size(); i++)
     {
+        // center on 0 hz
         float freq = int(( i * freqRange  ) / powerSpectrumShifted.size()) - freqRange / 2;
 
         if (!(isinf(freq) || isinf(powerSpectrumShifted[i])))
