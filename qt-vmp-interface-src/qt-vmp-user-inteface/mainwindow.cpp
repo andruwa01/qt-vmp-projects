@@ -243,7 +243,7 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> &powerSpectrumShifte
     chart->createDefaultAxes();
     chart->axes(Qt::Horizontal).back()->setTitleText("Frequency, Hz");
 //    chart->axes(Qt::Horizontal).back()->setRange(-30000, 30000);
-//    chart->axes(Qt::Vertical).first()->setRange(0, 100);
+    chart->axes(Qt::Vertical).first()->setRange(0, 80);
     chart->axes(Qt::Vertical).back()->setTitleText("Power, dB");
 
     ui->graphicsView->setChart(chart);
