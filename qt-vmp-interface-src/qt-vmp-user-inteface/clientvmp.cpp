@@ -2,10 +2,12 @@
 
 ClientVmp::ClientVmp(std::string ipv4_vmp_new
                     , int vmp_port_ctrl_new
-                    , int vmp_port_data_new)
+                    , int vmp_port_data_new
+                    , int frequency_new)
     : ipv4_vmp(ipv4_vmp_new),
       vmp_port_ctrl(vmp_port_ctrl_new),
-      vmp_port_data(vmp_port_data_new)
+      vmp_port_data(vmp_port_data_new),
+      vmp_frequency_hz(frequency_new)
 {
     qDebug() << "ClientVmp constructor called";
 }
@@ -165,6 +167,15 @@ ssize_t ClientVmp::receiveRespFromCommand(const uint8_t &command)
         }
     }
 
+    if (command == VPrm::MessId::SetFrequency)
+    {
+        if (ackByte != VPrm::MessId::AckFrequency)
+        {
+            qCritical() << "ERROR! don't get" << QString::fromStdString(messToStr(VPrm::MessId::AckFrequency)) << "\n";
+            return -1;
+        }
+    }
+
     QString respByteHex = QString::fromStdString(messToStr(ackByte));
     qInfo() << "<<<====================================================================" << respByteHex;
     return read_size;
@@ -277,6 +288,11 @@ int ClientVmp::getVmpCtrlPort()
 int ClientVmp::getVmpDataPort()
 {
     return vmp_port_data;
+}
+
+int ClientVmp::getVmpFreq()
+{
+    return vmp_frequency_hz;
 }
 
 std::string ClientVmp::messToStr(uint8_t messId)

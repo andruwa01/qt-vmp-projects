@@ -1,6 +1,8 @@
 #ifndef IPINFO_H
 #define IPINFO_H
 
+#define FREQ_DEFAULT_HZ 1.5e6
+
 #define IP_LOCALHOST "127.0.0.1"
 
 #define IP_VMP 		 "192.168.21.2"

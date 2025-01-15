@@ -3,9 +3,10 @@
 SocketWorker::SocketWorker(  std::string ipv4_vmp_new
                            , int vmp_port_ctrl_new
                            , int vmp_port_data_new
+                           , int frequency_new
                            , QObject *parent)
     :  QObject(parent)
-    ,  clientVmp(new ClientVmp(ipv4_vmp_new, vmp_port_ctrl_new, vmp_port_data_new))
+    ,  clientVmp(new ClientVmp(ipv4_vmp_new, vmp_port_ctrl_new, vmp_port_data_new, frequency_new))
 {
     qDebug() << "SocketWorker constructor called";
 }
@@ -27,14 +28,15 @@ void SocketWorker::startWorker()
     std::vector<uint8_t> command;
     std::vector<uint8_t> params;
 
+    // get current state of vmp
     command.clear();
     params.clear();
     params.resize(4);
     clientVmp->makeCommand(command, VPrm::MessId::GetCurrentState, params);
     clientVmp->sendCommand(command);
-
     clientVmp->receiveRespFromCommand(VPrm::MessId::GetCurrentState);
 
+    // start rtp flow
     command.clear();
     params.clear();
     params.resize(4);
@@ -42,6 +44,19 @@ void SocketWorker::startWorker()
     std::memcpy(&params[0], &RTPFlow, sizeof(RTPFlow));
     clientVmp->makeCommand(command, VPrm::MessId::SetRtpCtrl, params);
     clientVmp->sendCommand(command);
+
+    // set frequency
+    int32_t currentFreq = clientVmp->getVmpFreq();
+
+    qDebug() << "current freq:" << currentFreq;
+
+    command.clear();
+    params.clear();
+    params.resize(4);
+    std::memcpy(&params[0], &currentFreq, sizeof(currentFreq));
+    clientVmp->makeCommand(command, VPrm::MessId::SetFrequency, params);
+    clientVmp->sendCommand(command);
+    clientVmp->receiveRespFromCommand(VPrm::MessId::SetFrequency);
 
     std::vector<uint8_t> pkg_data(FULL_PACKAGE_SIZE);
     while(!stopWork)

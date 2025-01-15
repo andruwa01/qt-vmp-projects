@@ -26,7 +26,8 @@ class ClientVmp
 public:
     ClientVmp(std::string ipv4_vmp_new = IP_VMP
               , int vmp_port_ctrl_new  = PORT_CTRL
-              , int vmp_port_data_new  = PORT_DATA);
+              , int vmp_port_data_new  = PORT_DATA
+              , int frequency_new      = FREQ_DEFAULT_HZ);
     ~ClientVmp();
 
     bool initSockets();
@@ -40,6 +41,7 @@ public:
     std::string getVmpIp();
     int getVmpCtrlPort();
     int getVmpDataPort();
+    int getVmpFreq();
 
 private:
     int initSocket(std::string ipv4_vmp,  const int port_vmp, const int port_client);
@@ -57,6 +59,7 @@ private:
     int vmp_port_data;
     int rtcp_socket_ctrl;
     int rtcp_socket_data;
+    int vmp_frequency_hz;
 };
 
 #endif // CLIENTVMP_H

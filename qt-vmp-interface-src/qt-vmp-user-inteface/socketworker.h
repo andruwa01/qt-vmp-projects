@@ -22,6 +22,7 @@ public:
     SocketWorker( std::string ipv4_vmp_new = IP_VMP
                 , int vmp_port_ctrl_new = PORT_CTRL
                 , int vmp_port_data_new = PORT_DATA
+                , int frequency = 1.5e6
                 , QObject *parent = nullptr);
     ~SocketWorker();
 

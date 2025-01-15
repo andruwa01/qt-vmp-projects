@@ -140,10 +140,10 @@ void MainWindow::actionOnButtonClicked()
         socketWorkerThread = new QThread(this);
 
         std::string ipVmp = ui->qline_ip->text().toStdString();
-        int portVmp = ui->qline_port->text().toInt();
-        // TODO: add frequency
+        int portVmp 	  = ui->qline_port->text().toInt();
+        int freqKHz 	  = ui->qline_freq->text().toInt();
 
-        socketWorker = new SocketWorker(ipVmp, portVmp, portVmp - 1);
+        socketWorker = new SocketWorker(ipVmp, portVmp, portVmp - 1, freqKHz * 1e3);
         socketWorker->moveToThread(socketWorkerThread);
 
         // <===== debug connections ==================================> //
@@ -234,9 +234,10 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> &powerSpectrumShifte
     chart->setTitle("Signal spectre");
     chart->createDefaultAxes();
     chart->axes(Qt::Horizontal).back()->setTitleText("Frequency, Hz");
+    chart->axes(Qt::Vertical).back()->setTitleText("Power, dB");
+
 //    chart->axes(Qt::Horizontal).back()->setRange(-30000, 30000);
 //    chart->axes(Qt::Vertical).first()->setRange(0, 80);
-    chart->axes(Qt::Vertical).back()->setTitleText("Power, dB");
 
     ui->graphicsView->setChart(chart);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);
