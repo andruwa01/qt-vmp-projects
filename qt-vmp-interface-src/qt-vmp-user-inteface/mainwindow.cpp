@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-    qDebug() << "main window was closed";
+    qDebug() << "close button pressed";
 
     if (socketWorkerThread && socketWorkerThread->isRunning())
     {
