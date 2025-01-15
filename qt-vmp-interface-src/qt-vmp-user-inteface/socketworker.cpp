@@ -46,9 +46,8 @@ void SocketWorker::startWorker()
     std::vector<uint8_t> pkg_data(FULL_PACKAGE_SIZE);
     while(!stopWork)
     {
-        QCoreApplication::processEvents();
-
         qDebug() << "worker is working in thread working . . .";
+        QCoreApplication::processEvents();
 
         pkg_data.clear();
         pkg_data.resize(FULL_PACKAGE_SIZE);
@@ -56,7 +55,7 @@ void SocketWorker::startWorker()
         clientVmp->receiveDataPkg(pkg_data);
         calculateFFTsendToUi(pkg_data);
 
-        QThread::msleep(1000);
+        QThread::msleep(10);
     }
 
     emit workFinished();

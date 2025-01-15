@@ -143,7 +143,7 @@ void MainWindow::actionOnButtonClicked()
         int portVmp = ui->qline_port->text().toInt();
         // TODO: add frequency
 
-        socketWorker = new SocketWorker(this, ipVmp, portVmp, portVmp - 1);
+        socketWorker = new SocketWorker(nullptr, ipVmp, portVmp, portVmp - 1);
         socketWorker->moveToThread(socketWorkerThread);
 
         // <===== debug connections ==================================> //
