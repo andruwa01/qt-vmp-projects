@@ -194,15 +194,6 @@ void MainWindow::actionOnButtonClicked()
 void MainWindow::setChartView()
 {
     auto series = new QLineSeries;
-
-//    series->setName("series");
-
-//    series->append(0, 6);
-//    series->append(2, 4);
-//    series->append(3, 8);
-//    series->append(7, 4);
-//    series->append(10, 5);
-
     auto chart = new QChart;
     chart->legend()->hide();
     chart->addSeries(series);
