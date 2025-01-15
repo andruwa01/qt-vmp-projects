@@ -19,10 +19,10 @@ class SocketWorker : public QObject
     Q_OBJECT
 
 public:
-    SocketWorker(QObject *parent = nullptr
-            , std::string ipv4_vmp_new = IP_VMP
-            , int vmp_port_ctrl_new = PORT_CTRL
-            , int vmp_port_data_new = PORT_DATA);
+    SocketWorker( std::string ipv4_vmp_new = IP_VMP
+                , int vmp_port_ctrl_new = PORT_CTRL
+                , int vmp_port_data_new = PORT_DATA
+                , QObject *parent = nullptr);
     ~SocketWorker();
 
 signals:

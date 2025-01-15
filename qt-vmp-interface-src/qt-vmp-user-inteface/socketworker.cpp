@@ -1,9 +1,9 @@
 #include "socketworker.h"
 
-SocketWorker::SocketWorker(QObject *parent
-                           , std::string ipv4_vmp_new
+SocketWorker::SocketWorker(  std::string ipv4_vmp_new
                            , int vmp_port_ctrl_new
-                           , int vmp_port_data_new)
+                           , int vmp_port_data_new
+                           , QObject *parent)
     :  QObject(parent)
     ,  clientVmp(new ClientVmp(ipv4_vmp_new, vmp_port_ctrl_new, vmp_port_data_new))
 {
