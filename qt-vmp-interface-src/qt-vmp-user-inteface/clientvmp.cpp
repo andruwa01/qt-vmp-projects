@@ -375,5 +375,5 @@ void ClientVmp::debugPrintHexPkg(std::vector<uint8_t> pkg)
         qDebug().noquote() << line; // Печать строки в qDebug()
     }
 
-    qDebug() << "npkg data: <=========================================================>";
+    qDebug() << "\nnpkg data: <=========================================================>";
 }
