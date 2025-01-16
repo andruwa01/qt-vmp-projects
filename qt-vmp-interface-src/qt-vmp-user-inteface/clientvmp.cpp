@@ -144,7 +144,7 @@ ssize_t ClientVmp::receiveRespFromCommand(const uint8_t &command)
         return -1;
     }
 
-    qDebug()  << QString::fromStdString(messToStr(command)) << " answer recv():" << "get" << read_size << "bytes";
+//    qDebug()  << QString::fromStdString(messToStr(command)) << " answer recv():" << "get" << read_size << "bytes";
 
     uint8_t ackByte = resp[12];
     if (command == VPrm::MessId::GetCurrentState && ackByte != VPrm::MessId::AnsCurrentState)

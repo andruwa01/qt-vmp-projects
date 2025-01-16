@@ -19,9 +19,12 @@ SocketWorker::~SocketWorker()
 
 void SocketWorker::startWorker()
 {
+    qDebug() << "\n<================= worker info start =================>\n";
     qDebug() << "VmpIp: " 		<< QString::fromStdString(clientVmp->getVmpIp());
     qDebug() << "VmpCtrlPort: " << clientVmp->getVmpCtrlPort();
     qDebug() << "VmpDataPort: " << clientVmp->getVmpDataPort();
+    qDebug() << "VmpFreq: " 	<< clientVmp->getVmpFreq();
+    qDebug() << "\n<================= worker info end   =================>";
 
     clientVmp->initSockets();
 
@@ -48,8 +51,6 @@ void SocketWorker::startWorker()
 
     // set frequency
     int32_t currentFreq = clientVmp->getVmpFreq();
-    qDebug() << "current freq:" << currentFreq;
-
     command.clear();
     params.clear();
     params.resize(4);
@@ -83,6 +84,7 @@ void SocketWorker::stopWorker()
     std::vector<uint8_t> command;
     std::vector<uint8_t> params;
 
+    // stop rtp flow
     command.clear();
     params.clear();
     params.resize(4);
@@ -90,7 +92,6 @@ void SocketWorker::stopWorker()
     std::memcpy(&params[0], &RTPFlow, sizeof(RTPFlow));
     clientVmp->makeCommand(command, VPrm::MessId::SetRtpCtrl, params);
     clientVmp->sendCommand(command);
-
     clientVmp->receiveRespFromCommand(VPrm::MessId::SetRtpCtrl);
 }
 
