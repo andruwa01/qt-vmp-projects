@@ -44,10 +44,10 @@ void SocketWorker::startWorker()
     std::memcpy(&params[0], &RTPFlow, sizeof(RTPFlow));
     clientVmp->makeCommand(command, VPrm::MessId::SetRtpCtrl, params);
     clientVmp->sendCommand(command);
+    clientVmp->receiveRespFromCommand(VPrm::MessId::SetRtpCtrl);
 
     // set frequency
     int32_t currentFreq = clientVmp->getVmpFreq();
-
     qDebug() << "current freq:" << currentFreq;
 
     command.clear();

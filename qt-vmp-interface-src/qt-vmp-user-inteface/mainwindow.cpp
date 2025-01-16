@@ -10,33 +10,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     setChartView();
-
     // setup ui validation
     setValidationIp();
     setValidationPort();
     setValidationFreq();
     setButtonBehaviour();
-
-//    ClientVmp *clientVmp = new ClientVmp(IP_VMP, TEMP_PORT, TEMP_PORT - 1);
-//    clientVmp->initSockets();
-
-//    std::vector<uint8_t> command;
-//    std::vector<uint8_t> params;
-
-//    command.clear();
-//    params.clear();
-//    params.resize(4);
-//    clientVmp->makeCommand(command, VPrm::MessId::GetCurrentState, params);
-//    clientVmp->sendCommand(command);
-
-//    command.clear();
-//    params.clear();
-//    params.resize(4);
-//    uint8_t startRTP = 1;
-//    std::memcpy(&params[0], &startRTP, sizeof(startRTP));
-//    clientVmp->makeCommand(command, VPrm::MessId::SetRtpCtrl, params);
-//    clientVmp->sendCommand(command);
-
 }
 
 MainWindow::~MainWindow()
@@ -209,8 +187,7 @@ void MainWindow::setChartView()
 
 void MainWindow::drawPowerSpectrum(const std::vector<float> &powerSpectrumShifted)
 {
-    qDebug() << "start drawing power spectrum";
-
+//    qDebug() << "start drawing power spectrum";
 //    qDebug() << powerSpectrumShifted;
 
     auto series = new QLineSeries;

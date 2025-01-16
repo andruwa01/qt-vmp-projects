@@ -146,34 +146,23 @@ ssize_t ClientVmp::receiveRespFromCommand(const uint8_t &command)
 
     qDebug()  << QString::fromStdString(messToStr(command)) << " answer recv():" << "get" << read_size << "bytes";
 
-//    debugPrintHexPkg(resp);
-
     uint8_t ackByte = resp[12];
-    if (command == VPrm::MessId::GetCurrentState)
+    if (command == VPrm::MessId::GetCurrentState && ackByte != VPrm::MessId::AnsCurrentState)
     {
-        if (ackByte != VPrm::MessId::AnsCurrentState)
-        {
-            qCritical() << "ERROR! don't get" << QString::fromStdString(messToStr(VPrm::MessId::AnsCurrentState)) << "\n";
-            return -1;
-        }
+        qCritical() << "ERROR! don't get" << QString::fromStdString(messToStr(VPrm::MessId::AnsCurrentState)) << "\n";
+        return -1;
     }
 
-    if (command == VPrm::MessId::SetRtpCtrl)
+    if (command == VPrm::MessId::SetRtpCtrl && ackByte != VPrm::MessId::AckRtpCtrl)
     {
-        if (ackByte != VPrm::MessId::AckRtpCtrl)
-        {
-            qCritical() << "ERROR! don't get" << QString::fromStdString(messToStr(VPrm::MessId::AckRtpCtrl)) << "\n";
-            return -1;
-        }
+        qCritical() << "ERROR! don't get" << QString::fromStdString(messToStr(VPrm::MessId::AckRtpCtrl)) << "\n";
+        return -1;
     }
 
-    if (command == VPrm::MessId::SetFrequency)
+    if (command == VPrm::MessId::SetFrequency && ackByte != VPrm::MessId::AckFrequency)
     {
-        if (ackByte != VPrm::MessId::AckFrequency)
-        {
-            qCritical() << "ERROR! don't get" << QString::fromStdString(messToStr(VPrm::MessId::AckFrequency)) << "\n";
-            return -1;
-        }
+        qCritical() << "ERROR! don't get" << QString::fromStdString(messToStr(VPrm::MessId::AckFrequency)) << "\n";
+        return -1;
     }
 
     QString respByteHex = QString::fromStdString(messToStr(ackByte));
@@ -197,83 +186,83 @@ ssize_t ClientVmp::receiveDataPkg(std::vector<uint8_t> &pkg)
     return read_size;
 }
 
-uint32_t ClientVmp::parseIQBuffer(std::vector<uint8_t> &iq_buffer, uint32_t iq_buffer_size)
-{
-    uint32_t offset = 0; 		 // offset for stepping in buffer by one package with data
-    int step = sizeof(uint32_t); // 4 bytes step
-    int32_t ip_buffer_size_cnt  = 0;	 // used for tracking if we have enouph space
+uint32_t ClientVmp::parseIQBuffer(std::vector<uint8_t> &iq_buffer, uint32_t iq_buffer_size){}
+//{
+//    uint32_t offset = 0; 		 // offset for stepping in buffer by one package with data
+//    int step = sizeof(uint32_t); // 4 bytes step
+//    int32_t ip_buffer_size_cnt  = 0;	 // used for tracking if we have enouph space
 
-    do
-    {
-        qDebug() << "offset: " << offset;
+//    do
+//    {
+//        qDebug() << "offset: " << offset;
 
-        // check if we have enough data to read 4 bytes
-        if ( iq_buffer_size < step + offset)
-        {
-            return offset;
-        }
+//        // check if we have enough data to read 4 bytes
+//        if ( iq_buffer_size < step + offset)
+//        {
+//            return offset;
+//        }
 
-        // check if we have enough data to read all package
-        ip_buffer_size_cnt = *(int32_t*)(iq_buffer.data() + offset);
-        if ( iq_buffer_size < offset + step + ip_buffer_size_cnt   )
-        {
-            return offset;
-        }
+//        // check if we have enough data to read all package
+//        ip_buffer_size_cnt = *(int32_t*)(iq_buffer.data() + offset);
+//        if ( iq_buffer_size < offset + step + ip_buffer_size_cnt   )
+//        {
+//            return offset;
+//        }
 
-        // header 12 bytes
+//        // header 12 bytes
 
-        // swap (endianess)
-        std::swap(iq_buffer[offset + step + 2], iq_buffer[offset + step + 3]);
-        uint16_t seq_package_num = *(uint16_t*)&iq_buffer[offset + step + 2];
+//        // swap (endianess)
+//        std::swap(iq_buffer[offset + step + 2], iq_buffer[offset + step + 3]);
+//        uint16_t seq_package_num = *(uint16_t*)&iq_buffer[offset + step + 2];
 
-        qDebug() << "seq_package_num" << seq_package_num;
+//        qDebug() << "seq_package_num" << seq_package_num;
 
-        if (iq_buffer[offset + step]     != (uint8_t)0x80 ||
-            iq_buffer[offset + step + 1] != (uint8_t)0x7F ||
-            ip_buffer_size_cnt    		 != package_data_and_header_size)
-        {
-            return offset;
-        }
+//        if (iq_buffer[offset + step]     != (uint8_t)0x80 ||
+//            iq_buffer[offset + step + 1] != (uint8_t)0x7F ||
+//            ip_buffer_size_cnt    		 != package_data_and_header_size)
+//        {
+//            return offset;
+//        }
 
-        // Filing zeroes if there are missed packets
-        if (seq_package_num != uint16_t(last_seq_package_num + 1))
-        {
-            int32_t missed_packages_cnt = 0;
-            if (missed_packages_cnt >= last_seq_package_num)
-            {
-                missed_packages_cnt = missed_packages_cnt - last_seq_package_num - 1;
-            }
+//        // Filing zeroes if there are missed packets
+//        if (seq_package_num != uint16_t(last_seq_package_num + 1))
+//        {
+//            int32_t missed_packages_cnt = 0;
+//            if (missed_packages_cnt >= last_seq_package_num)
+//            {
+//                missed_packages_cnt = missed_packages_cnt - last_seq_package_num - 1;
+//            }
 
-            else
-            {
-                // in case seq_package_num counter was enter 65535 - we start counting missed packages
-                // from UINT16_MAX (65535) - last_seq_package_num
-                missed_packages_cnt = UINT16_MAX - last_seq_package_num + seq_package_num;
-            }
+//            else
+//            {
+//                // in case seq_package_num counter was enter 65535 - we start counting missed packages
+//                // from UINT16_MAX (65535) - last_seq_package_num
+//                missed_packages_cnt = UINT16_MAX - last_seq_package_num + seq_package_num;
+//            }
 
-            qInfo() << "PRM DROPOUT: " << missed_packages_cnt;
+//            qInfo() << "PRM DROPOUT: " << missed_packages_cnt;
 
-            if (missed_packages_cnt < 30)
-            {
-                if (zero_buffer.size() < (package_data_and_header_size - 12) * missed_packages_cnt)
-                {
-                    zero_buffer.resize(  (package_data_and_header_size - 12) * missed_packages_cnt, 0);
-                }
+//            if (missed_packages_cnt < 30)
+//            {
+//                if (zero_buffer.size() < (package_data_and_header_size - 12) * missed_packages_cnt)
+//                {
+//                    zero_buffer.resize(  (package_data_and_header_size - 12) * missed_packages_cnt, 0);
+//                }
 
-                qInfo() << "zero filled: " << missed_packages_cnt;
-            }
-        }
+//                qInfo() << "zero filled: " << missed_packages_cnt;
+//            }
+//        }
 
-        last_seq_package_num = seq_package_num;
+//        last_seq_package_num = seq_package_num;
 
-        // send data to gui
+//        // send data to gui
 
-        offset += ip_buffer_size_cnt   + step;
-    }
-    while (offset <  iq_buffer_size);
+//        offset += ip_buffer_size_cnt   + step;
+//    }
+//    while (offset <  iq_buffer_size);
 
-    return offset;
-}
+//    return offset;
+//}
 
 std::string ClientVmp::getVmpIp()
 {
