@@ -185,7 +185,7 @@ void MainWindow::setChartView()
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);
 }
 
-void MainWindow::drawPowerSpectrum(const std::vector<float> &powerSpectrumShifted)
+void MainWindow::drawPowerSpectrum(const std::vector<float> powerSpectrumShifted)
 {
 //    qDebug() << "start drawing power spectrum";
 //    qDebug() << powerSpectrumShifted;
@@ -198,7 +198,7 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> &powerSpectrumShifte
     {
         // center on 0 hz
         float freq = int(( i * freqRange  ) / powerSpectrumShifted.size()) - freqRange / 2;
-//        if (!(isinf(freq) || isinf(powerSpectrumShifted[i]) || powerSpectrumShifted[i] < 0 || powerSpectrumShifted[i] > 100))
+//        if (!(isinf(freq) || isinf(powerSpectrumShifted[i]) || powerSpectrumShifted[i] < 30 || powerSpectrumShifted[i] > 100))
         if (!(isinf(freq) || isinf(powerSpectrumShifted[i])))
         {
             series->append(freq, powerSpectrumShifted[i]);
@@ -213,7 +213,7 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> &powerSpectrumShifte
     chart->axes(Qt::Horizontal).back()->setTitleText("Frequency, Hz");
     chart->axes(Qt::Vertical).back()->setTitleText("Power, dB");
 
-//    chart->axes(Qt::Horizontal).back()->setRange(-30000, 30000);
+    chart->axes(Qt::Horizontal).back()->setRange(-25000, 25000);
 //    chart->axes(Qt::Vertical).first()->setRange(0, 80);
 
     ui->graphicsView->setChart(chart);

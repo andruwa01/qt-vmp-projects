@@ -19,12 +19,12 @@ SocketWorker::~SocketWorker()
 
 void SocketWorker::startWorker()
 {
-    qDebug() << "\n<================= worker info start =================>\n";
+    qDebug() << "<================= worker info start =================>\n";
     qDebug() << "VmpIp: " 		<< QString::fromStdString(clientVmp->getVmpIp());
     qDebug() << "VmpCtrlPort: " << clientVmp->getVmpCtrlPort();
     qDebug() << "VmpDataPort: " << clientVmp->getVmpDataPort();
     qDebug() << "VmpFreq: " 	<< clientVmp->getVmpFreq();
-    qDebug() << "\n<================= worker info end   =================>";
+    qDebug() << "<================= worker info end   =================>\n";
 
     clientVmp->initSockets();
 

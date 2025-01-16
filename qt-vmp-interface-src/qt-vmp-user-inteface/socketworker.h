@@ -28,7 +28,7 @@ public:
 
 signals:
     void workFinished();
-    void fftCalculated(const std::vector<float> &powerSpectrumShifted);
+    void fftCalculated(const std::vector<float> powerSpectrumShifted);
 
 public slots:
     void startWorker();
