@@ -2,7 +2,7 @@
 
 int main(int argc, char *argv[])
 {
-    qSetMessagePattern("%{time [yyyy.MM.dd]} %{time [hh:mm:ss]} %{type} ====> %{message} ");
+    qSetMessagePattern("%{time [yyyy.MM.dd]} %{time [hh:mm:ss]} %{type} :> %{message} ");
 
     QApplication a(argc, argv);
 

@@ -35,12 +35,10 @@ MainWindow::MainWindow(QWidget *parent)
 //    clientVmp->makeCommand(command, VPrm::MessId::SetRtpCtrl, params);
 //    clientVmp->sendCommand(command);
 
-
 }
 
 MainWindow::~MainWindow()
 {
-    qDebug() << "start destructor";
     if (socketWorkerThread && socketWorkerThread->isRunning())
     {
         emit stopWorker();
@@ -48,9 +46,6 @@ MainWindow::~MainWindow()
 
         socketWorkerThread->quit();
         socketWorkerThread->wait();
-
-        delete socketWorkerThread;
-        socketWorkerThread = nullptr;
     }
 
     qDebug() << "main window was closed";
@@ -140,22 +135,49 @@ void MainWindow::actionOnButtonClicked()
         ui->qline_freq->setEnabled(false);
 
         socketWorkerThread = new QThread(this);
-        socketWorker = new SocketWorker();
+
+        std::string ipVmp = ui->qline_ip->text().toStdString();
+        int portVmp = ui->qline_port->text().toInt();
+        // TODO: add frequency
+
+        socketWorker = new SocketWorker(this, ipVmp, portVmp, portVmp - 1);
         socketWorker->moveToThread(socketWorkerThread);
 
-        connect(this, &MainWindow::stopWorker, socketWorker, &SocketWorker::stopWorker);
-        connect(socketWorkerThread, &QThread::started, socketWorker, &SocketWorker::startWorker);
+        // <===== debug connections ==================================>
+        connect(socketWorkerThread, &QObject::destroyed, []()
+        {
+            qDebug() << "workerThread destroyed";
+        });
+        connect(socketWorker, &QObject::destroyed, []()
+        {
+            qDebug() << "worker destroyed";
+        });
+        // <==========================================================>
 
-        connect(socketWorker, &SocketWorker::workFinished, socketWorkerThread, &QThread::quit);
-        connect(socketWorker, &SocketWorker::workFinished, socketWorker, &SocketWorker::deleteLater);
-
-        connect(socketWorkerThread, &QThread::finished, socketWorkerThread, &QThread::deleteLater);
+        connect(this, 				&MainWindow::stopWorker, 	 socketWorker, 		 &SocketWorker::stopWorker,  Qt::UniqueConnection);
+        connect(socketWorkerThread, &QThread::started, 		 	 socketWorker, 		 &SocketWorker::startWorker, Qt::UniqueConnection);
+        connect(socketWorker, 		&SocketWorker::workFinished, socketWorkerThread, &QThread::quit,			 Qt::UniqueConnection);
+        connect(socketWorker, 		&SocketWorker::workFinished, socketWorker, 		 &SocketWorker::deleteLater, Qt::UniqueConnection);
+        connect(socketWorkerThread, &QThread::finished, 		 socketWorkerThread, &QThread::deleteLater, 	 Qt::UniqueConnection);
 
         socketWorkerThread->start();
     }
     else if (ui->pushButton->text() == "СТОП")
     {
-        emit stopWorker();
+        qDebug() << "stop button pressed";
+
+        // stop data flow from prm
+        if (socketWorkerThread && socketWorkerThread->isRunning())
+        {
+            emit stopWorker();
+            qDebug() << "stop worker emitted from stop button";
+
+            socketWorkerThread->quit();
+            socketWorkerThread->wait();
+        }
+
+        socketWorkerThread = nullptr;
+        socketWorker 	   = nullptr;
 
         ui->pushButton->setText("СТАРТ");
         ui->qline_ip->setEnabled(true);
