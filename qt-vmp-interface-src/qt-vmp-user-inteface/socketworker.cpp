@@ -60,6 +60,13 @@ void SocketWorker::startWorker()
     clientVmp->receiveRespFromCommand(VPrm::MessId::SetFrequency);
 
     std::vector<uint8_t> pkg_data(FULL_PACKAGE_SIZE);
+
+    const size_t N = 1024;
+
+    fftwf_complex *in  = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * N);
+    fftwf_complex *out = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * N);
+    fftwf_plan plan = fftwf_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_MEASURE);
+
     while(!stopWork)
     {
         qDebug() << "worker is working in thread working . . .";
@@ -69,10 +76,14 @@ void SocketWorker::startWorker()
         pkg_data.resize(FULL_PACKAGE_SIZE);
 
         clientVmp->receiveDataPkg(pkg_data);
-        calculateFFTsendToUi(pkg_data);
+        calculateFFTsendToUi(pkg_data, plan, in, out, N);
 
         QThread::msleep(10);
     }
+
+    fftwf_destroy_plan(plan);
+    fftwf_free(in);
+    fftwf_free(out);
 
     emit workFinished();
 }
@@ -95,15 +106,8 @@ void SocketWorker::stopWorker()
     clientVmp->receiveRespFromCommand(VPrm::MessId::SetRtpCtrl);
 }
 
-void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg)
+void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan plan, fftwf_complex *in, fftwf_complex *out, const size_t N)
 {
-    const size_t N = (pkg.size() - PACKAGE_HEADER_SIZE) / (sizeof(float) * 2);
-
-    fftwf_complex *in  = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * N);
-    fftwf_complex *out = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * N);
-    // FFTW_MEASURE could be added
-    fftwf_plan plan = fftwf_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
-
     size_t fftwIndex = 0;
     for (size_t offset = PACKAGE_HEADER_SIZE; offset < pkg.size(); offset += 8)
     {
@@ -119,11 +123,13 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg)
         fftwIndex++;
     }
 
-    fftwf_execute(plan);
+    for (; fftwIndex < N; fftwIndex++)
+    {
+        in[fftwIndex][0] = 0;
+        in[fftwIndex][1] = 0;
+    }
 
-    fftwf_destroy_plan(plan);
-    fftwf_free(in);
-    fftwf_free(out);
+    fftwf_execute(plan);
 
     std::vector<float> powerSpectrum(N);
     for (size_t i = 0; i < N; i++)
@@ -133,8 +139,6 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg)
         float abs  = std::sqrt(real * real + imag * imag);
         powerSpectrum[i] = abs;
     }
-
-//    qDebug() << "powerSpectrum: " << powerSpectrum;
 
     std::vector<float> powerSpectrumShifted(N);
     for (size_t i = 0; i < N / 2; i++)
@@ -149,9 +153,16 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg)
     std::for_each(powerSpectrumShifted.begin(), powerSpectrumShifted.end(),
         [](float &powerSpectrumValue)
         {
+            if (powerSpectrumValue == 0)
+            {
+                powerSpectrumValue = 1e-10;
+            }
+
             powerSpectrumValue = 20 * log10(powerSpectrumValue);
         }
     );
+
+    qDebug() << powerSpectrumShifted;
 
     emit fftCalculated(powerSpectrumShifted);
     qDebug() << "fft calculated";

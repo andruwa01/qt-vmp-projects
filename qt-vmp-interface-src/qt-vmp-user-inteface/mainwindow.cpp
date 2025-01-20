@@ -214,7 +214,7 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> powerSpectrumShifted
     chart->axes(Qt::Vertical).back()->setTitleText("Power, dB");
 
     chart->axes(Qt::Horizontal).back()->setRange(-25000, 25000);
-//    chart->axes(Qt::Vertical).first()->setRange(0, 80);
+    chart->axes(Qt::Vertical).first()->setRange(0, 100);
 
     ui->graphicsView->setChart(chart);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);

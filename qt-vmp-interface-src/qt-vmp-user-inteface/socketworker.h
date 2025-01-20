@@ -35,8 +35,7 @@ public slots:
     void stopWorker();
 
 private:
-    void calculateFFTsendToUi(std::vector<uint8_t> &pkg);
-
+    void calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan plan, fftwf_complex *in, fftwf_complex *out, const size_t N);
     bool stopWork;
     ClientVmp *clientVmp = nullptr;
 };
