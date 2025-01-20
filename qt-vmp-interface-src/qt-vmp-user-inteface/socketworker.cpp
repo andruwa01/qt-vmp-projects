@@ -75,10 +75,18 @@ void SocketWorker::startWorker()
         pkg_data.clear();
         pkg_data.resize(FULL_PACKAGE_SIZE);
 
-        clientVmp->receiveDataPkg(pkg_data);
+//        clientVmp->receiveDataPkg(pkg_data);
+
+        for (size_t i = PACKAGE_HEADER_SIZE; i < pkg_data.size(); i += 8)
+        {
+            pkg_data[i] = (float)25;
+        }
+
+        qDebug() << pkg_data;
+
         calculateFFTsendToUi(pkg_data, plan, in, out, N);
 
-        QThread::msleep(10);
+        QThread::msleep(1000);
     }
 
     fftwf_destroy_plan(plan);
@@ -129,17 +137,20 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan pl
         in[fftwIndex][1] = 0;
     }
 
+    // perform fft
     fftwf_execute(plan);
 
+    // find power
     std::vector<float> powerSpectrum(N);
     for (size_t i = 0; i < N; i++)
     {
         float real = out[i][0];
         float imag = out[i][1];
         float abs  = std::sqrt(real * real + imag * imag);
-        powerSpectrum[i] = abs;
+        powerSpectrum[i] =  std::pow(abs, 2) / N;
     }
 
+    // shift spectre
     std::vector<float> powerSpectrumShifted(N);
     for (size_t i = 0; i < N / 2; i++)
     {
@@ -147,18 +158,24 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan pl
         powerSpectrumShifted[N / 2 + i] = powerSpectrum[i];
     }
 
-//    qDebug() << "powerSpectrumShifted: " << powerSpectrumShifted;
-
     // perform log10 on powerSpectrumShifted
     std::for_each(powerSpectrumShifted.begin(), powerSpectrumShifted.end(),
-        [](float &powerSpectrumValue)
+        [](float &value)
         {
-            if (powerSpectrumValue == 0)
+            value = 20 * log10(value);
+            if (value < 0)
             {
-                powerSpectrumValue = 1e-10;
+                value = 1e-19;
             }
+        }
+    );
 
-            powerSpectrumValue = 20 * log10(powerSpectrumValue);
+    // normalize
+    float maxValue = *std::max_element(powerSpectrumShifted.begin(), powerSpectrumShifted.end());
+    std::for_each(powerSpectrumShifted.begin(), powerSpectrumShifted.end(),
+        [&](float &value)
+        {
+            value /= maxValue;
         }
     );
 
