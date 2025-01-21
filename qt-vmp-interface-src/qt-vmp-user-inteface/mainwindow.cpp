@@ -208,9 +208,10 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> powerSpectrumShifted
     chart->createDefaultAxes();
     chart->axes(Qt::Horizontal).back()->setTitleText("Frequency, Hz");
     chart->axes(Qt::Vertical).back()->setTitleText("Power, dB");
-
     chart->axes(Qt::Horizontal).back()->setRange(-25000, 25000);
-    chart->axes(Qt::Vertical).first()->setRange(0, 150);
+
+    float maxValue = *std::max_element(powerSpectrumShifted.begin(), powerSpectrumShifted.end());
+    chart->axes(Qt::Vertical).first()->setRange(0, maxValue + 20);
 
     ui->graphicsView->setChart(chart);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);
