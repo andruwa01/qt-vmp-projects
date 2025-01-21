@@ -129,11 +129,11 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan pl
         fftwIndex++;
     }
 
-    // padding zeroes to 1024
+    // add values to 1024
     for (; fftwIndex < N; fftwIndex++)
     {
-        in[fftwIndex][0] = 0;
-        in[fftwIndex][1] = 0;
+        in[fftwIndex][0] = 1e-13;
+        in[fftwIndex][1] = 1e-13;
     }
 
     // test in (successful)
@@ -169,10 +169,10 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan pl
         [](float &value)
         {
             value = 20 * log10(value);
-//            if (value < 1)
-//            {
-//                value = 1e-19;
-//            }
+            if (value < 1)
+            {
+                value = 1e-19;
+            }
         }
     );
 
