@@ -61,7 +61,7 @@ void SocketWorker::startWorker()
 
     std::vector<uint8_t> pkg_data(FULL_PACKAGE_SIZE);
 
-    const size_t N = 512;
+    const size_t N = 1024;
 
     fftwf_complex *in  = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * N);
     fftwf_complex *out = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * N);
@@ -123,20 +123,18 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan pl
         float real = (float)*reinterpret_cast<int32_t*>(&pkg[offset]);
         float imag = (float)*reinterpret_cast<int32_t*>(&pkg[offset + 4]);
 
-//        qDebug() << "imag: " << imag;
-//        qDebug() << "real: " << real;
-
         in[fftwIndex][0] = real;
         in[fftwIndex][1] = imag;
 
         fftwIndex++;
     }
 
-//    for (; fftwIndex < N; fftwIndex++)
-//    {
-//        in[fftwIndex][0] = 0;
-//        in[fftwIndex][1] = 0;
-//    }
+    // padding zeroes to 1024
+    for (; fftwIndex < N; fftwIndex++)
+    {
+        in[fftwIndex][0] = 0;
+        in[fftwIndex][1] = 0;
+    }
 
     // test in (successful)
 //    for (size_t i = 0; i < N; i++)
@@ -171,21 +169,12 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan pl
         [](float &value)
         {
             value = 20 * log10(value);
-            if (value < 0)
-            {
-                value = 1e-19;
-            }
+//            if (value < 1)
+//            {
+//                value = 1e-19;
+//            }
         }
     );
-
-    // normalize
-//    float maxValue = *std::max_element(powerSpectrumShifted.begin(), powerSpectrumShifted.end());
-//    std::for_each(powerSpectrumShifted.begin(), powerSpectrumShifted.end(),
-//        [&](float &value)
-//        {
-//            value /= maxValue;
-//        }
-//    );
 
 //    qDebug() << "powerSpectrumShifted: " << powerSpectrumShifted;
 
