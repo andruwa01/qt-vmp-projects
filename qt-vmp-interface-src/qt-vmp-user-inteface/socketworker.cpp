@@ -61,7 +61,7 @@ void SocketWorker::startWorker()
 
     std::vector<uint8_t> pkg_data(FULL_PACKAGE_SIZE);
 
-    const size_t N = 1024;
+    const size_t N = 512;
 
     fftwf_complex *in  = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * N);
     fftwf_complex *out = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * N);
@@ -75,18 +75,19 @@ void SocketWorker::startWorker()
         pkg_data.clear();
         pkg_data.resize(FULL_PACKAGE_SIZE);
 
-//        clientVmp->receiveDataPkg(pkg_data);
+        clientVmp->receiveDataPkg(pkg_data);
 
-        for (size_t i = PACKAGE_HEADER_SIZE; i < pkg_data.size(); i += 8)
-        {
-            pkg_data[i] = (float)25;
-        }
+//        for (size_t i = PACKAGE_HEADER_SIZE; i < pkg_data.size(); i += 8)
+//        {
+//            pkg_data[i] = (int32_t)25;
+//        }
 
-        qDebug() << pkg_data;
+
+//        qDebug() << "pkg_data: " << pkg_data;
 
         calculateFFTsendToUi(pkg_data, plan, in, out, N);
 
-        QThread::msleep(1000);
+        QThread::msleep(10);
     }
 
     fftwf_destroy_plan(plan);
@@ -119,8 +120,8 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan pl
     size_t fftwIndex = 0;
     for (size_t offset = PACKAGE_HEADER_SIZE; offset < pkg.size(); offset += 8)
     {
-        float imag = (float)*reinterpret_cast<int32_t*>(&pkg[offset]);
-        float real = (float)*reinterpret_cast<int32_t*>(&pkg[offset + 4]);
+        float real = (float)*reinterpret_cast<int32_t*>(&pkg[offset]);
+        float imag = (float)*reinterpret_cast<int32_t*>(&pkg[offset + 4]);
 
 //        qDebug() << "imag: " << imag;
 //        qDebug() << "real: " << real;
@@ -131,11 +132,18 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan pl
         fftwIndex++;
     }
 
-    for (; fftwIndex < N; fftwIndex++)
-    {
-        in[fftwIndex][0] = 0;
-        in[fftwIndex][1] = 0;
-    }
+//    for (; fftwIndex < N; fftwIndex++)
+//    {
+//        in[fftwIndex][0] = 0;
+//        in[fftwIndex][1] = 0;
+//    }
+
+    // test in (successful)
+//    for (size_t i = 0; i < N; i++)
+//    {
+//        in[i][0] = 5.0f;
+//        in[i][1] = 0.0f;
+//    }
 
     // perform fft
     fftwf_execute(plan);
@@ -171,15 +179,15 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan pl
     );
 
     // normalize
-    float maxValue = *std::max_element(powerSpectrumShifted.begin(), powerSpectrumShifted.end());
-    std::for_each(powerSpectrumShifted.begin(), powerSpectrumShifted.end(),
-        [&](float &value)
-        {
-            value /= maxValue;
-        }
-    );
+//    float maxValue = *std::max_element(powerSpectrumShifted.begin(), powerSpectrumShifted.end());
+//    std::for_each(powerSpectrumShifted.begin(), powerSpectrumShifted.end(),
+//        [&](float &value)
+//        {
+//            value /= maxValue;
+//        }
+//    );
 
-    qDebug() << powerSpectrumShifted;
+//    qDebug() << "powerSpectrumShifted: " << powerSpectrumShifted;
 
     emit fftCalculated(powerSpectrumShifted);
     qDebug() << "fft calculated";

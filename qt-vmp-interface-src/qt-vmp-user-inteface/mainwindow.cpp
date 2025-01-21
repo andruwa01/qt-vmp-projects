@@ -198,11 +198,7 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> powerSpectrumShifted
     {
         // center on 0 hz
         float freq = int(( i * freqRange  ) / powerSpectrumShifted.size()) - freqRange / 2;
-//        if (!(isinf(freq) || isinf(powerSpectrumShifted[i]) || powerSpectrumShifted[i] < 30 || powerSpectrumShifted[i] > 100))
-        if (!(isinf(freq) || isinf(powerSpectrumShifted[i])))
-        {
-            series->append(freq, powerSpectrumShifted[i]);
-        }
+        series->append(freq, powerSpectrumShifted[i]);
     }
 
     auto chart = new QChart;
@@ -214,7 +210,7 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> powerSpectrumShifted
     chart->axes(Qt::Vertical).back()->setTitleText("Power, dB");
 
     chart->axes(Qt::Horizontal).back()->setRange(-25000, 25000);
-//    chart->axes(Qt::Vertical).first()->setRange(-300, 400);
+    chart->axes(Qt::Vertical).first()->setRange(0, 150);
 
     ui->graphicsView->setChart(chart);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);
