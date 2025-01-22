@@ -176,8 +176,8 @@ void MainWindow::setChartView()
     chart->setTitle("Signal spectre");
     chart->createDefaultAxes();
     chart->axes(Qt::Horizontal).back()->setTitleText("Frequency, Hz");
-    chart->axes(Qt::Vertical).back()->setTitleText("Power, dB");
     chart->axes(Qt::Horizontal).back()->setRange(-25000, 25000);
+    chart->axes(Qt::Vertical).back()->setTitleText("Power, dB");
     chart->axes(Qt::Vertical).first()->setRange(minPower, maxPower);
 
     ui->graphicsView->setChart(chart);
@@ -197,6 +197,7 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> powerSpectrumShifted
         float freq = int(( i * freqRange  ) / powerSpectrumShifted.size()) - freqRange / 2;
         points.append(QPointF(freq, powerSpectrumShifted[i]));
     }
+
     series->replace(points);
 
     float maxValue = *std::max_element(powerSpectrumShifted.begin(), powerSpectrumShifted.end());
