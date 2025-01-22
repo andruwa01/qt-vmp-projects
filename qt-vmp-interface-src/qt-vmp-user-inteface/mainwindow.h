@@ -44,11 +44,8 @@ private:
     QColor 		plotColor;
     QChart		*chart	   = nullptr;
 
-// old way
     QThread *socketWorkerThread = nullptr;
     SocketWorker *socketWorker = nullptr;
-//    QThread socketWorkerThread;
-//    SocketWorker socketWorker;
 
     void setValidationIp();
     void setValidationPort();
@@ -59,5 +56,7 @@ private:
 
     void setChartView();
 
+    float maxPower = 10;
+    float minPower = 0;
 };
 #endif // MAINWINDOW_H

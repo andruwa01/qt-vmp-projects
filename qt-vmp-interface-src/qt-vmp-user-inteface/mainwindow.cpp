@@ -23,12 +23,13 @@ MainWindow::~MainWindow()
 
     if (socketWorkerThread && socketWorkerThread->isRunning())
     {
-        emit stopWorker();
-        qDebug() << "stop worker emitted from main thread";
-
+        socketWorker->stopWorker();
         socketWorkerThread->quit();
         socketWorkerThread->wait();
     }
+
+    socketWorkerThread = nullptr;
+    socketWorker       = nullptr;
 
     delete ui;
 }
@@ -135,7 +136,6 @@ void MainWindow::actionOnButtonClicked()
         });
         // <==========================================================> //
 
-        connect(this, 				&MainWindow::stopWorker, 	  socketWorker, 	  &SocketWorker::stopWorker,  Qt::UniqueConnection);
         connect(socketWorkerThread, &QThread::started, 		 	  socketWorker, 	  &SocketWorker::startWorker, Qt::UniqueConnection);
         connect(socketWorker, 		&SocketWorker::workFinished,  socketWorkerThread, &QThread::quit,			  Qt::UniqueConnection);
         connect(socketWorker, 		&SocketWorker::workFinished,  socketWorker, 	  &SocketWorker::deleteLater, Qt::UniqueConnection);
@@ -152,9 +152,7 @@ void MainWindow::actionOnButtonClicked()
         // stop data flow from prm
         if (socketWorkerThread && socketWorkerThread->isRunning())
         {
-            emit stopWorker();
-            qDebug() << "stop worker emitted from stop button";
-
+            socketWorker->stopWorker();
             socketWorkerThread->quit();
             socketWorkerThread->wait();
         }
@@ -178,7 +176,7 @@ void MainWindow::setChartView()
     chart->setTitle("Signal spectre");
     chart->createDefaultAxes();
     chart->axes(Qt::Horizontal).back()->setTitleText("Frequency, Hz");
-    chart->axes(Qt::Vertical).first()->setRange(0, 100);
+    chart->axes(Qt::Vertical).first()->setRange(minPower - 20, maxPower + 20);
     chart->axes(Qt::Vertical).back()->setTitleText("Power, dB");
 
     ui->graphicsView->setChart(chart);
@@ -196,6 +194,11 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> powerSpectrumShifted
     int freqRange = 48000;  // Hz
     for (size_t i = 0; i < powerSpectrumShifted.size(); i++)
     {
+        if (isinf(powerSpectrumShifted[i]))
+        {
+            qDebug() << "stop";
+        }
+
         // center on 0 hz
         float freq = int(( i * freqRange  ) / powerSpectrumShifted.size()) - freqRange / 2;
         series->append(freq, powerSpectrumShifted[i]);
@@ -211,7 +214,18 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> powerSpectrumShifted
     chart->axes(Qt::Horizontal).back()->setRange(-25000, 25000);
 
     float maxValue = *std::max_element(powerSpectrumShifted.begin(), powerSpectrumShifted.end());
-    chart->axes(Qt::Vertical).first()->setRange(0, maxValue + 20);
+    if (maxValue > maxPower)
+    {
+        maxPower = maxValue;
+    }
+
+    float minValue = *std::min_element(powerSpectrumShifted.begin(), powerSpectrumShifted.end());
+    if (minValue < minPower)
+    {
+        minPower = minValue;
+    }
+
+    chart->axes(Qt::Vertical).first()->setRange(minPower - 20, maxPower + 20);
 
     ui->graphicsView->setChart(chart);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);

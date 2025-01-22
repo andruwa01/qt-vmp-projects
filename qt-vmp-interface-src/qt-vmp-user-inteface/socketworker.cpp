@@ -70,17 +70,16 @@ void SocketWorker::startWorker()
     while(!stopWork)
     {
         qDebug() << "worker is working in thread working . . .";
-        QCoreApplication::processEvents();
 
         pkg_data.clear();
         pkg_data.resize(FULL_PACKAGE_SIZE);
 
-//        clientVmp->receiveDataPkg(pkg_data);
+        clientVmp->receiveDataPkg(pkg_data);
 
-        for (size_t i = PACKAGE_HEADER_SIZE; i < pkg_data.size(); i += 8)
-        {
-            pkg_data[i] = (int32_t)25;
-        }
+//        for (size_t i = PACKAGE_HEADER_SIZE; i < pkg_data.size(); i += 8)
+//        {
+//            pkg_data[i] = (int32_t)25;
+//        }
 
 
 //        qDebug() << "pkg_data: " << pkg_data;
@@ -99,6 +98,8 @@ void SocketWorker::startWorker()
 
 void SocketWorker::stopWorker()
 {
+    qDebug() << "stopWorker()";
+
     stopWork = true;
 
     std::vector<uint8_t> command;
@@ -169,7 +170,7 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan pl
         [](float &value)
         {
             value = 20 * log10(value);
-            if (value < 1)
+            if (value < 0)
             {
                 value = 1e-19;
             }
