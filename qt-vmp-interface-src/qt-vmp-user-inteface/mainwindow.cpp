@@ -169,15 +169,16 @@ void MainWindow::actionOnButtonClicked()
 
 void MainWindow::setChartView()
 {
-    auto series = new QLineSeries;
-    auto chart = new QChart;
+    series = new QLineSeries;
+    chart = new QChart;
     chart->legend()->hide();
     chart->addSeries(series);
     chart->setTitle("Signal spectre");
     chart->createDefaultAxes();
     chart->axes(Qt::Horizontal).back()->setTitleText("Frequency, Hz");
-    chart->axes(Qt::Vertical).first()->setRange(minPower - 20, maxPower + 20);
     chart->axes(Qt::Vertical).back()->setTitleText("Power, dB");
+    chart->axes(Qt::Horizontal).back()->setRange(-25000, 25000);
+    chart->axes(Qt::Vertical).first()->setRange(minPower, maxPower);
 
     ui->graphicsView->setChart(chart);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);
@@ -188,39 +189,25 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> powerSpectrumShifted
 //    qDebug() << "start drawing power spectrum";
 //    qDebug() << powerSpectrumShifted;
 
-    auto series = new QLineSeries;
-    series->setName("series");
-
+    QVector<QPointF> points;
     int freqRange = 48000;  // Hz
     for (size_t i = 0; i < powerSpectrumShifted.size(); i++)
     {
         // center on 0 hz
         float freq = int(( i * freqRange  ) / powerSpectrumShifted.size()) - freqRange / 2;
-        series->append(freq, powerSpectrumShifted[i]);
+        points.append(QPointF(freq, powerSpectrumShifted[i]));
     }
-
-    auto chart = new QChart;
-    chart->legend()->hide();
-    chart->addSeries(series);
-    chart->setTitle("Signal spectre");
-    chart->createDefaultAxes();
-    chart->axes(Qt::Horizontal).back()->setTitleText("Frequency, Hz");
-    chart->axes(Qt::Vertical).back()->setTitleText("Power, dB");
-    chart->axes(Qt::Horizontal).back()->setRange(-25000, 25000);
+    series->replace(points);
 
     float maxValue = *std::max_element(powerSpectrumShifted.begin(), powerSpectrumShifted.end());
-    if (maxValue > maxPower)
-    {
-        maxPower = maxValue;
-    }
-
     float minValue = *std::min_element(powerSpectrumShifted.begin(), powerSpectrumShifted.end());
-    if (minValue < minPower)
-    {
-        minPower = minValue;
-    }
 
-    chart->axes(Qt::Vertical).first()->setRange(minPower, maxPower);
+    if (maxValue > maxPower || minValue < minPower)
+    {
+        if (maxValue > maxPower) maxPower = maxValue;
+        if (minValue < minPower) minPower = minValue;
+        chart->axes(Qt::Vertical).first()->setRange(minPower, maxPower);
+    }
 
     ui->graphicsView->setChart(chart);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);

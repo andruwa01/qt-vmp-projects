@@ -11,6 +11,7 @@
 #include <QRegularExpressionValidator>
 #include <QMainWindow>
 #include <QLineEdit>
+#include <QVector>
 
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
@@ -41,8 +42,8 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    QColor 		plotColor;
     QChart		*chart	   = nullptr;
+    QLineSeries *series    = nullptr;
 
     QThread *socketWorkerThread = nullptr;
     SocketWorker *socketWorker = nullptr;
