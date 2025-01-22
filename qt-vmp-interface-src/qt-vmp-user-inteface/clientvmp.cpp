@@ -284,6 +284,16 @@ int ClientVmp::getVmpFreq()
     return vmp_frequency_hz;
 }
 
+int ClientVmp::getSocketCtrl()
+{
+    return rtcp_socket_ctrl;
+}
+
+int ClientVmp::getSocketData()
+{
+    return rtcp_socket_data;
+}
+
 std::string ClientVmp::messToStr(uint8_t messId)
 {
     if(messId == VPrm::MessId::GetDiag) 			return "GetDiag";

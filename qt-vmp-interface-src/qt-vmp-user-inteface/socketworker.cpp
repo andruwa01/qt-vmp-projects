@@ -26,7 +26,26 @@ void SocketWorker::startWorker()
     qDebug() << "VmpFreq: " 	<< clientVmp->getVmpFreq();
     qDebug() << "<================= worker info end   =================>\n";
 
+    int flags;
+
+    // create sockets and set them to O_NONBLOCK
     clientVmp->initSockets();
+
+    int socket_ctrl = clientVmp->getSocketCtrl();
+    int socket_data = clientVmp->getSocketData();
+
+    flags = fcntl(socket_ctrl, F_GETFL, 0);
+    fcntl(socket_ctrl, F_SETFL, flags | O_NONBLOCK);
+    flags = fcntl(socket_data, F_GETFL, 0);
+    fcntl(socket_data, F_SETFL, flags | O_NONBLOCK);
+
+    fd_set readfds, writefds;
+    FD_ZERO(&readfds);
+    FD_ZERO(&writefds);
+
+    FD_SET(socket_ctrl, &writefds);
+    FD_SET(socket_ctrl, &readfds);
+    FD_SET(socket_data, &readfds);
 
     std::vector<uint8_t> command;
     std::vector<uint8_t> params;
@@ -72,12 +91,12 @@ void SocketWorker::startWorker()
         pkg_data.clear();
         pkg_data.resize(FULL_PACKAGE_SIZE);
 
-//        clientVmp->receiveDataPkg(pkg_data);
+        clientVmp->receiveDataPkg(pkg_data);
 
-        for (size_t i = PACKAGE_HEADER_SIZE; i < pkg_data.size(); i += 8)
-        {
-            pkg_data[i] = (int32_t)25;
-        }
+//        for (size_t i = PACKAGE_HEADER_SIZE; i < pkg_data.size(); i += 8)
+//        {
+//            pkg_data[i] = (int32_t)25;
+//        }
 
 
 //        qDebug() << "pkg_data: " << pkg_data;

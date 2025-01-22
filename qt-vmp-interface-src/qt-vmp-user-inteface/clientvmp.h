@@ -15,8 +15,10 @@
 // Networking libraries
 #include <sys/types.h>	// size_t
 #include <sys/socket.h> // socket()
+#include <sys/select.h> // select()
 #include <netinet/in.h> // sockaddr_in
 #include <arpa/inet.h>  // htons, inet_pton
+#include <fcntl.h>
 
 // qt
 #include <QDebug> // qInfo() etc.
@@ -42,6 +44,8 @@ public:
     int getVmpCtrlPort();
     int getVmpDataPort();
     int getVmpFreq();
+    int getSocketCtrl();
+    int getSocketData();
 
 private:
     int initSocket(std::string ipv4_vmp,  const int port_vmp, const int port_client);
