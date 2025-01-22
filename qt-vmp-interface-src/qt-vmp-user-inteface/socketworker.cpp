@@ -69,11 +69,8 @@ void SocketWorker::startWorker()
 
     while(!stopWork)
     {
-        qDebug() << "worker is working in thread working . . .";
-
         pkg_data.clear();
         pkg_data.resize(FULL_PACKAGE_SIZE);
-
         clientVmp->receiveDataPkg(pkg_data);
 
 //        for (size_t i = PACKAGE_HEADER_SIZE; i < pkg_data.size(); i += 8)

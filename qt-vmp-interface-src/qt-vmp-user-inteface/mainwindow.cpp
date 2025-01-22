@@ -120,9 +120,9 @@ void MainWindow::actionOnButtonClicked()
 
         std::string ipVmp = ui->qline_ip->text().toStdString();
         int portVmp 	  = ui->qline_port->text().toInt();
-        int freqKHz 	  = ui->qline_freq->text().toInt();
+        int freqHz 	  = ui->qline_freq->text().toInt() * 1e3;
 
-        socketWorker = new SocketWorker(ipVmp, portVmp, portVmp - 1, freqKHz * 1e3);
+        socketWorker = new SocketWorker(ipVmp, portVmp, portVmp - 1, freqHz);
         socketWorker->moveToThread(socketWorkerThread);
 
         // <===== debug connections ==================================> //
@@ -194,11 +194,6 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> powerSpectrumShifted
     int freqRange = 48000;  // Hz
     for (size_t i = 0; i < powerSpectrumShifted.size(); i++)
     {
-        if (isinf(powerSpectrumShifted[i]))
-        {
-            qDebug() << "stop";
-        }
-
         // center on 0 hz
         float freq = int(( i * freqRange  ) / powerSpectrumShifted.size()) - freqRange / 2;
         series->append(freq, powerSpectrumShifted[i]);
@@ -225,7 +220,7 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> powerSpectrumShifted
         minPower = minValue;
     }
 
-    chart->axes(Qt::Vertical).first()->setRange(minPower - 20, maxPower + 20);
+    chart->axes(Qt::Vertical).first()->setRange(minPower, maxPower);
 
     ui->graphicsView->setChart(chart);
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);
