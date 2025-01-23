@@ -33,8 +33,8 @@ public:
     ~ClientVmp();
 
     bool initSockets();
-    void sendCommand(std::vector<uint8_t> &buffer);
-    void makeCommand(std::vector<uint8_t>& command_result, uint8_t mess_id, const std::vector<uint8_t> &buffer_data);
+//    void sendCommand(std::vector<uint8_t> &buffer);
+    void sendCommand(uint8_t commmandByteIs, const std::vector<uint8_t> &params);
 
     ssize_t receiveRespFromCommand(const uint8_t &command);
     ssize_t receiveDataPkg(std::vector<uint8_t> &pkg);
@@ -49,6 +49,7 @@ public:
 
 private:
     int initSocket(std::string ipv4_vmp,  const int port_vmp, const int port_client);
+    void makeCommand(std::vector<uint8_t>& command_result, uint8_t mess_id, const std::vector<uint8_t> &buffer_data);
 
     std::string messToStr(uint8_t messId);
     std::string messIdToHex(uint8_t messId);

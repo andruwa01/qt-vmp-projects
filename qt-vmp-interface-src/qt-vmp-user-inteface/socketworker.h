@@ -11,6 +11,8 @@
 #include <QCoreApplication>
 #include <QString>
 
+#include <queue>
+
 #include <fftw3.h>
 #include <math.h>
 
@@ -26,6 +28,7 @@ public:
                 , QObject *parent = nullptr);
     ~SocketWorker();
 
+
 signals:
     void workFinished();
     void fftCalculated(const std::vector<float> powerSpectrumShifted);
@@ -36,8 +39,20 @@ public slots:
 
 private:
     void calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan plan, fftwf_complex *in, fftwf_complex *out, const size_t N);
+
     bool stopWork;
     ClientVmp *clientVmp = nullptr;
+
+    struct CommandInfo
+    {
+        int8_t commandByte;
+        bool isSent;
+        bool isWaitingForResponse;
+    };
+
+    std::queue<CommandInfo> commandQueue;
+
+    CommandInfo getLastCommandFromQueue();
 };
 
 #endif // SOCKETWORKER_H

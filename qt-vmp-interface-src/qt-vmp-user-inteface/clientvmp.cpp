@@ -55,6 +55,15 @@ int ClientVmp::initSocket(std::string ipv4_vmp, const int port_vmp, const int po
 
     qInfo() << "socket(): " << "created";
 
+    // set socket O_NONBLOCK
+    int flags = fcntl(sockfd, F_GETFL, 0);
+    flags |= O_NONBLOCK;
+    int status = fcntl(sockfd, F_SETFL, flags);
+    if (status == -1)
+    {
+        qCritical() << "fcntl(): " << std::strerror(errno);
+    }
+
     // add functionality to receive data from vmp (to use recv() instead of recvfrom())
 
     std::memset(&hints, 0, sizeof(sockaddr_in));
@@ -90,8 +99,11 @@ int ClientVmp::initSocket(std::string ipv4_vmp, const int port_vmp, const int po
     return sockfd;
 }
 
-void ClientVmp::sendCommand(std::vector<uint8_t> &buffer)
+void ClientVmp::sendCommand(uint8_t commandBytes, const std::vector<uint8_t> &params)
 {
+    std::vector<uint8_t> command;
+    std::vector<uint8_t> params;
+
     if (send(rtcp_socket_ctrl, buffer.data(), buffer.size(), MSG_NOSIGNAL) == -1)
     {
         qCritical() << "send(): " << strerror(errno);
@@ -136,8 +148,9 @@ void ClientVmp::makeCommand(std::vector<uint8_t> &command_pkg, uint8_t mess_id, 
 
 ssize_t ClientVmp::receiveRespFromCommand(const uint8_t &command)
 {
-    std::vector<uint8_t> resp(COMMAND_RESP_SIZE);
-    ssize_t read_size = recv(rtcp_socket_ctrl, resp.data(), COMMAND_RESP_SIZE, 0);
+    std::vector<uint8_t> buffer(MAX_UDP_SIZE);
+
+    ssize_t read_size = recv(rtcp_socket_ctrl,  buffer.data(), MAX_UDP_SIZE, 0);
     if (read_size == -1)
     {
         qCritical() << QString::fromStdString(messToStr(command)) << " answer recv():" << strerror(errno);
@@ -146,7 +159,7 @@ ssize_t ClientVmp::receiveRespFromCommand(const uint8_t &command)
 
 //    qDebug()  << QString::fromStdString(messToStr(command)) << " answer recv():" << "get" << read_size << "bytes";
 
-    uint8_t ackByte = resp[12];
+    uint8_t ackByte = buffer[12];
     if (command == VPrm::MessId::GetCurrentState && ackByte != VPrm::MessId::AnsCurrentState)
     {
         qCritical() << "ERROR! don't get" << QString::fromStdString(messToStr(VPrm::MessId::AnsCurrentState)) << "\n";

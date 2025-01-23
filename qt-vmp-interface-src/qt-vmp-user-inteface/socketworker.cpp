@@ -17,6 +17,20 @@ SocketWorker::~SocketWorker()
     qDebug() << "SocketWorker destructor called";
 }
 
+SocketWorker::CommandInfo SocketWorker::getLastCommandFromQueue()
+{
+    CommandInfo cmdInfo;
+    if (!commandQueue.empty())
+    {
+        cmdInfo = commandQueue.front();
+        commandQueue.pop();
+        return cmdInfo;
+    }
+
+    cmdInfo.commandByte = -1;
+    return cmdInfo;
+}
+
 void SocketWorker::startWorker()
 {
     qDebug() << "<================= worker info start =================>\n";
@@ -26,27 +40,10 @@ void SocketWorker::startWorker()
     qDebug() << "VmpFreq: " 	<< clientVmp->getVmpFreq();
     qDebug() << "<================= worker info end   =================>\n";
 
-    int flags;
-
     // create sockets and set them to O_NONBLOCK
     clientVmp->initSockets();
 
-    int socket_ctrl = clientVmp->getSocketCtrl();
-    int socket_data = clientVmp->getSocketData();
-
-    flags = fcntl(socket_ctrl, F_GETFL, 0);
-    fcntl(socket_ctrl, F_SETFL, flags | O_NONBLOCK);
-    flags = fcntl(socket_data, F_GETFL, 0);
-    fcntl(socket_data, F_SETFL, flags | O_NONBLOCK);
-
-    fd_set readfds, writefds;
-    FD_ZERO(&readfds);
-    FD_ZERO(&writefds);
-
-    FD_SET(socket_ctrl, &writefds);
-    FD_SET(socket_ctrl, &readfds);
-    FD_SET(socket_data, &readfds);
-
+       // init buffers
     std::vector<uint8_t> command;
     std::vector<uint8_t> params;
 
@@ -65,6 +62,7 @@ void SocketWorker::startWorker()
     uint8_t RTPFlow = 1;
     std::memcpy(&params[0], &RTPFlow, sizeof(RTPFlow));
     clientVmp->makeCommand(command, VPrm::MessId::SetRtpCtrl, params);
+
     clientVmp->sendCommand(command);
     clientVmp->receiveRespFromCommand(VPrm::MessId::SetRtpCtrl);
 
@@ -78,30 +76,88 @@ void SocketWorker::startWorker()
     clientVmp->sendCommand(command);
     clientVmp->receiveRespFromCommand(VPrm::MessId::SetFrequency);
 
-    std::vector<uint8_t> pkg_data(FULL_PACKAGE_SIZE);
-
+    // configure fftw
     const size_t N = 512;
 
     fftwf_complex *in  = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * N);
     fftwf_complex *out = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * N);
     fftwf_plan    plan = fftwf_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_MEASURE);
 
-    while(!stopWork)
+    // init structs for select()
+    fd_set readfds, writefds;
+
+    int socket_ctrl = clientVmp->getSocketCtrl();
+    int socket_data = clientVmp->getSocketData();
+
+    int fdmax = std::max(socket_ctrl, socket_data);
+
+    std::vector<uint8_t> pkg_data(FULL_PACKAGE_SIZE);
+    while(!stopWork || !commandQueue.empty())
     {
-        pkg_data.clear();
-        pkg_data.resize(FULL_PACKAGE_SIZE);
+        FD_ZERO(&readfds);
+        FD_SET(socket_ctrl, &readfds);
+        FD_SET(socket_data, &readfds);
 
-        clientVmp->receiveDataPkg(pkg_data);
+        FD_ZERO(&writefds);
+        FD_SET(socket_ctrl, &writefds);
 
-//        for (size_t i = PACKAGE_HEADER_SIZE; i < pkg_data.size(); i += 8)
-//        {
-//            pkg_data[i] = (int32_t)25;
-//        }
+        if (select(fdmax + 1, &readfds, &writefds, NULL, NULL) == -1)
+        {
+            std::cout << "select():" << std::strerror(errno);
+        }
 
+        if (!commandQueue.empty())
+        {
 
-//        qDebug() << "pkg_data: " << pkg_data;
+            CommandInfo currentCommand = commandQueue.front();
 
-        calculateFFTsendToUi(pkg_data, plan, in, out, N);
+            if (!currentCommand.isSent && FD_ISSET(socket_ctrl, &writefds))
+            {
+                // refactor sendCommand()
+                clientVmp->sendCommand(currentCommand, params);
+                currentCommand.isSent 			    = true;
+                currentCommand.isWaitingForResponse = true;
+            }
+
+            if (currentCommand.isWaitingForResponse && FD_ISSET(socket_ctrl, &readfds))
+            {
+                int bytesrecv = clientVmp->receiveRespFromCommand();
+                if (bytesrecv == -1)
+                {
+                    if (errno == EAGAIN || errno == EWOULDBLOCK)
+                    {
+                        qInfo() << "no data to read on socket with commands ";
+                    }
+                    else
+                    {
+                        qCritical() << "error when recvRespFromCommand(): " << std::strerror(errno);
+                    }
+                }
+                else
+                {
+                    currentCommand.isWaitingForResponse = false;
+                    commandQueue.pop();
+                }
+            }
+
+        }
+
+        if (FD_ISSET(socket_data, &readfds))
+        {
+
+//            for (size_t i = PACKAGE_HEADER_SIZE; i < pkg_data.size(); i += 8)
+//            {
+//                pkg_data[i] = (int32_t)25;
+//            }
+
+//            qDebug() << "pkg_data: " << pkg_data;
+
+            pkg_data.clear();
+            pkg_data.resize(FULL_PACKAGE_SIZE);
+            clientVmp->receiveDataPkg(pkg_data);
+            calculateFFTsendToUi(pkg_data, plan, in, out, N);
+        }
+
 
         QThread::msleep(10);
     }
