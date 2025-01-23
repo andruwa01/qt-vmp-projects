@@ -102,14 +102,16 @@ int ClientVmp::initSocket(std::string ipv4_vmp, const int port_vmp, const int po
 void ClientVmp::sendCommand(uint8_t commandBytes, const std::vector<uint8_t> &params)
 {
     std::vector<uint8_t> command;
-    std::vector<uint8_t> params;
+    command.clear();
 
-    if (send(rtcp_socket_ctrl, buffer.data(), buffer.size(), MSG_NOSIGNAL) == -1)
+    makeCommand(command, commandBytes, params);
+
+    if (send(rtcp_socket_ctrl, command.data(), command.size(), MSG_NOSIGNAL) == -1)
     {
         qCritical() << "send(): " << strerror(errno);
     }
 
-    QString commandHex = QString::fromStdString(messToStr(buffer[12]));
+    QString commandHex = QString::fromStdString(messToStr(command[12]));
 
     qInfo() << "====================================================================>>>" << commandHex;
 }

@@ -44,37 +44,58 @@ void SocketWorker::startWorker()
     clientVmp->initSockets();
 
        // init buffers
-    std::vector<uint8_t> command;
-    std::vector<uint8_t> params;
+//    std::vector<uint8_t> command;
+//    std::vector<uint8_t> params;
 
     // get current state of vmp
-    command.clear();
-    params.clear();
-    params.resize(4);
-    clientVmp->makeCommand(command, VPrm::MessId::GetCurrentState, params);
-    clientVmp->sendCommand(command);
-    clientVmp->receiveRespFromCommand(VPrm::MessId::GetCurrentState);
+//    command.clear();
+//    params.clear();
+//    params.resize(4);
+//    clientVmp->makeCommand(command, VPrm::MessId::GetCurrentState, params);
+//    clientVmp->sendCommand(command);
+//    clientVmp->receiveRespFromCommand(VPrm::MessId::GetCurrentState);
 
     // start rtp flow
-    command.clear();
-    params.clear();
-    params.resize(4);
-    uint8_t RTPFlow = 1;
-    std::memcpy(&params[0], &RTPFlow, sizeof(RTPFlow));
-    clientVmp->makeCommand(command, VPrm::MessId::SetRtpCtrl, params);
+//    command.clear();
+//    params.clear();
+//    params.resize(4);
+//    uint8_t RTPFlow = 1;
+//    std::memcpy(&params[0], &RTPFlow, sizeof(RTPFlow));
+//    clientVmp->makeCommand(command, VPrm::MessId::SetRtpCtrl, params);
 
-    clientVmp->sendCommand(command);
-    clientVmp->receiveRespFromCommand(VPrm::MessId::SetRtpCtrl);
+//    clientVmp->sendCommand(command);
+//    clientVmp->receiveRespFromCommand(VPrm::MessId::SetRtpCtrl);
 
     // set frequency
+//    int32_t currentFreq = clientVmp->getVmpFreq();
+//    command.clear();
+//    params.clear();
+//    params.resize(4);
+//    std::memcpy(&params[0], &currentFreq, sizeof(currentFreq));
+//    clientVmp->makeCommand(command, VPrm::MessId::SetFrequency, params);
+//    clientVmp->sendCommand(command);
+//    clientVmp->receiveRespFromCommand(VPrm::MessId::SetFrequency);
+
+    // register commands
+    CommandInfo commandInfo;
+
+    commandInfo.commandByte = VPrm::MessId::GetCurrentState;
+    commandInfo.params.clear();
+    commandInfo.params.resize(4);
+    commandQueue.push(commandInfo);
+
+    commandInfo.commandByte = VPrm::MessId::SetRtpCtrl;
+    commandInfo.params.clear();
+    commandInfo.params.resize(4);
+    std::memset(commandInfo.params.data(), (uint8_t)1, sizeof(uint8_t));
+    commandQueue.push(commandInfo);
+
     int32_t currentFreq = clientVmp->getVmpFreq();
-    command.clear();
-    params.clear();
-    params.resize(4);
-    std::memcpy(&params[0], &currentFreq, sizeof(currentFreq));
-    clientVmp->makeCommand(command, VPrm::MessId::SetFrequency, params);
-    clientVmp->sendCommand(command);
-    clientVmp->receiveRespFromCommand(VPrm::MessId::SetFrequency);
+    commandInfo.commandByte = VPrm::MessId::SetFrequency;
+    commandInfo.params.clear();
+    commandInfo.params.resize(4);
+    std::memcpy(commandInfo.params.data(), &currentFreq, sizeof(currentFreq));
+    commandQueue.push(commandInfo);
 
     // configure fftw
     const size_t N = 512;
@@ -85,7 +106,6 @@ void SocketWorker::startWorker()
 
     // init structs for select()
     fd_set readfds, writefds;
-
     int socket_ctrl = clientVmp->getSocketCtrl();
     int socket_data = clientVmp->getSocketData();
 
