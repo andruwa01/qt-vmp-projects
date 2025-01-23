@@ -99,12 +99,11 @@ int ClientVmp::initSocket(std::string ipv4_vmp, const int port_vmp, const int po
     return sockfd;
 }
 
-void ClientVmp::sendCommand(uint8_t commandBytes, const std::vector<uint8_t> &params)
+void ClientVmp::sendCommand(const CommandInfo &commandInfo)
 {
-    std::vector<uint8_t> command;
-    command.clear();
+    std::vector<uint8_t> command(0);
 
-    makeCommand(command, commandBytes, params);
+    makeCommand(command, commandInfo.commandByte, commandInfo.params);
 
     if (send(rtcp_socket_ctrl, command.data(), command.size(), MSG_NOSIGNAL) == -1)
     {

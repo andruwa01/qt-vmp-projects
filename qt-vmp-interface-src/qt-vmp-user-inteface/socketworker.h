@@ -3,6 +3,7 @@
 
 #include "ipInfo.h"
 #include "clientvmp.h"
+#include "types.h"
 
 #include <QObject>
 #include <QDebug>
@@ -42,14 +43,6 @@ private:
 
     bool stopWork;
     ClientVmp *clientVmp = nullptr;
-
-    struct CommandInfo
-    {
-        int8_t commandByte = 0;
-        std::vector<uint8_t> params = {0};
-        bool isSent = false;
-        bool isWaitingForResponse = false;
-    };
 
     std::queue<CommandInfo> commandQueue;
 

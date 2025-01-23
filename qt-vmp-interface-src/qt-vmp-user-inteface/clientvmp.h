@@ -3,6 +3,7 @@
 
 #include "ipInfo.h"
 #include "vmp_rx_defs.h"
+#include "types.h"
 
 // c/c++
 #include <iostream>
@@ -34,7 +35,7 @@ public:
 
     bool initSockets();
 //    void sendCommand(std::vector<uint8_t> &buffer);
-    void sendCommand(uint8_t commmandByteIs, const std::vector<uint8_t> &params);
+    void sendCommand(const CommandInfo &commmandByteIs);
 
     ssize_t receiveRespFromCommand(const uint8_t &command);
     ssize_t receiveDataPkg(std::vector<uint8_t> &pkg);

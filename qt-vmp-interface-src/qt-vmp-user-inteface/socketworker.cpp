@@ -17,7 +17,7 @@ SocketWorker::~SocketWorker()
     qDebug() << "SocketWorker destructor called";
 }
 
-SocketWorker::CommandInfo SocketWorker::getLastCommandFromQueue()
+CommandInfo SocketWorker::getLastCommandFromQueue()
 {
     CommandInfo cmdInfo;
     if (!commandQueue.empty())
@@ -134,7 +134,7 @@ void SocketWorker::startWorker()
             if (!currentCommand.isSent && FD_ISSET(socket_ctrl, &writefds))
             {
                 // refactor sendCommand()
-                clientVmp->sendCommand(currentCommand, params);
+                clientVmp->sendCommand(currentCommand);
                 currentCommand.isSent 			    = true;
                 currentCommand.isWaitingForResponse = true;
             }

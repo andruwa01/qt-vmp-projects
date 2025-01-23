@@ -19,6 +19,7 @@ HEADERS += \
     main.h \
     mainwindow.h \
     socketworker.h \
+    types.h \
     vmp_rx_defs.h \
     ipInfo.h
 
