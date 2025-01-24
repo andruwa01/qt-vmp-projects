@@ -39,18 +39,15 @@ void SocketWorker::startWorker()
     // create sockets and set them to O_NONBLOCK
     clientVmp->initSockets();
 
-    // add commands to deque
-    int32_t currentFreq = clientVmp->getVmpFreq();
+    // add commands to queue
     addCommandToQueue(VPrm::MessId::GetCurrentState, 0);
     addCommandToQueue(VPrm::MessId::SetRtpCtrl     , 1);
-    addCommandToQueue(VPrm::MessId::SetFrequency   , currentFreq);
+    addCommandToQueue(VPrm::MessId::SetFrequency   , clientVmp->getVmpFreq());
 
     // configure fftw
-    const size_t N = 512;
-
-    fftwf_complex *in  = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * N);
-    fftwf_complex *out = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * N);
-    fftwf_plan    plan = fftwf_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_MEASURE);
+    in  = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * N);
+    out = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * N);
+    plan = fftwf_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_MEASURE);
 
     // init structs for select()
     fd_set readfds, writefds;
@@ -62,55 +59,52 @@ void SocketWorker::startWorker()
     while(!stopWork || !commandQueue.empty())
     {
         FD_ZERO(&readfds);
+        FD_ZERO(&writefds);
         FD_SET(socket_ctrl, &readfds);
         FD_SET(socket_data, &readfds);
+        FD_SET(socket_ctrl, &writefds);
 
-        FD_ZERO(&writefds); FD_SET(socket_ctrl, &writefds);
-
-        if (select(fdmax + 1, &readfds, &writefds, NULL, NULL) == -1)
+        struct timeval timeout = {0, 10000}; // 10ms
+        if (select(fdmax + 1, &readfds, &writefds, NULL, &timeout) == -1)
         {
-            std::cout << "select():" << std::strerror(errno);
+            qCritical() << "select():" << std::strerror(errno);
+            break;
         }
 
-        if (!commandQueue.empty())
-        {
+        if (FD_ISSET(socket_ctrl, &writefds)) processCommandQueue();
+        if (FD_ISSET(socket_data, &readfds )) processIncomingData();
+    }
 
-            CommandInfo &currentCommand = commandQueue.front();
+    fftwf_destroy_plan(plan);
+    fftwf_free(in);
+    fftwf_free(out);
 
-            if (!currentCommand.isSent && FD_ISSET(socket_ctrl, &writefds))
-            {
-                // refactor sendCommand()
-                clientVmp->sendCommand(currentCommand);
-                currentCommand.isSent 			    = true;
-                currentCommand.isWaitingForResponse = true;
-            }
+    emit workFinished();
+}
 
-            if (currentCommand.isWaitingForResponse && FD_ISSET(socket_ctrl, &readfds))
-            {
-                int bytesrecv = clientVmp->receiveRespFromCommand(currentCommand);
-                if (bytesrecv == -1)
-                {
-                    if (errno == EAGAIN || errno == EWOULDBLOCK)
-                    {
-                        qInfo() << "no data to read on socket with commands ";
-                    }
-                    else
-                    {
-                        qCritical() << "error when recvRespFromCommand(): " << std::strerror(errno);
-                    }
-                }
-                else
-                {
-                    commandQueue.pop();
-                }
-            }
+void SocketWorker::processCommandQueue()
+{
+    if (commandQueue.empty()) return;
 
-        }
+    CommandInfo &currentCommand = commandQueue.front();
 
-        if (FD_ISSET(socket_data, &readfds))
-        {
+    if (!currentCommand.isSent)
+    {
+        clientVmp->sendCommand(currentCommand);
+        currentCommand.isSent 				= true;
+        currentCommand.isWaitingForResponse = true;
+    }
 
-            std::vector<uint8_t> pkg_data(MAX_UDP_SIZE);
+    if (currentCommand.isWaitingForResponse)
+    {
+        clientVmp->receiveRespFromCommand(currentCommand);
+        commandQueue.pop();
+    }
+}
+
+void SocketWorker::processIncomingData()
+{
+    std::vector<uint8_t> pkg_data(MAX_UDP_SIZE);
 
 //            for (size_t i = PACKAGE_HEADER_SIZE; i < pkg_data.size(); i += 8)
 //            {
@@ -119,18 +113,9 @@ void SocketWorker::startWorker()
 
 //            qDebug() << "pkg_data: " << pkg_data;
 
-            clientVmp->receiveDataPkg(pkg_data);
-            calculateFFTsendToUi(pkg_data, plan, in, out, N);
-        }
+    clientVmp->receiveDataPkg(pkg_data);
+    calculateFFTsendToUi(pkg_data, plan, in, out, N);
 
-        QThread::msleep(10);
-    }
-
-    fftwf_destroy_plan(plan);
-    fftwf_free(in);
-    fftwf_free(out);
-
-    emit workFinished();
 }
 
 void SocketWorker::stopWorker()

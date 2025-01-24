@@ -155,7 +155,15 @@ ssize_t ClientVmp::receiveRespFromCommand(const CommandInfo &commandInfo)
     ssize_t read_size = recv(rtcp_socket_ctrl,  buffer.data(), MAX_UDP_SIZE, 0);
     if (read_size == -1)
     {
-        qCritical() << QString::fromStdString(messToStr(command)) << " answer recv():" << strerror(errno);
+        if (errno == EAGAIN || errno == EWOULDBLOCK)
+        {
+            qInfo() << "No data available on command socket";
+        }
+        else
+        {
+            qCritical() << QString::fromStdString(messToStr(command)) << " answer recv():" << strerror(errno);
+        }
+
         return -1;
     }
 

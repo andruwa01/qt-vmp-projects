@@ -42,10 +42,18 @@ private:
     void calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan plan, fftwf_complex *in, fftwf_complex *out, const size_t N);
     void addCommandToQueue(const int commandByte, const int32_t params);
 
+    void processCommandQueue();
+    void processIncomingData();
+
     bool stopWork;
     ClientVmp *clientVmp = nullptr;
 
     std::queue<CommandInfo> commandQueue;
+
+    fftwf_plan    plan;
+    fftwf_complex *in   = nullptr;
+    fftwf_complex *out  = nullptr;
+    const size_t N = 512;
 };
 
 #endif // SOCKETWORKER_H
