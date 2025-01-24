@@ -17,14 +17,14 @@ SocketWorker::~SocketWorker()
     qDebug() << "SocketWorker destructor called";
 }
 
-void SocketWorker::addCommandToDeque(const int commandByte, const int32_t paramsBytes)
+void SocketWorker::addCommandToQueue(const int commandByte, const int32_t paramsBytes)
 {
     CommandInfo commandInfo;
     commandInfo.commandByte = commandByte;
     commandInfo.params.clear();
     commandInfo.params.resize(4);
     std::memcpy(commandInfo.params.data(), &paramsBytes, sizeof(paramsBytes));
-    commandDeque.push_back(commandInfo);
+    commandQueue.push(commandInfo);
 }
 
 void SocketWorker::startWorker()
@@ -40,11 +40,10 @@ void SocketWorker::startWorker()
     clientVmp->initSockets();
 
     // add commands to deque
-    const int lastCommandIndexInDeque = 0;
     int32_t currentFreq = clientVmp->getVmpFreq();
-    addCommandToDeque(VPrm::MessId::GetCurrentState, 0);
-    addCommandToDeque(VPrm::MessId::SetRtpCtrl     , 1);
-    addCommandToDeque(VPrm::MessId::SetFrequency   , currentFreq);
+    addCommandToQueue(VPrm::MessId::GetCurrentState, 0);
+    addCommandToQueue(VPrm::MessId::SetRtpCtrl     , 1);
+    addCommandToQueue(VPrm::MessId::SetFrequency   , currentFreq);
 
     // configure fftw
     const size_t N = 512;
@@ -60,7 +59,7 @@ void SocketWorker::startWorker()
 
     int fdmax = std::max(socket_ctrl, socket_data);
 
-    while(!stopWork || !commandDeque.empty())
+    while(!stopWork || !commandQueue.empty())
     {
         FD_ZERO(&readfds);
         FD_SET(socket_ctrl, &readfds);
@@ -73,10 +72,10 @@ void SocketWorker::startWorker()
             std::cout << "select():" << std::strerror(errno);
         }
 
-        if (!commandDeque.empty())
+        if (!commandQueue.empty())
         {
 
-            CommandInfo currentCommand = commandDeque.front();
+            CommandInfo &currentCommand = commandQueue.front();
 
             if (!currentCommand.isSent && FD_ISSET(socket_ctrl, &writefds))
             {
@@ -84,10 +83,6 @@ void SocketWorker::startWorker()
                 clientVmp->sendCommand(currentCommand);
                 currentCommand.isSent 			    = true;
                 currentCommand.isWaitingForResponse = true;
-
-                // update front element in command deque
-                commandDeque.at(lastCommandIndexInDeque).isSent = currentCommand.isSent;
-                commandDeque.at(lastCommandIndexInDeque).isWaitingForResponse = currentCommand.isWaitingForResponse;
             }
 
             if (currentCommand.isWaitingForResponse && FD_ISSET(socket_ctrl, &readfds))
@@ -106,7 +101,7 @@ void SocketWorker::startWorker()
                 }
                 else
                 {
-                    commandDeque.pop_front();
+                    commandQueue.pop();
                 }
             }
 
@@ -142,7 +137,7 @@ void SocketWorker::stopWorker()
 {
     qDebug() << "stopWorker()";
     stopWork = true;
-    addCommandToDeque(VPrm::MessId::SetRtpCtrl, 1);
+    addCommandToQueue(VPrm::MessId::SetRtpCtrl, 1);
 }
 
 void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan plan, fftwf_complex *in, fftwf_complex *out, const size_t N)

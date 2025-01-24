@@ -12,7 +12,7 @@
 #include <QCoreApplication>
 #include <QString>
 
-#include <deque>
+#include <queue>
 
 #include <fftw3.h>
 #include <math.h>
@@ -40,12 +40,12 @@ public slots:
 
 private:
     void calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan plan, fftwf_complex *in, fftwf_complex *out, const size_t N);
-    void addCommandToDeque(const int commandByte, const int32_t params);
+    void addCommandToQueue(const int commandByte, const int32_t params);
 
     bool stopWork;
     ClientVmp *clientVmp = nullptr;
 
-    std::deque<CommandInfo> commandDeque;
+    std::queue<CommandInfo> commandQueue;
 };
 
 #endif // SOCKETWORKER_H
