@@ -157,7 +157,7 @@ ssize_t ClientVmp::receiveRespFromCommand(const CommandInfo &commandInfo)
     {
         if (errno == EAGAIN || errno == EWOULDBLOCK)
         {
-            qInfo() << "No data available on command socket";
+            qInfo() << "no data available on ctrl socket";
         }
         else
         {
@@ -200,7 +200,7 @@ ssize_t ClientVmp::receiveDataPkg(std::vector<uint8_t> &pkg)
     {
         if (errno == EAGAIN || errno == EWOULDBLOCK)
         {
-            qInfo() << "no data to read on socket with data";
+            qInfo() << "no data to read on data socket";
         }
         else
         {
