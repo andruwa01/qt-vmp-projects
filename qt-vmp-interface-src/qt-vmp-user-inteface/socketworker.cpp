@@ -85,6 +85,7 @@ void SocketWorker::startWorker()
                 currentCommand.isSent 			    = true;
                 currentCommand.isWaitingForResponse = true;
 
+                // update front element in command deque
                 commandDeque.at(lastCommandIndexInDeque).isSent = currentCommand.isSent;
                 commandDeque.at(lastCommandIndexInDeque).isWaitingForResponse = currentCommand.isWaitingForResponse;
             }
@@ -106,6 +107,8 @@ void SocketWorker::startWorker()
                 else
                 {
                     currentCommand.isWaitingForResponse = false;
+
+                    // update front element in command deque
                     commandDeque.at(lastCommandIndexInDeque).isWaitingForResponse = currentCommand.isWaitingForResponse;
                     commandDeque.pop_front();
                 }
