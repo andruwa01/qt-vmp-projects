@@ -17,18 +17,14 @@ SocketWorker::~SocketWorker()
     qDebug() << "SocketWorker destructor called";
 }
 
-CommandInfo SocketWorker::getLastCommandFromQueue()
+void SocketWorker::addCommandToDeque(const int commandByte, const int32_t paramsBytes)
 {
-    CommandInfo cmdInfo;
-    if (!commandQueue.empty())
-    {
-        cmdInfo = commandQueue.front();
-        commandQueue.pop();
-        return cmdInfo;
-    }
-
-    cmdInfo.commandByte = -1;
-    return cmdInfo;
+    CommandInfo commandInfo;
+    commandInfo.commandByte = commandByte;
+    commandInfo.params.clear();
+    commandInfo.params.resize(4);
+    std::memcpy(commandInfo.params.data(), &paramsBytes, sizeof(paramsBytes));
+    commandDeque.push_back(commandInfo);
 }
 
 void SocketWorker::startWorker()
@@ -43,59 +39,12 @@ void SocketWorker::startWorker()
     // create sockets and set them to O_NONBLOCK
     clientVmp->initSockets();
 
-       // init buffers
-//    std::vector<uint8_t> command;
-//    std::vector<uint8_t> params;
-
-    // get current state of vmp
-//    command.clear();
-//    params.clear();
-//    params.resize(4);
-//    clientVmp->makeCommand(command, VPrm::MessId::GetCurrentState, params);
-//    clientVmp->sendCommand(command);
-//    clientVmp->receiveRespFromCommand(VPrm::MessId::GetCurrentState);
-
-    // start rtp flow
-//    command.clear();
-//    params.clear();
-//    params.resize(4);
-//    uint8_t RTPFlow = 1;
-//    std::memcpy(&params[0], &RTPFlow, sizeof(RTPFlow));
-//    clientVmp->makeCommand(command, VPrm::MessId::SetRtpCtrl, params);
-
-//    clientVmp->sendCommand(command);
-//    clientVmp->receiveRespFromCommand(VPrm::MessId::SetRtpCtrl);
-
-    // set frequency
-//    int32_t currentFreq = clientVmp->getVmpFreq();
-//    command.clear();
-//    params.clear();
-//    params.resize(4);
-//    std::memcpy(&params[0], &currentFreq, sizeof(currentFreq));
-//    clientVmp->makeCommand(command, VPrm::MessId::SetFrequency, params);
-//    clientVmp->sendCommand(command);
-//    clientVmp->receiveRespFromCommand(VPrm::MessId::SetFrequency);
-
-    // register commands
-    CommandInfo commandInfo;
-
-    commandInfo.commandByte = VPrm::MessId::GetCurrentState;
-    commandInfo.params.clear();
-    commandInfo.params.resize(4);
-    commandQueue.push(commandInfo);
-
-    commandInfo.commandByte = VPrm::MessId::SetRtpCtrl;
-    commandInfo.params.clear();
-    commandInfo.params.resize(4);
-    std::memset(commandInfo.params.data(), (uint8_t)1, sizeof(uint8_t));
-    commandQueue.push(commandInfo);
-
+    // add commands to deque
+    const int lastCommandIndexInDeque = 0;
     int32_t currentFreq = clientVmp->getVmpFreq();
-    commandInfo.commandByte = VPrm::MessId::SetFrequency;
-    commandInfo.params.clear();
-    commandInfo.params.resize(4);
-    std::memcpy(commandInfo.params.data(), &currentFreq, sizeof(currentFreq));
-    commandQueue.push(commandInfo);
+    addCommandToDeque(VPrm::MessId::GetCurrentState, 0);
+    addCommandToDeque(VPrm::MessId::SetRtpCtrl     , 1);
+    addCommandToDeque(VPrm::MessId::SetFrequency   , currentFreq);
 
     // configure fftw
     const size_t N = 512;
@@ -111,25 +60,23 @@ void SocketWorker::startWorker()
 
     int fdmax = std::max(socket_ctrl, socket_data);
 
-    std::vector<uint8_t> pkg_data(FULL_PACKAGE_SIZE);
-    while(!stopWork || !commandQueue.empty())
+    while(!stopWork || !commandDeque.empty())
     {
         FD_ZERO(&readfds);
         FD_SET(socket_ctrl, &readfds);
         FD_SET(socket_data, &readfds);
 
-        FD_ZERO(&writefds);
-        FD_SET(socket_ctrl, &writefds);
+        FD_ZERO(&writefds); FD_SET(socket_ctrl, &writefds);
 
         if (select(fdmax + 1, &readfds, &writefds, NULL, NULL) == -1)
         {
             std::cout << "select():" << std::strerror(errno);
         }
 
-        if (!commandQueue.empty())
+        if (!commandDeque.empty())
         {
 
-            CommandInfo currentCommand = commandQueue.front();
+            CommandInfo currentCommand = commandDeque.front();
 
             if (!currentCommand.isSent && FD_ISSET(socket_ctrl, &writefds))
             {
@@ -137,11 +84,14 @@ void SocketWorker::startWorker()
                 clientVmp->sendCommand(currentCommand);
                 currentCommand.isSent 			    = true;
                 currentCommand.isWaitingForResponse = true;
+
+                commandDeque.at(lastCommandIndexInDeque).isSent = currentCommand.isSent;
+                commandDeque.at(lastCommandIndexInDeque).isWaitingForResponse = currentCommand.isWaitingForResponse;
             }
 
             if (currentCommand.isWaitingForResponse && FD_ISSET(socket_ctrl, &readfds))
             {
-                int bytesrecv = clientVmp->receiveRespFromCommand();
+                int bytesrecv = clientVmp->receiveRespFromCommand(currentCommand);
                 if (bytesrecv == -1)
                 {
                     if (errno == EAGAIN || errno == EWOULDBLOCK)
@@ -156,7 +106,8 @@ void SocketWorker::startWorker()
                 else
                 {
                     currentCommand.isWaitingForResponse = false;
-                    commandQueue.pop();
+                    commandDeque.at(lastCommandIndexInDeque).isWaitingForResponse = currentCommand.isWaitingForResponse;
+                    commandDeque.pop_front();
                 }
             }
 
@@ -165,6 +116,8 @@ void SocketWorker::startWorker()
         if (FD_ISSET(socket_data, &readfds))
         {
 
+            std::vector<uint8_t> pkg_data(MAX_UDP_SIZE);
+
 //            for (size_t i = PACKAGE_HEADER_SIZE; i < pkg_data.size(); i += 8)
 //            {
 //                pkg_data[i] = (int32_t)25;
@@ -172,12 +125,9 @@ void SocketWorker::startWorker()
 
 //            qDebug() << "pkg_data: " << pkg_data;
 
-            pkg_data.clear();
-            pkg_data.resize(FULL_PACKAGE_SIZE);
             clientVmp->receiveDataPkg(pkg_data);
             calculateFFTsendToUi(pkg_data, plan, in, out, N);
         }
-
 
         QThread::msleep(10);
     }
@@ -192,21 +142,8 @@ void SocketWorker::startWorker()
 void SocketWorker::stopWorker()
 {
     qDebug() << "stopWorker()";
-
     stopWork = true;
-
-    std::vector<uint8_t> command;
-    std::vector<uint8_t> params;
-
-    // stop rtp flow
-    command.clear();
-    params.clear();
-    params.resize(4);
-    uint8_t RTPFlow = 0;
-    std::memcpy(&params[0], &RTPFlow, sizeof(RTPFlow));
-    clientVmp->makeCommand(command, VPrm::MessId::SetRtpCtrl, params);
-    clientVmp->sendCommand(command);
-    clientVmp->receiveRespFromCommand(VPrm::MessId::SetRtpCtrl);
+    addCommandToDeque(VPrm::MessId::SetRtpCtrl, 1);
 }
 
 void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan plan, fftwf_complex *in, fftwf_complex *out, const size_t N)

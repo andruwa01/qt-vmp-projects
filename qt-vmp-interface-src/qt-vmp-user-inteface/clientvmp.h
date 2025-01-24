@@ -35,9 +35,9 @@ public:
 
     bool initSockets();
 //    void sendCommand(std::vector<uint8_t> &buffer);
-    void sendCommand(const CommandInfo &commmandByteIs);
+    void sendCommand(const CommandInfo &commmandInfo);
 
-    ssize_t receiveRespFromCommand(const uint8_t &command);
+    ssize_t receiveRespFromCommand(const CommandInfo &commandInfo);
     ssize_t receiveDataPkg(std::vector<uint8_t> &pkg);
     uint32_t parseIQBuffer(std::vector<uint8_t>& iq_pkg, uint32_t pkg_size);
 

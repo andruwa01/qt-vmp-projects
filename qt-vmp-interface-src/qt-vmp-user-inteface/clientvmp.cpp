@@ -147,10 +147,11 @@ void ClientVmp::makeCommand(std::vector<uint8_t> &command_pkg, uint8_t mess_id, 
     command_pkg[3] = command_pkg.size() / 4 - 1;
 }
 
-ssize_t ClientVmp::receiveRespFromCommand(const uint8_t &command)
+ssize_t ClientVmp::receiveRespFromCommand(const CommandInfo &commandInfo)
 {
-    std::vector<uint8_t> buffer(MAX_UDP_SIZE);
+    const int command = commandInfo.commandByte;
 
+    std::vector<uint8_t> buffer(MAX_UDP_SIZE);
     ssize_t read_size = recv(rtcp_socket_ctrl,  buffer.data(), MAX_UDP_SIZE, 0);
     if (read_size == -1)
     {
@@ -186,14 +187,24 @@ ssize_t ClientVmp::receiveRespFromCommand(const uint8_t &command)
 
 ssize_t ClientVmp::receiveDataPkg(std::vector<uint8_t> &pkg)
 {
-    ssize_t read_size = recv(rtcp_socket_data, pkg.data(), FULL_PACKAGE_SIZE, 0);
+    ssize_t read_size = recv(rtcp_socket_data, pkg.data(), MAX_UDP_SIZE, 0);
     if (read_size == -1)
     {
-        qCritical() << "data pkg recv():" << strerror(errno);
+        if (errno == EAGAIN || errno == EWOULDBLOCK)
+        {
+            qInfo() << "no data to read on socket with data";
+        }
+        else
+        {
+            qCritical() << "data pkg recv():" << strerror(errno);
+        }
+
         return -1;
     }
 
     qInfo() << "data pkg recv():" << "get" << read_size << "bytes";
+
+    pkg.resize(read_size);
 
 //    debugPrintHexPkg(pkg);
 
