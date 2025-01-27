@@ -181,8 +181,6 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg)
         powerSpectrumShifted[N / 2 + i] = powerSpectrum[i];
     }
 
-//    qDebug() << "powerSpectrumShifted before log 10: " << powerSpectrumShifted;
-
     // perform log10 on powerSpectrumShifted
     std::for_each(powerSpectrumShifted.begin(), powerSpectrumShifted.end(),
         [](float &value)
