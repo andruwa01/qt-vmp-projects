@@ -19,8 +19,8 @@ ClientVmp::~ClientVmp()
 
 bool ClientVmp::initSockets()
 {
-    rtcp_socket_ctrl = initSocket(ipv4_vmp, vmp_port_ctrl, 0);
-    if (rtcp_socket_ctrl == -1)
+    socket_ctrl = initSocket(ipv4_vmp, vmp_port_ctrl, 0);
+    if (socket_ctrl == -1)
     {
         qCritical() << "initSocket(): " << "failed for ctrl";
         return false;
@@ -29,10 +29,10 @@ bool ClientVmp::initSockets()
     struct sockaddr_in local_addr;
     std::memset(&local_addr, 0, sizeof(sockaddr_in));
     socklen_t hints_size = sizeof(local_addr);
-    getsockname(rtcp_socket_ctrl, (struct sockaddr*)&local_addr, &hints_size);
+    getsockname(socket_ctrl, (struct sockaddr*)&local_addr, &hints_size);
 
-    rtcp_socket_data = initSocket(ipv4_vmp, vmp_port_data, ntohs(local_addr.sin_port) - 1);
-    if (rtcp_socket_data == -1)
+    socket_data = initSocket(ipv4_vmp, vmp_port_data, ntohs(local_addr.sin_port) - 1);
+    if (socket_data == -1)
     {
         qCritical() << "initSocket(): " << "failed for data";
         return false;
@@ -105,7 +105,7 @@ void ClientVmp::sendCommand(const CommandInfo &commandInfo)
 
     makeCommand(command, commandInfo.commandByte, commandInfo.params);
 
-    if (send(rtcp_socket_ctrl, command.data(), command.size(), MSG_NOSIGNAL) == -1)
+    if (send(socket_ctrl, command.data(), command.size(), MSG_NOSIGNAL) == -1)
     {
         qCritical() << "send(): " << strerror(errno);
     }
@@ -152,7 +152,7 @@ ssize_t ClientVmp::receiveRespFromCommand(const CommandInfo &commandInfo)
     const int command = commandInfo.commandByte;
 
     std::vector<uint8_t> buffer(MAX_UDP_SIZE);
-    ssize_t read_size = recv(rtcp_socket_ctrl,  buffer.data(), MAX_UDP_SIZE, 0);
+    ssize_t read_size = recv(socket_ctrl,  buffer.data(), MAX_UDP_SIZE, 0);
     if (read_size == -1)
     {
         if (errno == EAGAIN || errno == EWOULDBLOCK)
@@ -195,7 +195,7 @@ ssize_t ClientVmp::receiveRespFromCommand(const CommandInfo &commandInfo)
 
 ssize_t ClientVmp::receiveDataPkg(std::vector<uint8_t> &pkg)
 {
-    ssize_t read_size = recv(rtcp_socket_data, pkg.data(), MAX_UDP_SIZE, 0);
+    ssize_t read_size = recv(socket_data, pkg.data(), MAX_UDP_SIZE, 0);
     if (read_size == -1)
     {
         if (errno == EAGAIN || errno == EWOULDBLOCK)
@@ -319,12 +319,12 @@ int ClientVmp::getVmpFreq()
 
 int ClientVmp::getSocketCtrl()
 {
-    return rtcp_socket_ctrl;
+    return socket_ctrl;
 }
 
 int ClientVmp::getSocketData()
 {
-    return rtcp_socket_data;
+    return socket_data;
 }
 
 std::string ClientVmp::messToStr(uint8_t messId)

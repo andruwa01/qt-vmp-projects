@@ -63,8 +63,8 @@ private:
     std::string ipv4_vmp;
     int vmp_port_ctrl;
     int vmp_port_data;
-    int rtcp_socket_ctrl;
-    int rtcp_socket_data;
+    int socket_ctrl;
+    int socket_data;
     int vmp_frequency_hz;
 };
 
