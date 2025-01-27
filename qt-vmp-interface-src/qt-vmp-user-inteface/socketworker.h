@@ -40,7 +40,7 @@ public slots:
     void stopWorker();
 
 private:
-    void calculateFFTsendToUi(std::vector<uint8_t> &pkg);
+    void calculateFFTsendToUi(std::vector<uint8_t> &buffer);
     void addCommandToQueue(const int commandByte, const int32_t params);
 
     void processCommandQueue();
@@ -51,10 +51,11 @@ private:
 
     std::queue<CommandInfo> commandQueue;
 
+    std::vector<uint8_t> ReImBuffer;
     fftwf_plan    plan;
     fftwf_complex *in   = nullptr;
     fftwf_complex *out  = nullptr;
-    const size_t N = 512;
+    const size_t N = 1024;
 
     fd_set readfds, writefds;
 };

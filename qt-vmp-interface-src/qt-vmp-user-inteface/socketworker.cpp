@@ -129,7 +129,28 @@ void SocketWorker::processIncomingData()
 
     #endif
 
-    calculateFFTsendToUi(pkg_data);
+    for (size_t offset = PACKAGE_HEADER_SIZE; offset < pkg_data.size(); offset += 4)
+    {
+        if (ReImBuffer.size() < 8192)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                uint8_t byte = pkg_data[offset + i];
+                ReImBuffer.push_back(byte);
+            }
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    if (ReImBuffer.size() == 8192)
+    {
+        calculateFFTsendToUi(ReImBuffer);
+        ReImBuffer.clear();
+        ReImBuffer.resize(0);
+    }
 }
 
 void SocketWorker::stopWorker()
@@ -139,20 +160,31 @@ void SocketWorker::stopWorker()
     addCommandToQueue(VPrm::MessId::SetRtpCtrl, 0);
 }
 
-void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg)
+void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &buffer)
 {
+//    size_t fftwIndex = 0;
+//    for (size_t offset = PACKAGE_HEADER_SIZE; offset < buffer.size(); offset += 8)
+//    {
+//        float real = *reinterpret_cast<int32_t*>(&buffer[offset]);
+//        float imag = *reinterpret_cast<int32_t*>(&buffer[offset + 4]);
+
+//        in[fftwIndex][0] = real;
+//        in[fftwIndex][1] = imag;
+
+//        fftwIndex++;
+//    }
+
     size_t fftwIndex = 0;
-    for (size_t offset = PACKAGE_HEADER_SIZE; offset < pkg.size(); offset += 8)
+    for (size_t offset = 0; offset < buffer.size(); offset += 8)
     {
-        float real = *reinterpret_cast<int32_t*>(&pkg[offset]);
-        float imag = *reinterpret_cast<int32_t*>(&pkg[offset + 4]);
+        float real = *reinterpret_cast<int32_t*>(&buffer[offset]);
+        float imag = *reinterpret_cast<int32_t*>(&buffer[offset + 4]);
 
         in[fftwIndex][0] = real;
         in[fftwIndex][1] = imag;
 
         fftwIndex++;
     }
-
 //     add values to N
 //    for (; fftwIndex < N; fftwIndex++)
 //    {
