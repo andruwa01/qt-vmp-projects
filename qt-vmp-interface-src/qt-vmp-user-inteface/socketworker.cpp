@@ -121,8 +121,8 @@ void SocketWorker::processIncomingData()
 
 //    clientVmp->receiveDataPkg(pkg_data);
 //    qDebug() << "pkg_data: " << pkg_data;
-    calculateFFTsendToUi(pkg_data, plan, in, out, N);
 
+    calculateFFTsendToUi(pkg_data);
 }
 
 void SocketWorker::stopWorker()
@@ -132,7 +132,7 @@ void SocketWorker::stopWorker()
     addCommandToQueue(VPrm::MessId::SetRtpCtrl, 0);
 }
 
-void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan plan, fftwf_complex *in, fftwf_complex *out, const size_t N)
+void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg)
 {
     size_t fftwIndex = 0;
     for (size_t offset = PACKAGE_HEADER_SIZE; offset < pkg.size(); offset += 8)
