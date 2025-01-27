@@ -72,6 +72,8 @@ void SocketWorker::startWorker()
 
         if (FD_ISSET(socket_ctrl, &writefds)) processCommandQueue();
         if (FD_ISSET(socket_data, &readfds )) processIncomingData();
+
+        QThread::msleep(10);
     }
 
     fftwf_destroy_plan(plan);
@@ -107,14 +109,15 @@ void SocketWorker::processIncomingData()
 {
     std::vector<uint8_t> pkg_data(MAX_UDP_SIZE);
 
-//            for (size_t i = PACKAGE_HEADER_SIZE; i < pkg_data.size(); i += 8)
-//            {
-//                pkg_data[i] = (int32_t)25;
-//            }
+    const size_t size = 4096;
+    pkg_data.resize(size);
+    for (size_t i = PACKAGE_HEADER_SIZE; i < size; i += 8)
+    {
+        pkg_data[i] = (int32_t)25;
+    }
 
-//            qDebug() << "pkg_data: " << pkg_data;
-
-    clientVmp->receiveDataPkg(pkg_data);
+//    clientVmp->receiveDataPkg(pkg_data);
+//    qDebug() << "pkg_data: " << pkg_data;
     calculateFFTsendToUi(pkg_data, plan, in, out, N);
 
 }
@@ -123,7 +126,7 @@ void SocketWorker::stopWorker()
 {
     qDebug() << "stopWorker()";
     stopWork = true;
-    addCommandToQueue(VPrm::MessId::SetRtpCtrl, 1);
+    addCommandToQueue(VPrm::MessId::SetRtpCtrl, 0);
 }
 
 void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan plan, fftwf_complex *in, fftwf_complex *out, const size_t N)
@@ -190,5 +193,4 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan pl
 //    qDebug() << "powerSpectrumShifted: " << powerSpectrumShifted;
 
     emit fftCalculated(powerSpectrumShifted);
-    qDebug() << "fft calculated";
 }
