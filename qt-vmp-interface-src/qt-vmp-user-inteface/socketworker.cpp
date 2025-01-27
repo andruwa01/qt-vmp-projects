@@ -140,11 +140,11 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan pl
         fftwIndex++;
     }
 
-    // add values to 1024
+//     add values to 1024
 //    for (; fftwIndex < N; fftwIndex++)
 //    {
-//        in[fftwIndex][0] = in[fftwIndex - 1][0];
-//        in[fftwIndex][1] = in[fftwIndex - 1][1];
+//        in[fftwIndex][0] = 0;
+//        in[fftwIndex][1] = 0;
 //    }
 
     // test in (successful)
