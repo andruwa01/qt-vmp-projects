@@ -211,7 +211,4 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> powerSpectrumShifted
         if (minValue < minPower) minPower = minValue;
         chart->axes(Qt::Vertical).first()->setRange(minPower, maxPower);
     }
-
-    ui->graphicsView->setChart(chart);
-    ui->graphicsView->setRenderHint(QPainter::Antialiasing);
 }
