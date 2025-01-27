@@ -80,6 +80,9 @@ void SocketWorker::startWorker()
     fftwf_free(in);
     fftwf_free(out);
 
+    in  = nullptr;
+    out = nullptr;
+
     emit workFinished();
 }
 
@@ -109,11 +112,11 @@ void SocketWorker::processIncomingData()
 {
     std::vector<uint8_t> pkg_data(MAX_UDP_SIZE);
 
-    const size_t size = 4096;
+    const size_t size = FULL_PACKAGE_SIZE;
     pkg_data.resize(size);
     for (size_t i = PACKAGE_HEADER_SIZE; i < size; i += 8)
     {
-        pkg_data[i] = (int32_t)25;
+        pkg_data[i] = 25.0f;
     }
 
 //    clientVmp->receiveDataPkg(pkg_data);
@@ -134,8 +137,8 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan pl
     size_t fftwIndex = 0;
     for (size_t offset = PACKAGE_HEADER_SIZE; offset < pkg.size(); offset += 8)
     {
-        float real = (float)*reinterpret_cast<int32_t*>(&pkg[offset]);
-        float imag = (float)*reinterpret_cast<int32_t*>(&pkg[offset + 4]);
+        float real = *reinterpret_cast<int32_t*>(&pkg[offset]);
+        float imag = *reinterpret_cast<int32_t*>(&pkg[offset + 4]);
 
         in[fftwIndex][0] = real;
         in[fftwIndex][1] = imag;
@@ -143,17 +146,17 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan pl
         fftwIndex++;
     }
 
-//     add values to 1024
+//     add values to N
 //    for (; fftwIndex < N; fftwIndex++)
 //    {
-//        in[fftwIndex][0] = 0;
-//        in[fftwIndex][1] = 0;
+//        in[fftwIndex][0] = 0.0f;
+//        in[fftwIndex][1] = 0.0f;
 //    }
 
     // test in (successful)
 //    for (size_t i = 0; i < N; i++)
 //    {
-//        in[i][0] = 5.0f;
+//        in[i][0] = 25.0f;
 //        in[i][1] = 0.0f;
 //    }
 
@@ -178,19 +181,21 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan pl
         powerSpectrumShifted[N / 2 + i] = powerSpectrum[i];
     }
 
+//    qDebug() << "powerSpectrumShifted before log 10: " << powerSpectrumShifted;
+
     // perform log10 on powerSpectrumShifted
     std::for_each(powerSpectrumShifted.begin(), powerSpectrumShifted.end(),
         [](float &value)
         {
-            value = 20 * log10(value);
-            if (value < 0)
-            {
-                value = 0;
-            }
+           if (value < 1)
+           {
+                value = 1;
+           }
+           value = 20 * log10(value);
         }
     );
 
-//    qDebug() << "powerSpectrumShifted: " << powerSpectrumShifted;
+//    qDebug() << "powerSpectrumShifted after log 10: " << powerSpectrumShifted;
 
     emit fftCalculated(powerSpectrumShifted);
 }

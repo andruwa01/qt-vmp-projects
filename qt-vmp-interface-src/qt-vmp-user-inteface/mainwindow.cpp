@@ -203,6 +203,8 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> powerSpectrumShifted
     float maxValue = *std::max_element(powerSpectrumShifted.begin(), powerSpectrumShifted.end());
     float minValue = *std::min_element(powerSpectrumShifted.begin(), powerSpectrumShifted.end());
 
+//    chart->axes(Qt::Vertical).first()->setRange(0, maxValue);
+
     if (maxValue > maxPower || minValue < minPower)
     {
         if (maxValue > maxPower) maxPower = maxValue;
