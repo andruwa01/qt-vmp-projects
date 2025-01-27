@@ -111,6 +111,8 @@ void MainWindow::actionOnButtonClicked()
 {
     if (ui->pushButton->text() == "СТАРТ")
     {
+        qDebug() << "start button pressed !";
+
         ui->pushButton->setText("СТОП");
         ui->qline_ip->setEnabled(false);
         ui->qline_port->setEnabled(false);

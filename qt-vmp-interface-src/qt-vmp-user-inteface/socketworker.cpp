@@ -55,6 +55,7 @@ void SocketWorker::startWorker()
 
     int fdmax = std::max(socket_ctrl, socket_data);
 
+    qDebug() << "start while";
     while(!stopWork || !commandQueue.empty())
     {
         FD_ZERO(&readfds);
@@ -73,8 +74,9 @@ void SocketWorker::startWorker()
         if (FD_ISSET(socket_ctrl, &writefds)) processCommandQueue();
         if (FD_ISSET(socket_data, &readfds )) processIncomingData();
 
-        QThread::msleep(10);
+//        QThread::msleep(10);
     }
+    qDebug() << "exit while";
 
     fftwf_destroy_plan(plan);
     fftwf_free(in);
@@ -83,6 +85,7 @@ void SocketWorker::startWorker()
     in  = nullptr;
     out = nullptr;
 
+    qDebug() << "work finished signal !";
     emit workFinished();
 }
 
@@ -133,6 +136,7 @@ void SocketWorker::processIncomingData()
     {
         if (ReImBuffer.size() < 8192)
         {
+
             for (int i = 0; i < 4; i++)
             {
                 uint8_t byte = pkg_data[offset + i];
@@ -149,15 +153,14 @@ void SocketWorker::processIncomingData()
     {
         calculateFFTsendToUi(ReImBuffer);
         ReImBuffer.clear();
-        ReImBuffer.resize(0);
     }
 }
 
 void SocketWorker::stopWorker()
 {
     qDebug() << "stopWorker()";
-    stopWork = true;
     addCommandToQueue(VPrm::MessId::SetRtpCtrl, 0);
+    stopWork = true;
 }
 
 void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &buffer)
@@ -185,6 +188,7 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &buffer)
 
         fftwIndex++;
     }
+
 //     add values to N
 //    for (; fftwIndex < N; fftwIndex++)
 //    {
