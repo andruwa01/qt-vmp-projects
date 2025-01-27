@@ -16,6 +16,7 @@ SOURCES += \
 
 HEADERS += \
     clientvmp.h \
+    debug.h \
     main.h \
     mainwindow.h \
     socketworker.h \

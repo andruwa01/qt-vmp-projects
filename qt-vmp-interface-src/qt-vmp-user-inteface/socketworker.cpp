@@ -112,6 +112,8 @@ void SocketWorker::processIncomingData()
 {
     std::vector<uint8_t> pkg_data(MAX_UDP_SIZE);
 
+    #ifdef DEBUG_FFT
+
     const size_t size = FULL_PACKAGE_SIZE;
     pkg_data.resize(size);
     for (size_t i = PACKAGE_HEADER_SIZE; i < size; i += 8)
@@ -119,8 +121,13 @@ void SocketWorker::processIncomingData()
         pkg_data[i] = 25.0f;
     }
 
-//    clientVmp->receiveDataPkg(pkg_data);
+    #else
+
+    clientVmp->receiveDataPkg(pkg_data);
+
 //    qDebug() << "pkg_data: " << pkg_data;
+
+    #endif
 
     calculateFFTsendToUi(pkg_data);
 }

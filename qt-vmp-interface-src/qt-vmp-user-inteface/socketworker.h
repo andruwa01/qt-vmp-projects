@@ -4,6 +4,7 @@
 #include "ipInfo.h"
 #include "clientvmp.h"
 #include "types.h"
+#include "debug.h"
 
 #include <QObject>
 #include <QDebug>
