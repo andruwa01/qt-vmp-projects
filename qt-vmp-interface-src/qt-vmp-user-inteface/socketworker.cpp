@@ -50,7 +50,6 @@ void SocketWorker::startWorker()
     plan = fftwf_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_MEASURE);
 
     // init structs for select()
-    fd_set readfds, writefds;
     int socket_ctrl = clientVmp->getSocketCtrl();
     int socket_data = clientVmp->getSocketData();
 
@@ -84,6 +83,8 @@ void SocketWorker::startWorker()
 
 void SocketWorker::processCommandQueue()
 {
+    int socket_ctrl = clientVmp->getSocketCtrl();
+
     if (commandQueue.empty()) return;
 
     CommandInfo &currentCommand = commandQueue.front();
@@ -95,7 +96,7 @@ void SocketWorker::processCommandQueue()
         currentCommand.isWaitingForResponse = true;
     }
 
-    if (currentCommand.isWaitingForResponse)
+    if (currentCommand.isWaitingForResponse && FD_ISSET(socket_ctrl, &readfds))
     {
         clientVmp->receiveRespFromCommand(currentCommand);
         commandQueue.pop();
@@ -181,7 +182,7 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &pkg, fftwf_plan pl
             value = 20 * log10(value);
             if (value < 0)
             {
-                value = 1e-19;
+                value = 0;
             }
         }
     );

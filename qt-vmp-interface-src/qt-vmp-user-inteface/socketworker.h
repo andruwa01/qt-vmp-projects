@@ -54,6 +54,8 @@ private:
     fftwf_complex *in   = nullptr;
     fftwf_complex *out  = nullptr;
     const size_t N = 512;
+
+    fd_set readfds, writefds;
 };
 
 #endif // SOCKETWORKER_H
