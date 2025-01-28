@@ -174,6 +174,13 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &buffer)
 //        fftwIndex++;
 //    }
 
+//    clientVmp->debugPrintHexPkg(buffer);
+
+    if (buffer.size() % 8 != 0) {
+        qWarning() << "Buffer size is not a multiple of 8!";
+        return;
+    }
+
     size_t fftwIndex = 0;
     for (size_t offset = 0; offset < buffer.size(); offset += 8)
     {

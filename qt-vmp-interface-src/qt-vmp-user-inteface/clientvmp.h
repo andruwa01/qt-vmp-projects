@@ -48,14 +48,14 @@ public:
     int getSocketCtrl();
     int getSocketData();
 
+    void debugPrintHexPkg(std::vector<uint8_t> pkg);
+
 private:
     int initSocket(std::string ipv4_vmp,  const int port_vmp, const int port_client);
     void makeCommand(std::vector<uint8_t>& command_result, uint8_t mess_id, const std::vector<uint8_t> &buffer_data);
 
     std::string messToStr(uint8_t messId);
     std::string messIdToHex(uint8_t messId);
-    void debugPrintHexPkg(std::vector<uint8_t> pkg);
-
     const uint32_t package_data_and_header_size = FULL_PACKAGE_SIZE;
     uint16_t last_seq_package_num = -1;
     std::vector<uint8_t> zero_buffer;

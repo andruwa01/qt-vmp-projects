@@ -192,6 +192,9 @@ ssize_t ClientVmp::receiveRespFromCommand(const CommandInfo &commandInfo)
 
     QString respByteHex = QString::fromStdString(messToStr(ackByte));
     qInfo() << "<<<====================================================================" << respByteHex;
+
+//    debugPrintHexPkg(buffer);
+
     return read_size;
 }
 
