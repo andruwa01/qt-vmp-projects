@@ -46,7 +46,7 @@ private:
     void processCommandQueue();
     void processIncomingData();
 
-    bool stopWork;
+    bool stopWork = false;
     ClientVmp *clientVmp = nullptr;
 
     std::queue<CommandInfo> commandQueue;
