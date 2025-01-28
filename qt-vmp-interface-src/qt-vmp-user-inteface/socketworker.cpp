@@ -56,7 +56,7 @@ void SocketWorker::startWorker()
     int fdmax = std::max(socket_ctrl, socket_data);
 
     stopWork = false;
-    qDebug() << "start while with" << "stopWork:" << stopWork << ", commandQueue.empty(): " << commandQueue.empty();
+//    qDebug() << "start while with" << "stopWork:" << stopWork << ", commandQueue.empty(): " << commandQueue.empty();
     while(!stopWork || !commandQueue.empty())
     {
         FD_ZERO(&readfds);
@@ -77,7 +77,7 @@ void SocketWorker::startWorker()
 
 //        QThread::msleep(10);
     }
-    qDebug() << "exit while with" << "stopWork:" << stopWork << ", commandQueue.empty():" << commandQueue.empty();
+//    qDebug() << "exit while with" << "stopWork:" << stopWork << ", commandQueue.empty():" << commandQueue.empty();
 
     fftwf_destroy_plan(plan);
     fftwf_free(in);
@@ -133,24 +133,20 @@ void SocketWorker::processIncomingData()
 
     #endif
 
+    const size_t bufferMaxSize = N * 8;
     for (size_t offset = PACKAGE_HEADER_SIZE; offset < pkg_data.size(); offset += 4)
     {
-        if (ReImBuffer.size() < 8192)
-        {
-
-            for (int i = 0; i < 4; i++)
-            {
-                uint8_t byte = pkg_data[offset + i];
-                ReImBuffer.push_back(byte);
-            }
-        }
-        else
+        size_t remainingSpace = bufferMaxSize - ReImBuffer.size();
+        if (remainingSpace == 0)
         {
             break;
         }
+
+        size_t bytesToCopy = std::min(remainingSpace, size_t(4));
+        ReImBuffer.insert(ReImBuffer.end(), pkg_data.begin() + offset, pkg_data.begin() + offset + bytesToCopy);
     }
 
-    if (ReImBuffer.size() == 8192)
+    if (ReImBuffer.size() == bufferMaxSize)
     {
         calculateFFTsendToUi(ReImBuffer);
         ReImBuffer.clear();
