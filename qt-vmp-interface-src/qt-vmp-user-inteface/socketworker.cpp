@@ -55,7 +55,8 @@ void SocketWorker::startWorker()
 
     int fdmax = std::max(socket_ctrl, socket_data);
 
-    qDebug() << "start while";
+    stopWork = false;
+    qDebug() << "start while with" << "stopWork:" << stopWork << ", commandQueue.empty(): " << commandQueue.empty();
     while(!stopWork || !commandQueue.empty())
     {
         FD_ZERO(&readfds);
@@ -76,7 +77,7 @@ void SocketWorker::startWorker()
 
 //        QThread::msleep(10);
     }
-    qDebug() << "exit while";
+    qDebug() << "exit while with" << "stopWork:" << stopWork << ", commandQueue.empty():" << commandQueue.empty();
 
     fftwf_destroy_plan(plan);
     fftwf_free(in);
