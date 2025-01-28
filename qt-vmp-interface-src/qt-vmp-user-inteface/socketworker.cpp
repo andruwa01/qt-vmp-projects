@@ -45,9 +45,9 @@ void SocketWorker::startWorker()
     addCommandToQueue(VPrm::MessId::SetFrequency   , clientVmp->getVmpFreq());
 
     // configure fftw
-    in  = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * N);
-    out = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * N);
-    plan = fftwf_plan_dft_1d(N, in, out, FFTW_FORWARD, FFTW_MEASURE);
+    in  = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * Nfft);
+    out = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * Nfft);
+    plan = fftwf_plan_dft_1d(Nfft, in, out, FFTW_FORWARD, FFTW_MEASURE);
 
     // init structs for select()
     int socket_ctrl = clientVmp->getSocketCtrl();
@@ -133,7 +133,7 @@ void SocketWorker::processIncomingData()
 
     #endif
 
-    const size_t bufferMaxSize = N * 8;
+    const size_t bufferMaxSize = Nfft * 8;
     for (size_t offset = PACKAGE_HEADER_SIZE; offset < pkg_data.size(); offset += 4)
     {
         size_t remainingSpace = bufferMaxSize - ReImBuffer.size();
@@ -162,20 +162,6 @@ void SocketWorker::stopWorker()
 
 void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &buffer)
 {
-//    size_t fftwIndex = 0;
-//    for (size_t offset = PACKAGE_HEADER_SIZE; offset < buffer.size(); offset += 8)
-//    {
-//        float real = *reinterpret_cast<int32_t*>(&buffer[offset]);
-//        float imag = *reinterpret_cast<int32_t*>(&buffer[offset + 4]);
-
-//        in[fftwIndex][0] = real;
-//        in[fftwIndex][1] = imag;
-
-//        fftwIndex++;
-//    }
-
-//    clientVmp->debugPrintHexPkg(buffer);
-
     if (buffer.size() % 8 != 0) {
         qWarning() << "Buffer size is not a multiple of 8!";
         return;
@@ -211,21 +197,21 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &buffer)
     fftwf_execute(plan);
 
     // find power
-    std::vector<float> powerSpectrum(N);
-    for (size_t i = 0; i < N; i++)
+    std::vector<float> powerSpectrum(Nfft);
+    for (size_t i = 0; i < Nfft; i++)
     {
         float real = out[i][0];
         float imag = out[i][1];
         float abs  = std::sqrt(real * real + imag * imag);
-        powerSpectrum[i] =  std::pow(abs, 2) / N;
+        powerSpectrum[i] =  std::pow(abs, 2) / Nfft;
     }
 
     // shift spectre
-    std::vector<float> powerSpectrumShifted(N);
-    for (size_t i = 0; i < N / 2; i++)
+    std::vector<float> powerSpectrumShifted(Nfft);
+    for (size_t i = 0; i < Nfft / 2; i++)
     {
-        powerSpectrumShifted[i] = powerSpectrum[N / 2 + i];
-        powerSpectrumShifted[N / 2 + i] = powerSpectrum[i];
+        powerSpectrumShifted[i] = powerSpectrum[Nfft / 2 + i];
+        powerSpectrumShifted[Nfft / 2 + i] = powerSpectrum[i];
     }
 
     // perform log10 on powerSpectrumShifted
