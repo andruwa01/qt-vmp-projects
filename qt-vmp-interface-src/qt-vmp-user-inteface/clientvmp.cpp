@@ -167,6 +167,8 @@ ssize_t ClientVmp::receiveRespFromCommand(const CommandInfo &commandInfo)
         return -1;
     }
 
+    buffer.resize(read_size);
+
 //    qDebug()  << QString::fromStdString(messToStr(command)) << " answer recv():" << "get" << read_size << "bytes";
 
     uint8_t ackByte = buffer[12];
