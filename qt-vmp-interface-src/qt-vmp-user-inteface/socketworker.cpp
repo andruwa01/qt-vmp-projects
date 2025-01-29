@@ -162,7 +162,8 @@ void SocketWorker::stopWorker()
 
 void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &buffer)
 {
-    if (buffer.size() % 8 != 0) {
+    if (buffer.size() % 8 != 0)
+    {
         qWarning() << "Buffer size is not a multiple of 8!";
         return;
     }
