@@ -14,12 +14,12 @@
 #include <iomanip>
 
 // Networking libraries
-#include <sys/types.h>	// size_t
+#include <sys/types.h>  // size_t
 #include <sys/socket.h> // socket()
 #include <sys/select.h> // select()
 #include <netinet/in.h> // sockaddr_in
 #include <arpa/inet.h>  // htons, inet_pton
-#include <fcntl.h>
+#include <fcntl.h>      // for O_NONBLOCK
 
 // qt
 #include <QDebug> // qInfo() etc.
