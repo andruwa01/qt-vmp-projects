@@ -58,7 +58,6 @@ private:
     std::string messIdToHex(uint8_t messId);
     const uint32_t package_data_and_header_size = FULL_PACKAGE_SIZE;
     uint16_t last_seq_package_num = -1;
-    std::vector<uint8_t> zero_buffer;
 
     std::string ipv4_vmp;
     int vmp_port_ctrl;
