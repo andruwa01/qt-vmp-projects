@@ -34,7 +34,6 @@ public:
     ~ClientVmp();
 
     bool initSockets();
-//    void sendCommand(std::vector<uint8_t> &buffer);
     void sendCommand(const CommandInfo &commmandInfo);
 
     ssize_t receiveRespFromCommand(const CommandInfo &commandInfo);
