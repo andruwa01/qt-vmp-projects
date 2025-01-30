@@ -1,4 +1,4 @@
-#ifndef SOCKETWORKER_H
+﻿#ifndef SOCKETWORKER_H
 #define SOCKETWORKER_H
 
 #include "ipInfo.h"

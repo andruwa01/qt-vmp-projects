@@ -134,22 +134,26 @@ void SocketWorker::processIncomingData()
     #endif
 
     const size_t fftwBufferMaxSize = Nfft * 8;
-    for (size_t offset = PACKAGE_HEADER_SIZE; offset < pkg_data.size(); offset += 4)
-    {
-        size_t remainingSpace = fftwBufferMaxSize - ReImBuffer.size();
-        if (remainingSpace == 0)
-        {
-            break;
-        }
+    std::vector<uint8_t> bufferTofft(fftwBufferMaxSize);
 
-        size_t bytesToCopy = std::min(remainingSpace, size_t(4));
-        ReImBuffer.insert(ReImBuffer.end(), pkg_data.begin() + offset, pkg_data.begin() + offset + bytesToCopy);
+    for (size_t offset = PACKAGE_HEADER_SIZE; offset < pkg_data.size(); offset++)
+    {
+        ReImBuffer.push_back(pkg_data[offset]);
     }
 
-    if (ReImBuffer.size() == fftwBufferMaxSize)
+    if (ReImBuffer.size() >= fftwBufferMaxSize)
     {
-        calculateFFTsendToUi(ReImBuffer);
-        ReImBuffer.clear();
+        std::copy(ReImBuffer.begin(), ReImBuffer.begin() + fftwBufferMaxSize, bufferTofft.begin());
+        // rotate
+        std::rotate(ReImBuffer.begin(), ReImBuffer.begin() + fftwBufferMaxSize, ReImBuffer.end());
+        // clear last part (that is about to fft)
+        ReImBuffer.resize(ReImBuffer.size() - fftwBufferMaxSize);
+
+        // just erase
+//        ReImBuffer.erase(ReImBuffer.begin(), ReImBuffer.begin() + fftwBufferMaxSize);
+
+        // send data
+        calculateFFTsendToUi(bufferTofft);
     }
 }
 
