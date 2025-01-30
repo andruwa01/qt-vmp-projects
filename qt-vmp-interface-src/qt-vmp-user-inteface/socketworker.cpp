@@ -133,10 +133,10 @@ void SocketWorker::processIncomingData()
 
     #endif
 
-    const size_t bufferMaxSize = Nfft * 8;
+    const size_t fftwBufferMaxSize = Nfft * 8;
     for (size_t offset = PACKAGE_HEADER_SIZE; offset < pkg_data.size(); offset += 4)
     {
-        size_t remainingSpace = bufferMaxSize - ReImBuffer.size();
+        size_t remainingSpace = fftwBufferMaxSize - ReImBuffer.size();
         if (remainingSpace == 0)
         {
             break;
@@ -146,7 +146,7 @@ void SocketWorker::processIncomingData()
         ReImBuffer.insert(ReImBuffer.end(), pkg_data.begin() + offset, pkg_data.begin() + offset + bytesToCopy);
     }
 
-    if (ReImBuffer.size() == bufferMaxSize)
+    if (ReImBuffer.size() == fftwBufferMaxSize)
     {
         calculateFFTsendToUi(ReImBuffer);
         ReImBuffer.clear();
