@@ -240,12 +240,8 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &buffer)
         {
             value = 1;
         }
-
         value = 20 * log10(value);
-
-        powerSpectrumShifted[i] = value;
-
-        fftSum[i] += powerSpectrumShifted[i];
+        fftSum[i] += value;
     }
 
     fftCounter++;
