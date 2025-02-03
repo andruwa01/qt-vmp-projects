@@ -221,18 +221,7 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &buffer)
         powerSpectrumShifted[Nfft / 2 + i] = powerSpectrum[i];
     }
 
-    // perform log10 on powerSpectrumShifted
-//    std::for_each(powerSpectrumShifted.begin(), powerSpectrumShifted.end(),
-//        [](float &value)
-//        {
-//           if (value < 1)
-//           {
-//                value = 1;
-//           }
-//           value = 20 * log10(value);
-//        }
-//    );
-
+    // perform log10
     for (size_t i = 0; i < powerSpectrumShifted.size(); i++)
     {
         float value = powerSpectrumShifted[i];
@@ -262,8 +251,4 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &buffer)
 
         emit fftCalculated(powerSpectrumShifted);
     }
-
-//    qDebug() << powerSpectrumShifted;
-
-//    emit fftCalculated(powerSpectrumShifted);
 }
