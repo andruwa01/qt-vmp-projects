@@ -143,6 +143,7 @@ void SocketWorker::processIncomingData()
 
     if (ReImBuffer.size() >= fftwBufferMaxSize)
     {
+        // move data that is ready to fft on to special buffer
         std::copy(ReImBuffer.begin(), ReImBuffer.begin() + fftwBufferMaxSize, bufferTofft.begin());
         // rotate
         std::rotate(ReImBuffer.begin(), ReImBuffer.begin() + fftwBufferMaxSize, ReImBuffer.end());
