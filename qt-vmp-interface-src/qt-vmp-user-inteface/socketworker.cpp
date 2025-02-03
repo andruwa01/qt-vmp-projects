@@ -77,8 +77,6 @@ void SocketWorker::startWorker()
 
         if (FD_ISSET(socket_ctrl, &writefds)) processCommandQueue();
         if (FD_ISSET(socket_data, &readfds )) processIncomingData();
-
-//        QThread::msleep(10);
     }
 //    qDebug() << "exit while with" << "stopWork:" << stopWork << ", commandQueue.empty():" << commandQueue.empty();
 
@@ -216,7 +214,7 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &buffer)
     }
 
     // shift spectre
-    std::vector<float> powerSpectrumShifted(Nfft);
+    std::vector<float> powerSpectrumShifted(Nfft, 0);
     for (size_t i = 0; i < Nfft / 2; i++)
     {
         powerSpectrumShifted[i] = powerSpectrum[Nfft / 2 + i];
@@ -245,14 +243,14 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &buffer)
 
         value = 20 * log10(value);
 
-//        powerSpectrumShifted[i] = value;
-        fftSum[i] += value;
+        powerSpectrumShifted[i] = value;
+
+        fftSum[i] += powerSpectrumShifted[i];
     }
 
     fftCounter++;
 
 //    qDebug() << "powerSpectrumShifted after log 10: " << powerSpectrumShifted;
-//    qDebug() << fftSum;
 
     // count fft result
     if (fftCounter == AVERAGE_FFT_OVER)
@@ -262,11 +260,14 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &buffer)
             powerSpectrumShifted[i] = fftSum[i] / fftCounter;
         }
 
-        fftSum.resize(Nfft, 0);
+        std::fill(fftSum.begin(), fftSum.end(), 0);
+
         fftCounter = 0;
 
         emit fftCalculated(powerSpectrumShifted);
     }
+
+//    qDebug() << powerSpectrumShifted;
 
 //    emit fftCalculated(powerSpectrumShifted);
 }
