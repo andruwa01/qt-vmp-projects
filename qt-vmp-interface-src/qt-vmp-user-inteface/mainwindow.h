@@ -58,7 +58,7 @@ private:
 
     void setChartView();
 
-    float maxPower = 10;
-    float minPower = 0;
+    float maxPower = std::numeric_limits<float>::min();
+    float minPower = std::numeric_limits<float>::max();
 };
 #endif // MAINWINDOW_H
