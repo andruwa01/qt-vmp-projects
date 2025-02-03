@@ -8,6 +8,9 @@ SocketWorker::SocketWorker(  std::string ipv4_vmp_new
     :  QObject(parent)
     ,  clientVmp(new ClientVmp(ipv4_vmp_new, vmp_port_ctrl_new, vmp_port_data_new, frequency_new))
 {
+    ReImBuffer.reserve(N_FFT);
+    fftSum.resize(N_FFT, 0);
+
     qDebug() << "SocketWorker constructor called";
 }
 SocketWorker::~SocketWorker()
@@ -221,18 +224,49 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &buffer)
     }
 
     // perform log10 on powerSpectrumShifted
-    std::for_each(powerSpectrumShifted.begin(), powerSpectrumShifted.end(),
-        [](float &value)
+//    std::for_each(powerSpectrumShifted.begin(), powerSpectrumShifted.end(),
+//        [](float &value)
+//        {
+//           if (value < 1)
+//           {
+//                value = 1;
+//           }
+//           value = 20 * log10(value);
+//        }
+//    );
+
+    for (size_t i = 0; i < powerSpectrumShifted.size(); i++)
+    {
+        float value = powerSpectrumShifted[i];
+        if (value < 1)
         {
-           if (value < 1)
-           {
-                value = 1;
-           }
-           value = 20 * log10(value);
+            value = 1;
         }
-    );
+
+        value = 20 * log10(value);
+
+//        powerSpectrumShifted[i] = value;
+        fftSum[i] += value;
+    }
+
+    fftCounter++;
 
 //    qDebug() << "powerSpectrumShifted after log 10: " << powerSpectrumShifted;
+//    qDebug() << fftSum;
 
-    emit fftCalculated(powerSpectrumShifted);
+    // count fft result
+    if (fftCounter == AVERAGE_FFT_OVER)
+    {
+        for (size_t i = 0; i < powerSpectrumShifted.size(); i++)
+        {
+            powerSpectrumShifted[i] = fftSum[i] / fftCounter;
+        }
+
+        fftSum.resize(Nfft, 0);
+        fftCounter = 0;
+
+        emit fftCalculated(powerSpectrumShifted);
+    }
+
+//    emit fftCalculated(powerSpectrumShifted);
 }

@@ -1,4 +1,4 @@
-﻿#ifndef SOCKETWORKER_H
+#ifndef SOCKETWORKER_H
 #define SOCKETWORKER_H
 
 #include "ipInfo.h"
@@ -52,6 +52,8 @@ private:
     std::queue<CommandInfo> commandQueue;
 
     std::vector<uint8_t> ReImBuffer;
+    uint8_t fftCounter = 0;
+    std::vector<float> fftSum;
     fftwf_plan    plan;
     fftwf_complex *in   = nullptr;
     fftwf_complex *out  = nullptr;
