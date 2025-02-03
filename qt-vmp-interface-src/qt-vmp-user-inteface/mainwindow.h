@@ -34,7 +34,7 @@ signals:
     void stopWorker();
 
 public slots:
-    void drawPowerSpectrum(const std::vector<float>& powerSpectrumShifted);
+    void drawPowerSpectrum(const std::vector<float> powerSpectrumShifted);
 
 private slots:
     void actionOnButtonClicked();

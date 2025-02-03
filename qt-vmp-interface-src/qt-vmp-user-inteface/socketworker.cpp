@@ -49,9 +49,9 @@ void SocketWorker::startWorker()
     addCommandToQueue(VPrm::MessId::SetFrequency   , clientVmp->getVmpFreq());
 
     // configure fftw
-    in  = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * Nfft);
-    out = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * Nfft);
-    plan = fftwf_plan_dft_1d(Nfft, in, out, FFTW_FORWARD, FFTW_MEASURE);
+    in  = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * N_FFT);
+    out = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * N_FFT);
+    plan = fftwf_plan_dft_1d(N_FFT, in, out, FFTW_FORWARD, FFTW_MEASURE);
 
     // init structs for select()
     int socket_ctrl = clientVmp->getSocketCtrl();
@@ -79,6 +79,7 @@ void SocketWorker::startWorker()
         if (FD_ISSET(socket_ctrl, &writefds)) processCommandQueue();
         if (FD_ISSET(socket_data, &readfds )) processIncomingData();
     }
+
 //    qDebug() << "exit while with" << "stopWork:" << stopWork << ", commandQueue.empty():" << commandQueue.empty();
 
     fftwf_destroy_plan(plan);
@@ -135,7 +136,7 @@ void SocketWorker::processIncomingData()
 
     #endif
 
-    const size_t fftwBufferMaxSize = Nfft * 8;
+    const size_t fftwBufferMaxSize = N_FFT * 8;
     std::vector<uint8_t> bufferTofft(fftwBufferMaxSize);
 
     for (size_t offset = PACKAGE_HEADER_SIZE; offset < pkg_data.size(); offset++)
@@ -206,16 +207,16 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &buffer)
 
     // find power
 //    std::vector<float> powerSpectrum(Nfft, 0);
-    for (size_t i = 0; i < Nfft; i++)
+    for (size_t i = 0; i < N_FFT; i++)
     {
         float real = out[i][0];
         float imag = out[i][1];
         float abs  = std::sqrt(real * real + imag * imag);
-        powerSpectrum[i] =  std::pow(abs, 2) / Nfft;
+        powerSpectrum[i] =  std::pow(abs, 2) / N_FFT;
     }
 
     // shift spectre
-    std::rotate(powerSpectrum.begin(), powerSpectrum.begin() + Nfft / 2, powerSpectrum.end());
+    std::rotate(powerSpectrum.begin(), powerSpectrum.begin() + N_FFT / 2, powerSpectrum.end());
 
     // perform log10
     for (size_t i = 0; i < powerSpectrum.size(); i++)

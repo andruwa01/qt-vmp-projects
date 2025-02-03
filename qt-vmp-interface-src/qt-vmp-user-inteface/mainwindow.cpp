@@ -187,7 +187,7 @@ void MainWindow::setChartView()
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);
 }
 
-void MainWindow::drawPowerSpectrum(const std::vector<float>& powerSpectrumShifted)
+void MainWindow::drawPowerSpectrum(const std::vector<float> powerSpectrumShifted)
 {
 //    qDebug() << "start drawing power spectrum";
 //    qDebug() << powerSpectrumShifted;
