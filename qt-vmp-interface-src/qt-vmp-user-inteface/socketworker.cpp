@@ -227,27 +227,9 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &buffer)
             value = 1;
         }
         value = 20 * log10(value);
-        fftSum[i] += value;
+
+        fftSum[i] += (value - fftSum[i]) / AVERAGE_FFT_OVER;
     }
 
-    fftCounter++;
-
-//    qDebug() << "powerSpectrumShifted after log 10: " << powerSpectrumShifted;
-
-    // count fft result
-    if (fftCounter == AVERAGE_FFT_OVER)
-    {
-        for (size_t i = 0; i < powerSpectrum.size(); i++)
-        {
-            powerSpectrum[i] = fftSum[i] / fftCounter;
-        }
-
-        std::fill(fftSum.begin(), fftSum.end(), 0);
-
-        fftCounter = 0;
-
-        emit fftCalculated(powerSpectrum);
-    }
-
-    std::fill(powerSpectrum.begin(), powerSpectrum.end(), 0);
+    emit fftCalculated(fftSum);
 }
