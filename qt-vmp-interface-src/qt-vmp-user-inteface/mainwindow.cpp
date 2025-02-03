@@ -171,6 +171,7 @@ void MainWindow::actionOnButtonClicked()
 
 void MainWindow::setChartView()
 {
+    pointsToDraw.reserve(N_FFT);
     series = new QLineSeries;
     chart = new QChart;
     chart->legend()->hide();
@@ -186,31 +187,33 @@ void MainWindow::setChartView()
     ui->graphicsView->setRenderHint(QPainter::Antialiasing);
 }
 
-void MainWindow::drawPowerSpectrum(const std::vector<float> powerSpectrumShifted)
+void MainWindow::drawPowerSpectrum(const std::vector<float>& powerSpectrumShifted)
 {
 //    qDebug() << "start drawing power spectrum";
 //    qDebug() << powerSpectrumShifted;
 
-    QVector<QPointF> points;
+    float maxValue = std::numeric_limits<float>::min();
+    float minValue = std::numeric_limits<float>::max();
+
     int freqRange = 48000;  // Hz
     for (size_t i = 0; i < powerSpectrumShifted.size(); i++)
     {
         // center on 0 hz
         float freq = int(( (float)i / powerSpectrumShifted.size() ) * freqRange) - freqRange / 2;
-        points.push_back(QPointF(freq, powerSpectrumShifted[i]));
+        pointsToDraw.push_back(QPointF(freq, powerSpectrumShifted[i]));
+
+        maxValue = std::max(maxValue, powerSpectrumShifted[i]);
+        minValue = std::min(minValue, powerSpectrumShifted[i]);
     }
 
-    series->replace(points);
+    series->replace(pointsToDraw);
+    pointsToDraw.clear();
 
-    float maxValue = *std::max_element(powerSpectrumShifted.begin(), powerSpectrumShifted.end());
-    float minValue = *std::min_element(powerSpectrumShifted.begin(), powerSpectrumShifted.end());
-
-//    chart->axes(Qt::Vertical).first()->setRange(0, maxValue);
-
-    if (maxValue > maxPower || minValue < minPower)
+    if ( std::abs(maxValue - maxPower) > THRESHOLD || std::abs(minValue - minPower) > THRESHOLD)
     {
-        if (maxValue > maxPower) maxPower = maxValue;
-        if (minValue < minPower) minPower = minValue;
+        maxPower = maxValue;
+        minPower = minValue;
         chart->axes(Qt::Vertical).first()->setRange(minPower, maxPower);
     }
+
 }

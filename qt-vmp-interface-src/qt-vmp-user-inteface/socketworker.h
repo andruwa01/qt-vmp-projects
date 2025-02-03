@@ -33,7 +33,7 @@ public:
 
 signals:
     void workFinished();
-    void fftCalculated(const std::vector<float> powerSpectrumShifted);
+    void fftCalculated(const std::vector<float>& powerSpectrumShifted);
 
 public slots:
     void startWorker();
@@ -51,6 +51,7 @@ private:
 
     std::queue<CommandInfo> commandQueue;
 
+    std::vector<float> powerSpectrum;
     std::vector<uint8_t> ReImBuffer;
     uint8_t fftCounter = 0;
     std::vector<float> fftSum;

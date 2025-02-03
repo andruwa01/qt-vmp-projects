@@ -10,6 +10,7 @@ SocketWorker::SocketWorker(  std::string ipv4_vmp_new
 {
     ReImBuffer.reserve(N_FFT);
     fftSum.resize(N_FFT, 0);
+    powerSpectrum.resize(N_FFT, 0);
 
     qDebug() << "SocketWorker constructor called";
 }
@@ -204,7 +205,7 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &buffer)
     fftwf_execute(plan);
 
     // find power
-    std::vector<float> powerSpectrum(Nfft);
+//    std::vector<float> powerSpectrum(Nfft, 0);
     for (size_t i = 0; i < Nfft; i++)
     {
         float real = out[i][0];
@@ -214,17 +215,12 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &buffer)
     }
 
     // shift spectre
-    std::vector<float> powerSpectrumShifted(Nfft, 0);
-    for (size_t i = 0; i < Nfft / 2; i++)
-    {
-        powerSpectrumShifted[i] = powerSpectrum[Nfft / 2 + i];
-        powerSpectrumShifted[Nfft / 2 + i] = powerSpectrum[i];
-    }
+    std::rotate(powerSpectrum.begin(), powerSpectrum.begin() + Nfft / 2, powerSpectrum.end());
 
     // perform log10
-    for (size_t i = 0; i < powerSpectrumShifted.size(); i++)
+    for (size_t i = 0; i < powerSpectrum.size(); i++)
     {
-        float value = powerSpectrumShifted[i];
+        float value = powerSpectrum[i];
         if (value < 1)
         {
             value = 1;
@@ -240,15 +236,17 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &buffer)
     // count fft result
     if (fftCounter == AVERAGE_FFT_OVER)
     {
-        for (size_t i = 0; i < powerSpectrumShifted.size(); i++)
+        for (size_t i = 0; i < powerSpectrum.size(); i++)
         {
-            powerSpectrumShifted[i] = fftSum[i] / fftCounter;
+            powerSpectrum[i] = fftSum[i] / fftCounter;
         }
 
         std::fill(fftSum.begin(), fftSum.end(), 0);
 
         fftCounter = 0;
 
-        emit fftCalculated(powerSpectrumShifted);
+        emit fftCalculated(powerSpectrum);
     }
+
+    std::fill(powerSpectrum.begin(), powerSpectrum.end(), 0);
 }

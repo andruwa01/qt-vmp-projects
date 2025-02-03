@@ -34,7 +34,7 @@ signals:
     void stopWorker();
 
 public slots:
-    void drawPowerSpectrum(const std::vector<float> powerSpectrumShifted);
+    void drawPowerSpectrum(const std::vector<float>& powerSpectrumShifted);
 
 private slots:
     void actionOnButtonClicked();
@@ -44,6 +44,7 @@ private:
 
     QChart		*chart	   = nullptr;
     QLineSeries *series    = nullptr;
+    QVector<QPointF> pointsToDraw;
 
     QThread *socketWorkerThread = nullptr;
     SocketWorker *socketWorker = nullptr;
