@@ -1,8 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-//#define TEMP_PORT 5051
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -122,7 +120,7 @@ void MainWindow::actionOnButtonClicked()
 
         std::string ipVmp = ui->qline_ip->text().toStdString();
         int portVmp 	  = ui->qline_port->text().toInt();
-        int freqHz 	  = ui->qline_freq->text().toInt() * 1e3;
+        int freqHz 	  	  = ui->qline_freq->text().toInt() * 1e3;
 
         socketWorker = new SocketWorker(ipVmp, portVmp, portVmp - 1, freqHz);
         socketWorker->moveToThread(socketWorkerThread);
