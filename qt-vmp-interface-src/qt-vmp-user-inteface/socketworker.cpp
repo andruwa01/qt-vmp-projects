@@ -104,11 +104,10 @@ void SocketWorker::processCommandQueue()
     if (!currentCommand.isSent)
     {
         clientVmp->sendCommand(currentCommand);
-        currentCommand.isSent 				= true;
-        currentCommand.isWaitingForResponse = true;
+        currentCommand.isSent = true;
     }
 
-    if (currentCommand.isWaitingForResponse && FD_ISSET(socket_ctrl, &readfds))
+    if (FD_ISSET(socket_ctrl, &readfds))
     {
         clientVmp->receiveRespFromCommand(currentCommand);
         commandQueue.pop();
@@ -163,21 +162,32 @@ void SocketWorker::processIncomingData()
 
 void SocketWorker::stopWorker()
 {
-    qDebug() << "stopWorker()";
-//    addCommandToQueue(VPrm::MessId::SetRtpCtrl, 0);
+//    qDebug() << "stopWorker()";
+
     int socket_ctrl = clientVmp->getSocketCtrl();
 
     CommandInfo stopRTPCommand =
     {
         .commandByte  		  = VPrm::MessId::SetRtpCtrl,
         .params		 		  = {0},
-        .isSent      		  = true,
-        .isWaitingForResponse = true
     };
 
-    if (FD_ISSET(socket_ctrl, &writefds)) clientVmp->sendCommand(stopRTPCommand);
-    if (FD_ISSET(socket_ctrl, &readfds))  clientVmp->receiveRespFromCommand(stopRTPCommand);
 
+    // select()
+
+    if (FD_ISSET(socket_ctrl, &writefds))
+    {
+        clientVmp->sendCommand(stopRTPCommand);
+        stopRTPCommand.isSent = true;
+    }
+
+    // FIX ME
+    // wait for updating readfds from second thread
+    QThread::msleep(10);
+
+    if (FD_ISSET(socket_ctrl, &readfds)) clientVmp->receiveRespFromCommand(stopRTPCommand);
+
+    // finish second thread
     stopWork = true;
 }
 
