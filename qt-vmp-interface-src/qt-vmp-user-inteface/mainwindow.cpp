@@ -196,7 +196,6 @@ void MainWindow::drawPowerSpectrum(const std::vector<float> powerSpectrumShifted
         // center on 0 hz
         float freq = int(( (float)i / powerSpectrumShifted.size() ) * freqRange) - freqRange / 2;
         pointsToDraw.push_back(QPointF(freq, powerSpectrumShifted[i]));
-
     }
 
     series->replace(pointsToDraw);
