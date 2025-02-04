@@ -61,7 +61,7 @@ void SocketWorker::startWorker()
 
     stopWork = false;
 //    qDebug() << "start while with" << "stopWork:" << stopWork << ", commandQueue.empty(): " << commandQueue.empty();
-    while(!stopWork || !commandQueue.empty())
+    while(!stopWork)
     {
         FD_ZERO(&readfds);
         FD_ZERO(&writefds);
@@ -164,7 +164,20 @@ void SocketWorker::processIncomingData()
 void SocketWorker::stopWorker()
 {
     qDebug() << "stopWorker()";
-    addCommandToQueue(VPrm::MessId::SetRtpCtrl, 0);
+//    addCommandToQueue(VPrm::MessId::SetRtpCtrl, 0);
+    int socket_ctrl = clientVmp->getSocketCtrl();
+
+    CommandInfo stopRTPCommand =
+    {
+        .commandByte  		  = VPrm::MessId::SetRtpCtrl,
+        .params		 		  = {0},
+        .isSent      		  = true,
+        .isWaitingForResponse = true
+    };
+
+    if (FD_ISSET(socket_ctrl, &writefds)) clientVmp->sendCommand(stopRTPCommand);
+    if (FD_ISSET(socket_ctrl, &readfds))  clientVmp->receiveRespFromCommand(stopRTPCommand);
+
     stopWork = true;
 }
 
