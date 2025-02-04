@@ -172,8 +172,9 @@ void SocketWorker::stopWorker()
         .params		 		  = {0},
     };
 
-
-    // select()
+    // FIX ME
+    // wait for updating writefds from second thread
+    QThread::msleep(10);
 
     if (FD_ISSET(socket_ctrl, &writefds))
     {
