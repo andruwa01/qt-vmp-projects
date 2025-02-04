@@ -168,8 +168,8 @@ void SocketWorker::stopWorker()
 
     CommandInfo stopRTPCommand =
     {
-        .commandByte  		  = VPrm::MessId::SetRtpCtrl,
-        .params		 		  = {0},
+        .commandByte = VPrm::MessId::SetRtpCtrl,
+        .params		 = {0}
     };
 
     // FIX ME
