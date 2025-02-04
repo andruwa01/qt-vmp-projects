@@ -174,7 +174,7 @@ void SocketWorker::stopWorker()
 
     // FIX ME
     // wait for updating writefds from second thread
-    QThread::msleep(10);
+    QThread::msleep(100);
 
     if (FD_ISSET(socket_ctrl, &writefds))
     {
@@ -184,7 +184,7 @@ void SocketWorker::stopWorker()
 
     // FIX ME
     // wait for updating readfds from second thread
-    QThread::msleep(10);
+    QThread::msleep(100);
 
     if (FD_ISSET(socket_ctrl, &readfds)) clientVmp->receiveRespFromCommand(stopRTPCommand);
 
