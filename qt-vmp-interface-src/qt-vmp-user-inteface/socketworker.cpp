@@ -247,9 +247,10 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &buffer)
         {
             value = 1;
         }
+
         value = 20 * log10(value);
 
-        // moving average algorithm
+        // moving average algorithm on log10 values
         fftSum[i] += (value - fftSum[i]) / AVERAGE_FFT_OVER;
     }
 
