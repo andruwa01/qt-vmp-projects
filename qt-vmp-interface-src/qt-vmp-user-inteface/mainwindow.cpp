@@ -64,9 +64,9 @@ void MainWindow::setValidationFreq()
     // [1500, ..., 3000] MHZ
     QRegularExpression freqStrRegexp("^(1500|1[5-9][0-9]{2}|[2-9][0-9]{3}|[12][0-9]{4}|30000)$");
     QRegularExpressionValidator *freqValidator = new QRegularExpressionValidator(freqStrRegexp, this);
-    ui->qline_freq->setValidator(freqValidator);
+    ui->qline_freq_khz->setValidator(freqValidator);
 
-    connect(ui->qline_freq, &QLineEdit::textChanged, this, &MainWindow::validateInputs);
+    connect(ui->qline_freq_khz, &QLineEdit::textChanged, this, &MainWindow::validateInputs);
 }
 
 void MainWindow::setButtonBehaviour()
@@ -78,7 +78,7 @@ void MainWindow::validateInputs()
 {
     bool validStatusIp   = checkInputValid(ui->qline_ip);
     bool validStatusPort = checkInputValid(ui->qline_port);
-    bool validStatusFreq = checkInputValid(ui->qline_freq);
+    bool validStatusFreq = checkInputValid(ui->qline_freq_khz);
 
     if (validStatusIp && validStatusPort && validStatusFreq)
     {
@@ -114,13 +114,13 @@ void MainWindow::actionOnButtonClicked()
         ui->pushButton->setText("СТОП");
         ui->qline_ip->setEnabled(false);
         ui->qline_port->setEnabled(false);
-        ui->qline_freq->setEnabled(false);
+        ui->qline_freq_khz->setEnabled(false);
 
         socketWorkerThread = new QThread(this);
 
         std::string ipVmp = ui->qline_ip->text().toStdString();
         int portVmp 	  = ui->qline_port->text().toInt();
-        int freqHz 	  	  = ui->qline_freq->text().toInt() * 1e3;
+        int freqHz 	  	  = ui->qline_freq_khz->text().toInt() * 1e3;
 
         socketWorker = new SocketWorker(ipVmp, portVmp, portVmp - 1, freqHz);
         socketWorker->moveToThread(socketWorkerThread);
@@ -163,7 +163,7 @@ void MainWindow::actionOnButtonClicked()
         ui->pushButton->setText("СТАРТ");
         ui->qline_ip->setEnabled(true);
         ui->qline_port->setEnabled(true);
-        ui->qline_freq->setEnabled(true);
+        ui->qline_freq_khz->setEnabled(true);
     }
 }
 
