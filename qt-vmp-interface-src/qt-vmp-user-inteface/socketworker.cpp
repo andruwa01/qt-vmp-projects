@@ -183,7 +183,7 @@ void SocketWorker::stopWorker()
 
     if (FD_ISSET(socket_ctrl, &readfds)) clientVmp->receiveRespFromCommand(stopRTPCommand);
 
-    // finish second thread
+    // finish worker thread
     stopWork.store(true);
 }
 
