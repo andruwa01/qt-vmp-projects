@@ -58,8 +58,7 @@ void SocketWorker::startWorker()
 
     int fdmax = std::max(socket_ctrl, socket_data);
 
-    stopWork = false;
-    while(!stopWork)
+    while(!stopWork.load())
     {
         FD_ZERO(&readfds);
         FD_ZERO(&writefds);
@@ -185,7 +184,7 @@ void SocketWorker::stopWorker()
     if (FD_ISSET(socket_ctrl, &readfds)) clientVmp->receiveRespFromCommand(stopRTPCommand);
 
     // finish second thread
-    stopWork = true;
+    stopWork.store(true);
 }
 
 void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &buffer)
