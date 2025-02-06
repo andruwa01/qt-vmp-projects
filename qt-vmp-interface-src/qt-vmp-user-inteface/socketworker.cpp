@@ -90,9 +90,9 @@ void SocketWorker::startWorker()
 
 void SocketWorker::processCommandQueue()
 {
-    int socket_ctrl = clientVmp->getSocketCtrl();
-
     if (commandQueue.empty()) return;
+
+    int socket_ctrl = clientVmp->getSocketCtrl();
 
     CommandInfo &currentCommand = commandQueue.front();
 
