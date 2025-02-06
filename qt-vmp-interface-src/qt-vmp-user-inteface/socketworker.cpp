@@ -53,7 +53,6 @@ void SocketWorker::startWorker()
     out = (fftwf_complex*) fftwf_malloc(sizeof(fftwf_complex) * N_FFT);
     plan = fftwf_plan_dft_1d(N_FFT, in, out, FFTW_FORWARD, FFTW_MEASURE);
 
-    // init structs for select()
     int socket_ctrl = clientVmp->getSocketCtrl();
     int socket_data = clientVmp->getSocketData();
 
