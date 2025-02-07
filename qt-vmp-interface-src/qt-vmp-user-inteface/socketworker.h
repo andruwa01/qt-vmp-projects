@@ -58,7 +58,6 @@ private:
     fftwf_plan    plan;
     fftwf_complex *in   = nullptr;
     fftwf_complex *out  = nullptr;
-//    const size_t Nfft = N_FFT;
 
     fd_set readfds, writefds;
 };
