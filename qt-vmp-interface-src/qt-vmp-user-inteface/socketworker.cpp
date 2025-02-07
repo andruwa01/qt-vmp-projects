@@ -237,7 +237,7 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &buffer)
     // shift spectre
     std::rotate(powerSpectrum.begin(), powerSpectrum.begin() + N_FFT / 2, powerSpectrum.end());
 
-    // perform log10
+    // perform log10 and move average algorithm
     for (size_t i = 0; i < powerSpectrum.size(); i++)
     {
         float value = powerSpectrum[i];
