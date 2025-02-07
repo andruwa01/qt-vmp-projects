@@ -225,7 +225,6 @@ void SocketWorker::calculateFFTsendToUi(std::vector<uint8_t> &buffer)
     fftwf_execute(plan);
 
     // find power
-//    std::vector<float> powerSpectrum(Nfft, 0);
     for (size_t i = 0; i < N_FFT; i++)
     {
         float real = out[i][0];
