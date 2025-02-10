@@ -47,6 +47,11 @@ private:
     void processIncomingData();
 
     std::atomic<bool> stopWork = {false};
+    std::condition_variable condVar;
+    std::mutex mutex;
+    bool readyToRead;
+    bool readyToWrite;
+
     ClientVmp *clientVmp = nullptr;
 
     std::queue<CommandInfo> commandQueue;

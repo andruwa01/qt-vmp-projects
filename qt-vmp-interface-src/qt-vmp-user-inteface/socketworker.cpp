@@ -60,6 +60,12 @@ void SocketWorker::startWorker()
 
     while(!stopWork.load())
     {
+        {
+            std::lock_guard<std::mutex> lg(mutex);
+            readyToRead = false;
+            readyToWrite = false;
+        }
+
         FD_ZERO(&readfds);
         FD_ZERO(&writefds);
         FD_SET(socket_ctrl, &readfds);
@@ -72,6 +78,25 @@ void SocketWorker::startWorker()
             qCritical() << "select():" << std::strerror(errno);
             break;
         }
+
+        if (commandQueue.empty())
+        {
+            {
+                std::lock_guard<std::mutex> lg(mutex);
+                if (FD_ISSET(socket_ctrl, &writefds))
+                {
+                    readyToWrite = true;
+                }
+
+                if (FD_ISSET(socket_ctrl, &readfds))
+                {
+                    readyToRead = true;
+                }
+            }
+
+            condVar.notify_one();
+        }
+
 
         if (FD_ISSET(socket_ctrl, &writefds)) processCommandQueue();
         if (FD_ISSET(socket_data, &readfds )) processIncomingData();
@@ -167,9 +192,10 @@ void SocketWorker::stopWorker()
         .params		 = {0}
     };
 
-    // FIX ME
-    // wait for updating writefds from second thread
-    QThread::msleep(100);
+    {
+        std::unique_lock<std::mutex> ul(mutex);
+        condVar.wait(ul, [this]{ return readyToWrite; });
+    }
 
     if (FD_ISSET(socket_ctrl, &writefds))
     {
@@ -177,9 +203,11 @@ void SocketWorker::stopWorker()
         stopRTPCommand.isSent = true;
     }
 
-    // FIX ME
-    // wait for updating readfds from second thread
-    QThread::msleep(100);
+    {
+        std::unique_lock<std::mutex> ul(mutex);
+        condVar.wait(ul, [this]{ return readyToRead; });
+    }
+
 
     if (FD_ISSET(socket_ctrl, &readfds))
     {
