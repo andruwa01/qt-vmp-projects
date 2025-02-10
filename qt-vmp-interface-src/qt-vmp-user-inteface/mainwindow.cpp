@@ -122,7 +122,8 @@ void MainWindow::actionOnButtonClicked()
         int portVmp 	  = ui->qline_port->text().toInt();
         int freqHz 	  	  = ui->qline_freq_khz->text().toInt() * 1e3;
 
-        socketWorker = new SocketWorker(ipVmp, portVmp, portVmp - 1, freqHz);
+        socketWorker = new SocketWorker();
+        socketWorker->setClientVmpParams(ipVmp, portVmp, portVmp - 1, freqHz);
         socketWorker->moveToThread(socketWorkerThread);
 
         // <===== debug connections ==================================> //
