@@ -87,6 +87,7 @@ void SocketWorker::startWorker()
             break;
         }
 
+        // if we sent all commands - we need to handle case when we will send last command
         if (commandQueue.empty())
         {
             {
