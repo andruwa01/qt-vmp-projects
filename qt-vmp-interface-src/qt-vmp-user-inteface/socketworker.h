@@ -49,8 +49,8 @@ private:
     std::atomic<bool> stopWork = {false};
     std::condition_variable condVar;
     std::mutex mutex;
-    bool readyToRead;
-    bool readyToWrite;
+    bool readyToLastRead;
+    bool readyToLastWrite;
 
     ClientVmp *clientVmp = nullptr;
 

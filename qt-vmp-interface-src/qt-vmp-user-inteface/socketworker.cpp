@@ -62,8 +62,8 @@ void SocketWorker::startWorker()
     {
         {
             std::lock_guard<std::mutex> lg(mutex);
-            readyToRead = false;
-            readyToWrite = false;
+            readyToLastRead = false;
+            readyToLastWrite = false;
         }
 
         FD_ZERO(&readfds);
@@ -85,12 +85,12 @@ void SocketWorker::startWorker()
                 std::lock_guard<std::mutex> lg(mutex);
                 if (FD_ISSET(socket_ctrl, &writefds))
                 {
-                    readyToWrite = true;
+                    readyToLastWrite = true;
                 }
 
                 if (FD_ISSET(socket_ctrl, &readfds))
                 {
-                    readyToRead = true;
+                    readyToLastRead = true;
                 }
             }
 
@@ -194,7 +194,7 @@ void SocketWorker::stopWorker()
 
     {
         std::unique_lock<std::mutex> ul(mutex);
-        condVar.wait(ul, [this]{ return readyToWrite; });
+        condVar.wait(ul, [this]{ return readyToLastWrite; });
     }
 
     if (FD_ISSET(socket_ctrl, &writefds))
@@ -205,7 +205,7 @@ void SocketWorker::stopWorker()
 
     {
         std::unique_lock<std::mutex> ul(mutex);
-        condVar.wait(ul, [this]{ return readyToRead; });
+        condVar.wait(ul, [this]{ return readyToLastRead; });
     }
 
 
