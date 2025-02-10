@@ -21,6 +21,14 @@ SocketWorker::~SocketWorker()
     qDebug() << "SocketWorker destructor called";
 }
 
+void SocketWorker::setClientVmpParams(std::string ipVmp, int portVmp, int portData, int freqHz)
+{
+    clientVmp->setVmpIp(ipVmp);
+    clientVmp->setVmpCtrlPort(portVmp);
+    clientVmp->setVmpDataPort(portData);
+    clientVmp->setVmpFreq(freqHz);
+}
+
 void SocketWorker::addCommandToQueue(const int commandByte, const int32_t paramsBytes)
 {
     CommandInfo commandInfo;

@@ -254,6 +254,26 @@ int ClientVmp::getSocketData()
     return socket_data;
 }
 
+void ClientVmp::setVmpIp(std::string new_vmp_ip)
+{
+    ipv4_vmp = new_vmp_ip;
+}
+
+void ClientVmp::setVmpCtrlPort(int new_vmp_ctrl_port)
+{
+    vmp_port_ctrl = new_vmp_ctrl_port;
+}
+
+void ClientVmp::setVmpDataPort(int new_vmp_data_port)
+{
+    vmp_port_data = new_vmp_data_port;
+}
+
+void ClientVmp::setVmpFreq(int new_vmp_freq)
+{
+    vmp_frequency_hz = new_vmp_freq;
+}
+
 std::string ClientVmp::messToStr(uint8_t messId)
 {
     if(messId == VPrm::MessId::GetDiag) 			return "GetDiag";

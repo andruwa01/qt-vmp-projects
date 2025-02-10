@@ -44,8 +44,14 @@ public:
     int getVmpCtrlPort();
     int getVmpDataPort();
     int getVmpFreq();
+
     int getSocketCtrl();
     int getSocketData();
+
+    void setVmpIp(std::string new_vmp_ip);
+    void setVmpCtrlPort(int new_vmp_ctrl_port);
+    void setVmpDataPort(int new_vmp_data_port);
+    void setVmpFreq(int new_vmp_freq);
 
     void debugPrintHexPkg(std::vector<uint8_t> pkg);
 

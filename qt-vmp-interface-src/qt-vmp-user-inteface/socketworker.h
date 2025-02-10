@@ -30,6 +30,7 @@ public:
                 , QObject *parent = nullptr);
     ~SocketWorker();
 
+    void setClientVmpParams(std::string ipVmp, int portCtrl, int portData, int freqHz);
 
 signals:
     void workFinished();
