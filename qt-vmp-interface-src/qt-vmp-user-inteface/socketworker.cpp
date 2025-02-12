@@ -108,9 +108,17 @@ void SocketWorker::startWorker()
             condVar.notify_one();
         }
 
+        bool writeIsReady = false;
+        bool readyIsReady = false;
 
-        if (FD_ISSET(socket_ctrl, &writefds)) processCommandQueue();
-        if (FD_ISSET(socket_data, &readfds )) processIncomingData();
+        {
+            std::lock_guard<std::mutex> lg(mutex);
+            readyIsReady = FD_ISSET(socket_data, &readfds);
+            writeIsReady = FD_ISSET(socket_ctrl, &writefds);
+        }
+
+        if (writeIsReady) processCommandQueue();
+        if (readyIsReady) processIncomingData();
     }
 
     fftwf_destroy_plan(plan);
