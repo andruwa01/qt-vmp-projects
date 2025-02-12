@@ -68,23 +68,32 @@ void SocketWorker::startWorker()
 
     while(!stopWork.load())
     {
+//        {
+//            std::lock_guard<std::mutex> lg(mutex);
+//            readyToLastRead = false;
+//            readyToLastWrite = false;
+//        }
+
+        readyToLastRead.store(false);
+        readyToLastWrite.store(false);
+
         {
             std::lock_guard<std::mutex> lg(mutex);
-            readyToLastRead = false;
-            readyToLastWrite = false;
-        }
 
-        FD_ZERO(&readfds);
-        FD_ZERO(&writefds);
-        FD_SET(socket_ctrl, &readfds);
-        FD_SET(socket_data, &readfds);
-        FD_SET(socket_ctrl, &writefds);
+            FD_ZERO(&readfds);
+            FD_ZERO(&writefds);
+            FD_SET(socket_ctrl, &readfds);
+            FD_SET(socket_data, &readfds);
+            FD_SET(socket_ctrl, &writefds);
 
-        struct timeval timeout = {0, 10000}; // 10ms
-        if (select(fdmax + 1, &readfds, &writefds, NULL, &timeout) == -1)
-        {
-            qCritical() << "select():" << std::strerror(errno);
-            break;
+            struct timeval timeout = {0, 10000}; // 10ms
+
+            if (select(fdmax + 1, &readfds, &writefds, NULL, &timeout) == -1)
+            {
+                qCritical() << "select():" << std::strerror(errno);
+                break;
+            }
+
         }
 
         // if we sent all commands - we need to handle case when we will send last command
@@ -94,12 +103,12 @@ void SocketWorker::startWorker()
                 std::lock_guard<std::mutex> lg(mutex);
                 if (FD_ISSET(socket_ctrl, &writefds))
                 {
-                    readyToLastWrite = true;
+                    readyToLastWrite.store(true);
                 }
 
                 if (FD_ISSET(socket_ctrl, &readfds))
                 {
-                    readyToLastRead = true;
+                    readyToLastRead.store(true);
                 }
             }
             condVar.notify_one();
@@ -202,7 +211,7 @@ void SocketWorker::stopWorker()
 
     {
         std::unique_lock<std::mutex> ul(mutex);
-        condVar.wait(ul, [this]{ return readyToLastWrite; });
+        condVar.wait(ul, [this]{ return readyToLastWrite.load(); });
     }
 
     if (FD_ISSET(socket_ctrl, &writefds))
@@ -213,7 +222,7 @@ void SocketWorker::stopWorker()
 
     {
         std::unique_lock<std::mutex> ul(mutex);
-        condVar.wait(ul, [this]{ return readyToLastRead; });
+        condVar.wait(ul, [this]{ return readyToLastRead.load(); });
     }
 
 
