@@ -101,6 +101,8 @@ int ClientVmp::initSocket(std::string ipv4_vmp, const int port_vmp, const int po
 
 void ClientVmp::sendCommand(const CommandInfo &commandInfo)
 {
+    std::lock_guard<std::mutex> lg(mutexSocket);
+
     std::vector<uint8_t> command(0);
 
     makeCommand(command, commandInfo.commandByte, commandInfo.params);
@@ -149,6 +151,8 @@ void ClientVmp::makeCommand(std::vector<uint8_t> &command_pkg, uint8_t mess_id, 
 
 ssize_t ClientVmp::receiveRespFromCommand(const CommandInfo &commandInfo)
 {
+    std::lock_guard<std::mutex> lg(mutexSocket);
+
     const int command = commandInfo.commandByte;
 
     std::vector<uint8_t> buffer(MAX_UDP_SIZE);
@@ -200,6 +204,8 @@ ssize_t ClientVmp::receiveRespFromCommand(const CommandInfo &commandInfo)
 
 ssize_t ClientVmp::receiveDataPkg(std::vector<uint8_t> &pkg)
 {
+    std::lock_guard<std::mutex> lg(mutexSocket);
+
     ssize_t read_size = recv(socket_data, pkg.data(), MAX_UDP_SIZE, 0);
     if (read_size == -1)
     {

@@ -12,6 +12,7 @@
 #include <unistd.h> // close
 #include <sstream>
 #include <iomanip>
+#include <mutex>
 
 // Networking libraries
 #include <sys/types.h>  // size_t
@@ -56,6 +57,8 @@ public:
     void debugPrintHexPkg(std::vector<uint8_t> pkg);
 
 private:
+    std::mutex mutexSocket;
+
     int initSocket(std::string ipv4_vmp,  const int port_vmp, const int port_client);
     void makeCommand(std::vector<uint8_t>& command_result, uint8_t mess_id, const std::vector<uint8_t> &buffer_data);
 
