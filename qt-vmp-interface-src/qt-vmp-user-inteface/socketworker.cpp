@@ -68,12 +68,6 @@ void SocketWorker::startWorker()
 
     while(!stopWork.load())
     {
-//        {
-//            std::lock_guard<std::mutex> lg(mutex);
-//            readyToLastRead = false;
-//            readyToLastWrite = false;
-//        }
-
         readyToLastRead.store(false);
         readyToLastWrite.store(false);
 
@@ -132,6 +126,8 @@ void SocketWorker::startWorker()
 
 void SocketWorker::processCommandQueue()
 {
+    std::lock_guard<std::mutex> lg(mutex);
+
     if (commandQueue.empty()) return;
 
     int socket_ctrl = clientVmp->getSocketCtrl();
@@ -153,6 +149,8 @@ void SocketWorker::processCommandQueue()
 
 void SocketWorker::processIncomingData()
 {
+    std::lock_guard<std::mutex> lg(mutex);
+
     std::vector<uint8_t> pkg_data(MAX_UDP_SIZE);
 
     #ifdef DEBUG_FFT
@@ -214,10 +212,14 @@ void SocketWorker::stopWorker()
         condVar.wait(ul, [this]{ return readyToLastWrite.load(); });
     }
 
-    if (FD_ISSET(socket_ctrl, &writefds))
     {
-        clientVmp->sendCommand(stopRTPCommand);
-        stopRTPCommand.isSent = true;
+
+        std::lock_guard lg(mutex);
+        if (FD_ISSET(socket_ctrl, &writefds))
+        {
+            clientVmp->sendCommand(stopRTPCommand);
+            stopRTPCommand.isSent = true;
+        }
     }
 
     {
@@ -225,10 +227,13 @@ void SocketWorker::stopWorker()
         condVar.wait(ul, [this]{ return readyToLastRead.load(); });
     }
 
-
-    if (FD_ISSET(socket_ctrl, &readfds))
     {
-        clientVmp->receiveRespFromCommand(stopRTPCommand);
+        std::lock_guard<std::mutex> lg(mutex);
+        if (FD_ISSET(socket_ctrl, &readfds))
+        {
+            clientVmp->receiveRespFromCommand(stopRTPCommand);
+        }
+
     }
 
     // finish worker thread
