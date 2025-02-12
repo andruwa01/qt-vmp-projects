@@ -102,7 +102,6 @@ void SocketWorker::startWorker()
                     readyToLastRead = true;
                 }
             }
-
             condVar.notify_one();
         }
 
