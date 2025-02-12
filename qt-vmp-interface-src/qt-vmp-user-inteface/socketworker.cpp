@@ -109,16 +109,16 @@ void SocketWorker::startWorker()
         }
 
         bool writeIsReady = false;
-        bool readyIsReady = false;
+        bool readIsReady  = false;
 
         {
             std::lock_guard<std::mutex> lg(mutex);
-            readyIsReady = FD_ISSET(socket_data, &readfds);
+            readIsReady  = FD_ISSET(socket_data, &readfds);
             writeIsReady = FD_ISSET(socket_ctrl, &writefds);
         }
 
         if (writeIsReady) processCommandQueue();
-        if (readyIsReady) processIncomingData();
+        if (readIsReady)  processIncomingData();
     }
 
     fftwf_destroy_plan(plan);
