@@ -68,8 +68,9 @@ void SocketWorker::startWorker()
 
     while(!stopWork.load())
     {
-        readyToLastRead.store(false);
-        readyToLastWrite.store(false);
+//        readyToLastRead.store(false);
+//        readyToLastWrite.store(false);
+        selectPerformed.store(false);
 
         std::unique_lock<std::mutex> ul(mutex);
 
@@ -87,15 +88,16 @@ void SocketWorker::startWorker()
         }
         ul.unlock();
 
-        if (commandQueue.empty())
-        {
+//        if (commandQueue.empty())
+//        {
             ul.lock();
-            readyToLastWrite.store(FD_ISSET(socket_ctrl, &writefds));
-            readyToLastRead.store(FD_ISSET(socket_ctrl, &readfds));
+//            readyToLastWrite.store(FD_ISSET(socket_ctrl, &writefds));
+//            readyToLastRead.store(FD_ISSET(socket_ctrl, &readfds));
+            selectPerformed.store(true);
             ul.unlock();
 
             condVar.notify_one();
-        }
+//        }
 
         bool writeIsReady = false;
         bool readIsReady  = false;
@@ -204,7 +206,7 @@ void SocketWorker::stopWorker()
     // wait until select() performs in worker thread
     // and give us info that we can write to socket
     std::unique_lock<std::mutex> ul(mutex);
-    condVar.wait(ul, [this]{ return readyToLastWrite.load(); });
+    condVar.wait(ul, [this, socket_ctrl]{ return selectPerformed.load() && FD_ISSET(socket_ctrl, &writefds); });
     ul.unlock();
 
     ul.lock();
@@ -220,7 +222,7 @@ void SocketWorker::stopWorker()
     // wait until select() performs in worker thread
     // and give us info that we can read from socket
     ul.lock();
-    condVar.wait(ul, [this]{ return readyToLastRead.load(); });
+    condVar.wait(ul, [this, socket_ctrl]{ return selectPerformed.load() && FD_ISSET(socket_ctrl, &readfds); });
     ul.unlock();
 
     ul.lock();
