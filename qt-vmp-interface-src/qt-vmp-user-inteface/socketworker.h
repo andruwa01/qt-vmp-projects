@@ -48,9 +48,9 @@ private:
     void processIncomingData();
 
     std::atomic<bool> stopWork = {false};
+    std::atomic<bool> selectPerformed = {false};
     std::condition_variable selectPerformedCondVar;
     std::mutex mutex;
-    std::atomic<bool> selectPerformed = {false};
 
     ClientVmp *clientVmp = nullptr;
 

@@ -118,23 +118,17 @@ void SocketWorker::processCommandQueue()
 
     int socket_ctrl = clientVmp->getSocketCtrl();
 
-    std::unique_lock<std::mutex> ul(mutex);
-
     CommandInfo &currentCommand = commandQueue.front();
 
     if (!currentCommand.isSent)
     {
-        ul.unlock();
         clientVmp->sendCommand(currentCommand);
-        ul.lock();
         currentCommand.isSent = true;
     }
 
     if (FD_ISSET(socket_ctrl, &readfds))
     {
-        ul.unlock();
         clientVmp->receiveRespFromCommand(currentCommand);
-        ul.lock();
         commandQueue.pop();
     }
 }
