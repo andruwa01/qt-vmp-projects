@@ -80,29 +80,24 @@ void SocketWorker::startWorker()
         FD_SET(socket_ctrl, &writefds);
 
         struct timeval timeout = {0, 10000}; // 10ms
-
         if (select(fdmax + 1, &readfds, &writefds, NULL, &timeout) == -1)
         {
             qCritical() << "select():" << std::strerror(errno);
             break;
         }
-
         ul.unlock();
 
         if (commandQueue.empty())
         {
             ul.lock();
-
             if (FD_ISSET(socket_ctrl, &writefds))
             {
                 readyToLastWrite.store(true);
             }
-
             if (FD_ISSET(socket_ctrl, &readfds))
             {
                 readyToLastRead.store(true);
             }
-
             ul.unlock();
 
             condVar.notify_one();
@@ -112,10 +107,8 @@ void SocketWorker::startWorker()
         bool readIsReady  = false;
 
         ul.lock();
-
         readIsReady  = FD_ISSET(socket_data, &readfds);
         writeIsReady = FD_ISSET(socket_ctrl, &writefds);
-
         ul.unlock();
 
         if (writeIsReady) processCommandQueue();
@@ -135,8 +128,6 @@ void SocketWorker::startWorker()
 
 void SocketWorker::processCommandQueue()
 {
-    std::lock_guard<std::mutex> lg(mutex);
-
     if (commandQueue.empty()) return;
 
     int socket_ctrl = clientVmp->getSocketCtrl();
@@ -149,8 +140,10 @@ void SocketWorker::processCommandQueue()
         currentCommand.isSent = true;
     }
 
+    std::unique_lock<std::mutex> ul(mutex);
     if (FD_ISSET(socket_ctrl, &readfds))
     {
+        ul.unlock();
         clientVmp->receiveRespFromCommand(currentCommand);
         commandQueue.pop();
     }
@@ -158,8 +151,6 @@ void SocketWorker::processCommandQueue()
 
 void SocketWorker::processIncomingData()
 {
-    std::lock_guard<std::mutex> lg(mutex);
-
     std::vector<uint8_t> pkg_data(MAX_UDP_SIZE);
 
     #ifdef DEBUG_FFT
@@ -218,7 +209,6 @@ void SocketWorker::stopWorker()
 
     std::unique_lock<std::mutex> ul(mutex);
     condVar.wait(ul, [this]{ return readyToLastWrite.load(); });
-
     ul.unlock();
 
     ul.lock();
@@ -229,7 +219,6 @@ void SocketWorker::stopWorker()
         ul.lock();
         stopRTPCommand.isSent = true;
     }
-
     ul.unlock();
 
     ul.lock();
@@ -243,7 +232,6 @@ void SocketWorker::stopWorker()
         clientVmp->receiveRespFromCommand(stopRTPCommand);
         ul.lock();
     }
-
     ul.unlock();
 
     // finish worker thread
