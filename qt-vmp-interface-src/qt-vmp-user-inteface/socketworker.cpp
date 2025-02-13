@@ -200,7 +200,11 @@ void SocketWorker::stopWorker()
     // wait until select() performs in worker thread
     // and give us info that we can write to socket
     std::unique_lock<std::mutex> ul(mutex);
-    selectPerformedCondVar.wait(ul, [this, socket_ctrl]{ return selectPerformed.load() && FD_ISSET(socket_ctrl, &writefds); });
+    selectPerformedCondVar.wait(ul, [this, socket_ctrl]
+    {
+        return selectPerformed.load() && FD_ISSET(socket_ctrl, &writefds);
+    });
+
     if (FD_ISSET(socket_ctrl, &writefds))
     {
         clientVmp->sendCommand(stopRTPCommand);
@@ -209,7 +213,11 @@ void SocketWorker::stopWorker()
 
     // wait until select() performs in worker thread
     // and give us info that we can read from socket
-    selectPerformedCondVar.wait(ul, [this, socket_ctrl]{ return selectPerformed.load() && FD_ISSET(socket_ctrl, &readfds); });
+    selectPerformedCondVar.wait(ul, [this, socket_ctrl]
+    {
+        return selectPerformed.load() && FD_ISSET(socket_ctrl, &readfds);
+    });
+
     if (FD_ISSET(socket_ctrl, &readfds))
     {
         clientVmp->receiveRespFromCommand(stopRTPCommand);
