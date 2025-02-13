@@ -90,14 +90,8 @@ void SocketWorker::startWorker()
         if (commandQueue.empty())
         {
             ul.lock();
-            if (FD_ISSET(socket_ctrl, &writefds))
-            {
-                readyToLastWrite.store(true);
-            }
-            if (FD_ISSET(socket_ctrl, &readfds))
-            {
-                readyToLastRead.store(true);
-            }
+            readyToLastWrite.store(FD_ISSET(socket_ctrl, &writefds));
+            readyToLastRead.store(FD_ISSET(socket_ctrl, &readfds));
             ul.unlock();
 
             condVar.notify_one();
