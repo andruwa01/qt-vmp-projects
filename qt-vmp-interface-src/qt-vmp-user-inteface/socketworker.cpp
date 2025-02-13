@@ -207,6 +207,8 @@ void SocketWorker::stopWorker()
         .params		 = {0}
     };
 
+    // wait until select() performs in worker thread
+    // and give us info that we can write to socket
     std::unique_lock<std::mutex> ul(mutex);
     condVar.wait(ul, [this]{ return readyToLastWrite.load(); });
     ul.unlock();
@@ -221,6 +223,8 @@ void SocketWorker::stopWorker()
     }
     ul.unlock();
 
+    // wait until select() performs in worker thread
+    // and give us info that we can read from socket
     ul.lock();
     condVar.wait(ul, [this]{ return readyToLastRead.load(); });
     ul.unlock();
