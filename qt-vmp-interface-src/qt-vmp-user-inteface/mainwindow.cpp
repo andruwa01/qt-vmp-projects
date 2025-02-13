@@ -171,6 +171,7 @@ void MainWindow::actionOnButtonClicked()
 void MainWindow::setChartView()
 {
     pointsToDraw.reserve(N_FFT);
+
     series = new QLineSeries;
     chart = new QChart;
     chart->legend()->hide();
