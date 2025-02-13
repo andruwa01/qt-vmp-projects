@@ -58,7 +58,7 @@ int ClientVmp::initSocket(std::string ipv4_vmp, const int port_vmp, const int po
 
     qInfo() << "socket(): " << "created";
 
-    // set socket O_NONBLOCK
+    // set socket to O_NONBLOCK
 
     int flags = fcntl(sockfd, F_GETFL, 0);
     flags |= O_NONBLOCK;
