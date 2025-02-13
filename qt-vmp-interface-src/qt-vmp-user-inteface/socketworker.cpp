@@ -71,8 +71,9 @@ void SocketWorker::startWorker()
         readyToLastRead.store(false);
         readyToLastWrite.store(false);
 
-        {
-            std::lock_guard<std::mutex> lg(mutex);
+//        {
+//            std::lock_guard<std::mutex> lg(mutex);
+        std::unique_lock<std::mutex> ul(mutex);
 
             FD_ZERO(&readfds);
             FD_ZERO(&writefds);
@@ -88,13 +89,16 @@ void SocketWorker::startWorker()
                 break;
             }
 
-        }
+//        }
+        ul.unlock();
 
         // if we sent all commands - we need to handle case when we will send last command
         if (commandQueue.empty())
         {
-            {
-                std::lock_guard<std::mutex> lg(mutex);
+//            {
+//                std::lock_guard<std::mutex> lg(mutex);
+            ul.lock();
+
                 if (FD_ISSET(socket_ctrl, &writefds))
                 {
                     readyToLastWrite.store(true);
@@ -104,18 +108,22 @@ void SocketWorker::startWorker()
                 {
                     readyToLastRead.store(true);
                 }
-            }
+//            }
+            ul.unlock();
+
             condVar.notify_one();
         }
 
         bool writeIsReady = false;
         bool readIsReady  = false;
 
-        {
-            std::lock_guard<std::mutex> lg(mutex);
+//        {
+//            std::lock_guard<std::mutex> lg(mutex);
+        ul.lock();
             readIsReady  = FD_ISSET(socket_data, &readfds);
             writeIsReady = FD_ISSET(socket_ctrl, &writefds);
-        }
+//        }
+        ul.unlock();
 
         if (writeIsReady) processCommandQueue();
         if (readIsReady)  processIncomingData();
@@ -215,34 +223,45 @@ void SocketWorker::stopWorker()
         .params		 = {0}
     };
 
-    {
+//    {
         std::unique_lock<std::mutex> ul(mutex);
         condVar.wait(ul, [this]{ return readyToLastWrite.load(); });
-    }
+        ul.unlock();
+//    }
 
-    {
+//    {
 
-        std::lock_guard lg(mutex);
+//        std::lock_guard lg(mutex);
+        ul.lock();
         if (FD_ISSET(socket_ctrl, &writefds))
         {
+            ul.unlock();
             clientVmp->sendCommand(stopRTPCommand);
+            ul.lock();
             stopRTPCommand.isSent = true;
         }
-    }
+//    }
+        ul.unlock();
 
-    {
-        std::unique_lock<std::mutex> ul(mutex);
+//    {
+//        std::unique_lock<std::mutex> ul(mutex);
+        ul.lock();
         condVar.wait(ul, [this]{ return readyToLastRead.load(); });
-    }
+        ul.unlock();
+//    }
 
-    {
-        std::lock_guard<std::mutex> lg(mutex);
+//    {
+//        std::lock_guard<std::mutex> lg(mutex);
+        ul.lock();
         if (FD_ISSET(socket_ctrl, &readfds))
         {
+            ul.unlock();
             clientVmp->receiveRespFromCommand(stopRTPCommand);
+            ul.lock();
         }
 
-    }
+//    }
+        ul.unlock();
 
     // finish worker thread
     stopWork.store(true);
