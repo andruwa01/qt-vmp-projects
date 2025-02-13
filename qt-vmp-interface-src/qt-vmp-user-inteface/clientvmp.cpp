@@ -14,6 +14,9 @@ ClientVmp::ClientVmp(std::string ipv4_vmp_new
 
 ClientVmp::~ClientVmp()
 {
+    close(socket_ctrl);
+    close(socket_data);
+
     qDebug() << "ClientVmp destructor called";
 }
 
