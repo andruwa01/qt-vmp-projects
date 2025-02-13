@@ -135,8 +135,6 @@ void SocketWorker::startWorker()
 
 void SocketWorker::processCommandQueue()
 {
-    std::lock_guard<std::mutex> lg(mutex);
-
     if (commandQueue.empty()) return;
 
     int socket_ctrl = clientVmp->getSocketCtrl();
@@ -158,8 +156,6 @@ void SocketWorker::processCommandQueue()
 
 void SocketWorker::processIncomingData()
 {
-    std::lock_guard<std::mutex> lg(mutex);
-
     std::vector<uint8_t> pkg_data(MAX_UDP_SIZE);
 
     #ifdef DEBUG_FFT
